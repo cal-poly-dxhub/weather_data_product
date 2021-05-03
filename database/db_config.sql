@@ -192,5 +192,103 @@ CREATE TABLE TemperatureProfilerMeasurements (
 
 
 CREATE TABLE WindProfilerMeasurements (
-    
+    AssetId INT, #(integer) (nnnn)
+
+    MeasurementDateTime DATETIME, #(string) (dd/mm/yyyy hh:mm:ss)
+
+    AZ-1 DOUBLE(4,1), #Azimuth of radial (beam) 1 – 5 (float) (nnn.n)
+
+    AZ-2 DOUBLE(4,1), #Azimuth of radial (beam) 1 – 5 (float) (nnn.n)
+
+    AZ-3 DOUBLE(4,1), #Azimuth of radial (beam) 1 – 5 (float) (nnn.n)
+
+    AZ-4 DOUBLE(4,1), #Azimuth of radial (beam) 1 – 5 (float) (nnn.n)
+
+    AZ-5 DOUBLE(4,1), #Azimuth of radial (beam) 1 – 5 (float) (nnn.n)
+
+    EL-1 DOUBLE(3,1), #Elevation of radial (beam) 1 – 5 (float) (nn.n)
+
+    EL-2 DOUBLE(3,1), #Elevation of radial (beam) 1 – 5 (float) (nn.n)
+
+    EL-3 DOUBLE(3,1), #Elevation of radial (beam) 1 – 5 (float) (nn.n)
+
+    EL-4 DOUBLE(3,1), #Elevation of radial (beam) 1 – 5 (float) (nn.n)
+
+    EL-5 DOUBLE(3,1), #Elevation of radial (beam) 1 – 5 (float) (nn.n)
+
+    GateNum INT, #The number of this gate (integer) (nnn)
+
+    HT DOUBLE(6,3), #Sample height in Kilometers (floating point) (nnn.nnn)
+
+    HT_QCFLAG INT,
+
+    SPD DOUBLE(3,1), #Sample speed in meters per second (floating point) (nn.n)
+
+    SPD_QCFLAG INT,
+
+    DIR INT, #Sample direction in degrees (integer) (nnn)
+
+    DIR_QCFLAG INT,
+
+    VEL-1 DOUBLE(3,1) SIGNED, #Velocity of radial (beam) 1 in meters per second (signed floating point) (snn.n)
+
+    VEL-1_QCFLAG INT,
+
+    OBS-1 INT, #Number of observations in the radial (beam) 1 consensus (integer) (nn)
+
+    OBS-1_QCFLAG INT,
+
+    SNR-1 INT SIGNED, #Signal to Noise Ratio of radial (beam) 1 in dB (signed integer) (snn)
+
+    SNR-1_QCFLAG INT,
+
+    VEL-2 DOUBLE(3,1) SIGNED, #Velocity of radial (beam) 2 in meters per second (signed floating point) (snn.n)
+
+    VEL-2_QCFLAG INT,
+
+    OBS-2 INT, #Number of observations in the radial (beam) 2 consensus (integer) (nn)
+
+    OBS-2_QCFLAG INT,
+
+    SNR-2 INT SIGNED, #Signal to Noise Ratio of radial (beam) 2 in dB (signed integer) (snn)
+
+    SNR-2_QCFLAG INT,
+
+    VEL-3 DOUBLE(3,1) SIGNED, #Velocity of radial (beam) 3 in meters per second (signed floating point) (snn.n)
+
+    VEL-3_QCFLAG INT,
+
+    OBS-3 INT, #Number of observations in the radial (beam) 3 consensus (integer) (nn)
+
+    OBS-3_QCFLAG INT,
+
+    SNR-3 INT SIGNED, #Signal to Noise Ratio of radial (beam) 3 in dB (integer) (snn)
+
+    SNR-3_QCFLAG INT,
+
+    VEL-4 DOUBLE(3,1) SIGNED, #Velocity of radial (beam) 4 in meters per second (signed floating point) (snn.n)
+
+    VEL-4_QCFLAG INT,
+
+    OBS-4 INT, #Number of observations in the radial (beam) 4 consensus (integer) (nn)
+
+    OBS-4_QCFLAG INT,
+
+    SNR-4 INT SIGNED, #Signal to Noise Ratio of radial (beam) 4 in dB (integer) (snn)
+
+    SNR-4_QCFLAG INT,
+
+    VEL-5 DOUBLE(3,1) SIGNED, #Velocity of radial (beam) 5 in meters per second (signed floating point) (snn.n)
+
+    VEL-5_QCFLAG INT,
+
+    OBS-5 INT, #Number of observations in the radial (beam) 5 consensus (integer) (nn)
+
+    OBS-5_QCFLAG INT,
+
+    SNR-5 INT SIGNED, #Signal to Noise Ratio of radial (beam) 5 in dB (integer) (snn)
+
+    SNR-5_QCFLAG,
+
+    PRIMARY KEY (AssetId, MeasurementDateTime, GateNum)
 );
