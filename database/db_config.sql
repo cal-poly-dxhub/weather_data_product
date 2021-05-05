@@ -1,43 +1,59 @@
-/*
-CREATE TABLE TowerProductCode (
-    Code INT,
-    Description VARCHAR(256) NOT NULL,
-    Unit VARCHAR(16),
-    UnitDescription VARCHAR(256),
+CREATE TABLE `Tower` (
+    `ArchiveNumber` SMALLINT UNSIGNED PRIMARY KEY,
 
-    PRIMARY KEY (Code)
+    `TowerNumber` SMALLINT UNSIGNED,
+
+    `Latitude` DOUBLE(9,6) SIGNED,
+
+    `Longitude` DOUBLE(9,6) SIGNED,
+
+    `MSLElevation` SMALLINT SIGNED,
+
+    `Location` VARCHAR(256)
 );
 
-CREATE TABLE Tower (
-    TowerNumber INT,
-    ArchiveNumber INT,
-    Latitude DOUBLE,
-    Longitude DOUBLE,
-    MSLElevation INT,
-    Location VARCHAR(256),
+
+CREATE TABLE `TowerProductCode` (
+    `Code` SMALLINT UNSIGNED PRIMARY KEY,
+
+    `Description` VARCHAR(256),
+
+    `Unit` VARCHAR(16),
+
+    `UnitDescription` VARCHAR(256)
 );
-*/
+
 
 CREATE TABLE `TowerMeasurements` (
+    `MeasurementID` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+
     `TowerID` SMALLINT UNSIGNED,
     
     `MeasurementDate` DATE,
     
     `MeasurementTime` TIME,
-    
-    `ProductCode` SMALLINT UNSIGNED NOT NULL,
-    
-    `HeightMeasurement` SMALLINT UNSIGNED NOT NULL,
-    
-    `Value` SMALLINT,
 
-    PRIMARY KEY (`TowerId`, `MeasurementDate`, `MeasurementTime`)
+    FOREIGN KEY (`TowerID`) REFERENCES Tower(`ArchiveNumber`)
 );
 
-#optimize data types where applicable
-#abstract MxHeight->WNoise attributes to separate table to reduce data duplication? foreign key: (AssetId, MeasurementDateTime)
 
-CREATE TABLE `MiniSODARMeasurements` (
+CREATE TABLE `TowerProductCodeResponse` (
+    `MeasurementID` INT UNSIGNED,
+
+    `ProductCode` SMALLINT UNSIGNED,
+
+    `HeightMeasurement` SMALLINT UNSIGNED,
+
+    `Value` SMALLINT,
+
+    PRIMARY KEY (`MeasurementID`, `ProductCode`, `HeightMeasurement`),
+    FOREIGN KEY (`ProductCode`) REFERENCES `TowerProductCode`(`Code`)
+);
+
+# A single MiniSODAR instrument measurement at a given date/time
+CREATE TABLE `MiniSODARMeasurement` (
+    `MeasurementID` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+
     `AssetId` SMALLINT UNSIGNED, #(integer) (nnnn)
     
     `MeasurementDateTime` DATETIME, #(string) (dd/mm/yyyy hh:mm:ss)
@@ -49,6 +65,11 @@ CREATE TABLE `MiniSODARMeasurements` (
     `VNoise` SMALLINT, #Noise level of the V measurement in millivolts (int) (nnnn) [ID 0003]
     
     `WNoise` SMALLINT, #Noise level of the W measurement in millivolts (int) (nnnn) [ID 0004]
+);
+
+# A single gate response (one of many gate measurements) originating from a MiniSODAR instrument measurement
+CREATE TABLE `MiniSODARGateResponse` (
+    `MeasurementID` INT UNSIGNED,
     
     `GateNum` SMALLINT UNSIGNED, #The number of this gate (integer) (nn)
     
@@ -141,14 +162,22 @@ CREATE TABLE `MiniSODARMeasurements` (
     `SDW10_QCFLAG` BIT(3),
 
 
-    PRIMARY KEY (`AssetId`, `MeasurementDateTime`, `GateNum`)
+    PRIMARY KEY (`MeasurementID`, `GateNum`),
+    FOREIGN KEY (`MeasurementID`) REFERENCES MiniSODARMeasurement(`MeasurementID`)
 );
 
+# A single Temperature Profiler instrument measurement at a given date/time
+CREATE TABLE `TemperatureProfilerMeasurement` (
+    `MeasurementID` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 
-CREATE TABLE `TemperatureProfilerMeasurements` (
     `AssetId` SMALLINT UNSIGNED, #(integer) (nnnn)
 
-    `MeasurementDateTime` DATETIME, #(string) (dd/mm/yyyy hh:mm:ss)
+    `MeasurementDateTime` DATETIME #(string) (dd/mm/yyyy hh:mm:ss)
+);
+
+# A single gate response (one of many gate measurements) originating from a Temperature Profiler instrument measurement
+CREATE TABLE `TemperatureProfilerGateResponse` (
+    `MeasurementID` INT UNSIGNED,
 
     `GateNum` TINYINT UNSIGNED, #The number of this gate (integer) (nn)
 
@@ -192,11 +221,14 @@ CREATE TABLE `TemperatureProfilerMeasurements` (
 
     `CNT-W_QCFLAG` BIT(3),
 
-    PRIMARY KEY (`AssetId`, `MeasurementDateTime`, `GateNum`)
+    PRIMARY KEY (`MeasurementID`, `GateNum`),
+    FOREIGN KEY (`MeasurementID`) REFERENCES TemperatureProfilerMeasurement(`MeasurementID`)
 );
 
+# A single Wind Profiler instrument measurement at a given date/time
+CREATE TABLE `WindProfilerMeasurement` (
+    `MeasurementID` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 
-CREATE TABLE `WindProfilerMeasurements` (
     `AssetId` SMALLINT UNSIGNED, #(integer) (nnnn)
 
     `MeasurementDateTime` DATETIME, #(string) (dd/mm/yyyy hh:mm:ss)
@@ -219,7 +251,12 @@ CREATE TABLE `WindProfilerMeasurements` (
 
     `EL-4` DOUBLE(3,1), #Elevation of radial (beam) 1 – 5 (float) (nn.n)
 
-    `EL-5` DOUBLE(3,1), #Elevation of radial (beam) 1 – 5 (float) (nn.n)
+    `EL-5` DOUBLE(3,1) #Elevation of radial (beam) 1 – 5 (float) (nn.n)
+);
+
+# A single gate response (one of many gate measurements) originating from a Wind Profiler instrument measurement
+CREATE TABLE `WindProfilerGateResponse` (
+    `MeasurementID` INT UNSIGNED, #(string) (dd/mm/yyyy hh:mm:ss)
 
     `GateNum` SMALLINT UNSIGNED, #The number of this gate (integer) (nnn)
 
@@ -295,33 +332,147 @@ CREATE TABLE `WindProfilerMeasurements` (
 
     `SNR-5_QCFLAG` BIT(3),
 
-    PRIMARY KEY (`AssetId`, `MeasurementDateTime`, `GateNum`)
+    PRIMARY KEY (`MeasurementID`, `GateNum`),
+    FOREIGN KEY (`MeasurementID`) REFERENCES WindProfilerMeasurement(`MeasurementID`)
 );
 
-/*
+
+CREATE TABLE `Amps2Measurements` (
+    `BalloonType` VARCHAR(16),
+
+    `OperationNumber` VARCHAR(16),
+    
+    `MeasurementDate` DATE,
+    
+    `MeasurementTime` TIME,
+    
+    `GeometHeight`  MEDIUMINT UNSIGNED,
+    
+    `GeopotHeight` MEDIUMINT UNSIGNED,
+    
+    `RiseRate` DOUBLE(3,1),
+
+    `Dir` TINYINT UNSIGNED,
+
+    `SpeedFPS` DOUBLE(3,1),
+
+    `SpeedKnots` DOUBLE(3,1),
+
+    `Temp` TINYINT SIGNED,
+
+    `Dew` TINYINT SIGNED,
+
+    `BP` TINYINT SIGNED,
+
+    `RH` TINYINT,
+
+    `ABH` DOUBLE(3,2),
+
+    `DEN` DOUBLE(5,2),
+
+    `MIR` TINYINT,
+
+    `OIR` TINYINT,
+
+    `VS` TINYINT,
+
+    `Shear` DOUBLE(4,3),
+
+    `ShrDir` TINYINT,
+
+    `VP` DOUBLE(3,2),
+
+    `PW` TINYINT,
+
+    `VX` DOUBLE(3,2),
+
+    `VY` DOUBLE(3,2),
+
+    `VelErr` DOUBLE(3,1),
+
+    `Edit` TINYINT
+
+    PRIMARY KEY (`OperationNumber`, `MeasurementDate`, `MeasurementTime`)
+);
+
+#second ASOS column can be ignored
+
 CREATE TABLE ASOSMeasurements (
-    AssetId SMALLINT UNSIGNED,
+    `AssetId` SMALLINT UNSIGNED,
 
-    MeasurementDateTime DATETIME,
+    `MeasurementDateTime` DATETIME,
 
-    asos_sky_condition_report
-    asos_visibility
-    asos_tower_visibility
-    asos_present_weather
-    asos_urgent_weather
-    asos_sea_level_pressure
-    asos_dew_point
-    asos_relative_humidity
-    asos_wind_direction
-    asos_wind_speed
-    asos_magnetic_wind_direction
-    asos_magnetic_wind_speed
-    asos_altimeter_pressure_setting
-    asos_density_altitude
-    asos_pressure_altitude
-    asos_remark
-    asos_rain_rate
-    asos_temperature
+    `asos_sky_condition_report` ?,#code: 1000
 
+    `asos_sky_condition_report_QCFLAG` BIT(3),
+
+    `asos_visibility` ?,#code:1001
+
+    `asos_visibility_QCFLAG` BIT(3),
+
+    `asos_tower_visibility` ?,#code:1002
+
+    `asos_tower_visibility_QCFLAG` BIT(3),
+
+    `asos_present_weather` ?,#code:1003
+
+    `asos_present_weather_QCFLAG` BIT(3),
+
+    `asos_urgent_weather` ?,#code:1004
+
+    `asos_urgent_weather_QCFLAG` BIT(3),
+
+    `asos_sea_level_pressure` ?,#code:1005
+
+    `asos_sea_level_pressure_QCFLAG` BIT(3),
+
+    `asos_dew_point` ?,#code:1007
+
+    `asos_dew_point_QCFLAG` BIT(3),
+
+    `asos_relative_humidity` ?,#code:1008
+
+    `asos_relative_humidity_QCFLAG` BIT(3),
+
+    `asos_wind_direction` ?,#code:1009
+
+    `asos_wind_direction_QCFLAG` BIT(3),
+
+    `asos_wind_speed`  ?,#code:1010
+
+    `asos_wind_speed_QCFLAG` BIT(3),
+    
+    `asos_magnetic_wind_direction` ?,#code:1011
+
+    `asos_magnetic_wind_direction_QCFLAG` BIT(3),
+
+    `asos_magnetic_wind_speed` ?,#code:1012
+
+    `asos_magnetic_wind_speed_QCFLAG` BIT(3),
+
+    `asos_altimeter_pressure_setting` ?,#code:1013
+
+    `asos_altimeter_pressure_setting_QCFLAG` BIT(3),
+
+    `asos_density_altitude` ?,#code:1014
+
+    `asos_density_altitude_QCFLAG` BIT(3),
+
+    `asos_pressure_altitude` ?,#code:1015
+
+    `asos_pressure_altitude_QCFLAG` BIT(3),
+
+    `asos_remark` ?,#code:1016
+
+    `asos_remark_QCFLAG` BIT(3),
+
+    `asos_rain_rate` ?,#code:1018
+
+    `asos_rain_rate_QCFLAG` BIT(3)
+    
+    `asos_temperature` ?,#code:1020
+
+    `asos_temperature_QCFLAG` BIT(3),
+
+    PRIMARY KEY(`AssetId`, `MeasurementDateTime`)
 );
-*/
