@@ -22,9 +22,11 @@ miniSODAR_codes = {
 }
 
 #------------------------------------ csv --------------------------------------
-'''
+
 with open(csv_file_path, "r") as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
+
+    print("CSV!")
 
     line_num = 0
 
@@ -43,15 +45,17 @@ with open(csv_file_path, "r") as csv_file:
             print(insert_measurement_stmt)
             print("\n" + "MeasurementId returned by statement execution (ex. 123)" + "\n")
 
-            insert_stmt = """INSERT INTO MiniSODARGateResponse(MeasurementID, GateNum, HT, HT_QCFLAG, ...)
+            insert_stmt = """INSERT INTO MiniSODARGateResponse(MeasurementID, GateNum, HT, HT_QCFLAG, SPD, SPD_QCFLAG, DIR, DIR_QCFLAG, GSPD, GSPD_QCFLAG, GDIR, GDIR_QCFLAG, W, W_QCFLAG, SDW, SDW_QCFLAG, NW, NW_QCFLAG, IW, IW_QCFLAG, SNRW, SNRW_QCFLAG, U, U_QCFLAG, SDU, SDU_QCFLAG, NU, NU_QCFLAG, IU, IU_QCFLAG, SNRU, SNRU_QCFLAG, V, V_QCFLAG, SDV, SDV_QCFLAG, NV, NV_QCFLAG, IV, IV_QCFLAG, SNRV, SNRV_QCFLAG, SDW5, SDW5_QCFLAG, SDW10, SDW10_QCFLAG)
                             VALUES(123, {});""".format(", ".join(row[1:])) #skip row[0] b/c it's the row identifier
             print(insert_stmt)
             break
         
-'''
+
 #------------------------------------ raw --------------------------------------
 
 with open(raw_file_path, "r") as raw_file:
+
+    print("RAW!")
 
     file_rows = [line.split() for line in raw_file]
     
