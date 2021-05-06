@@ -1,2 +1,4 @@
 documents
 assets
+**/*.csv
+**/*.raw
