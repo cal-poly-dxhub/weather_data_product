@@ -30,7 +30,7 @@ with open(csv_file_path, "r") as csv_file:
         elif line_num == 2:
             tower_instrument['measurement_date_time'] = row[0]
 
-            insert_measurement_stmt = """INSERT INTO TowerMeasurement(TowerID, MeasurementDateTime)
+            insert_measurement_stmt = """INSERT INTO TowerMeasurements(TowerID, MeasurementDateTime)
                                         VALUES({},'{}')""".format(tower_instrument['tower_id'], tower_instrument['measurement_date_time'])
             print(insert_measurement_stmt)
             print("\n" + "MeasurementId returned by statement execution (ex. 123)" + "\n")
