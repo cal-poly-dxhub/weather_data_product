@@ -33,9 +33,7 @@ CREATE TABLE `TowerMeasurements` (
 
     `TowerID` SMALLINT UNSIGNED,
     
-    `MeasurementDate` DATE,
-    
-    `MeasurementTime` TIME,
+    `MeasurementDateTime` DATETIME,
 
     FOREIGN KEY (`TowerID`) REFERENCES Tower(`ArchiveNumber`)
 );
