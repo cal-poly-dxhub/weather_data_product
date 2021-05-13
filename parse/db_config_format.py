@@ -1,0 +1,4 @@
+RDS_HOST=""
+NAME=""
+PASSWORD=""
+DB_NAME=""
