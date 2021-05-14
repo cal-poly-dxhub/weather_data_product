@@ -2,3 +2,4 @@ documents
 assets
 **/*.csv
 **/*.raw
+**/*_config.py
