@@ -46,7 +46,7 @@ CREATE TABLE `TowerProductCodeResponse` (
 
     `HeightMeasurement` SMALLINT UNSIGNED,
 
-    `Value` SMALLINT,
+    `Value` DOUBLE,
 
     PRIMARY KEY (`MeasurementID`, `ProductCode`, `HeightMeasurement`),
     FOREIGN KEY (`MeasurementID`) REFERENCES `TowerMeasurements`(`MeasurementID`),
