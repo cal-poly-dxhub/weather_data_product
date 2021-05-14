@@ -1,10 +1,12 @@
 import csv
 import sys
+import json
 from datetime import datetime
 from db_config import RDS_HOST, NAME, PASSWORD, DB_NAME
 import pymysql
+import boto3
 
-csv_file_path = "./MetTower.0097.20210414230100.csv"
+BUCKET="dxhub-vafb-xui-weather-data-raw"
 
 tower_instrument = {
     "tower_id": None,
@@ -14,6 +16,24 @@ tower_instrument = {
 def main():
     #------------------------------------ csv --------------------------------------
     
+    s3 = boto3.client('s3')
+
+    response = s3.list_objects(
+        Bucket=BUCKET,
+        Prefix="tower/",
+        MaxKeys=1000 #should be toggled when dealing with larger sets
+    )
+
+    file_names = [val['Key'] for val in response['Contents']]
+
+    for tower in file_names:
+        response = s3.get_object(
+            Bucket=BUCKET,
+            Key=tower
+        )
+
+    return {}
+
     try:
         conn = pymysql.connect(host=RDS_HOST, user=NAME, password=PASSWORD, database=DB_NAME, connect_timeout=5)
     except Exception as e:
