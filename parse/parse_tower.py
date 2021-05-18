@@ -72,7 +72,7 @@ def insert_into_db(file_key):
             print(str(e))
         
 
-    insert_products_stmt = "INSERT INTO TowerProductCodeResponse(MeasurementID, ProductCode, HeightMeasurement, Value) VALUES({}, %s, %s, %s)".format(measurement_id)
+    insert_products_stmt = "INSERT INTO TowerCodeResponse(MeasurementID, ProductCode, HeightMeasurement, Value) VALUES({}, %s, %s, %s)".format(measurement_id)
 
     try:
         #returns the number of executions
@@ -91,12 +91,12 @@ def insert_into_db(file_key):
 
 def insert_measurement(tower_archive_num, measurement_date_time):
     #insert header information
-    insert_measurement_stmt = "INSERT INTO TowerMeasurements(TowerID, MeasurementDateTime) VALUES(%s, %s)"
+    insert_measurement_stmt = "INSERT INTO TowerMeasurement(TowerID, MeasurementDateTime) VALUES(%s, %s)"
 
     cur.execute(insert_measurement_stmt, [tower_archive_num, measurement_date_time])
     
     #grab MeasurementID to associate with the following tower product code recordings
-    select_measurement_stmt = "SELECT MAX(MeasurementID) FROM TowerMeasurements;"
+    select_measurement_stmt = "SELECT MAX(MeasurementID) FROM TowerMeasurement;"
 
     cur.execute(select_measurement_stmt)
     
