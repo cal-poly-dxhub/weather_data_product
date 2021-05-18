@@ -187,10 +187,10 @@ CREATE TABLE `MiniSODARGateResponse` (
 );
 
 #-------------------------------------------------------------------------------
-#-------------------------------- TEMP PROFILER --------------------------------
+#----------------------------------- PROFILER ----------------------------------
 #-------------------------------------------------------------------------------
 
-CREATE TABLE `TemperatureProfilerInstrument` (
+CREATE TABLE `ProfilerInstrument` (
     `AssetID` SMALLINT UNSIGNED PRIMARY KEY, #(integer) (nnnn)
 
     `TowerID` SMALLINT UNSIGNED,
@@ -200,6 +200,9 @@ CREATE TABLE `TemperatureProfilerInstrument` (
     FOREIGN KEY (`TowerID`) REFERENCES `Tower`(`ArchiveNumber`)
 );
 
+#-------------------------------------------------------------------------------
+#-------------------------------- TEMP PROFILER --------------------------------
+#-------------------------------------------------------------------------------
 
 # A single Temperature Profiler instrument measurement at a given date/time
 CREATE TABLE `TemperatureProfilerMeasurement` (
@@ -209,7 +212,7 @@ CREATE TABLE `TemperatureProfilerMeasurement` (
 
     `MeasurementDateTime` DATETIME, #(string) (dd/mm/yyyy hh:mm:ss)
 
-    FOREIGN KEY (`AssetID`) REFERENCES `TemperatureProfilerInstrument`(`AssetID`)
+    FOREIGN KEY (`AssetID`) REFERENCES `ProfilerInstrument`(`AssetID`)
 );
 
 
@@ -267,17 +270,6 @@ CREATE TABLE `TemperatureProfilerGateResponse` (
 #-------------------------------- WIND PROFILER --------------------------------
 #-------------------------------------------------------------------------------
 
-CREATE TABLE `WindProfilerInstrument` (
-    `AssetID` SMALLINT UNSIGNED PRIMARY KEY, #(integer) (nnnn)
-
-    `TowerID` SMALLINT UNSIGNED,
-
-    `Name` VARCHAR(64),
-
-    FOREIGN KEY (`TowerID`) REFERENCES `Tower`(`ArchiveNumber`)
-);
-
-
 # A single Wind Profiler instrument measurement at a given date/time
 CREATE TABLE `WindProfilerMeasurement` (
     `MeasurementID` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -306,7 +298,7 @@ CREATE TABLE `WindProfilerMeasurement` (
 
     `EL-5` DOUBLE(3,1), #Elevation of radial (beam) 1 – 5 (float) (nn.n)
 	
-    FOREIGN KEY (`AssetID`) REFERENCES `WindProfilerInstrument`(`AssetID`)
+    FOREIGN KEY (`AssetID`) REFERENCES `ProfilerInstrument`(`AssetID`)
 );
 
 
