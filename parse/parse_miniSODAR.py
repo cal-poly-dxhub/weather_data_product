@@ -132,25 +132,6 @@ def upload_csv(file_key):
     return response
 
 
-def insert_measurement(miniSODAR_instrument):
-    insert_measurement_stmt = """INSERT INTO MiniSODARMeasurement(AssetId, MeasurementDateTime, MxHeight, UNoise, VNoise, WNoise)
-                                VALUES(%s, %s, %s, %s, %s, %s)"""
-    insert_args = [
-        miniSODAR_instrument['asset_id'],
-        miniSODAR_instrument['measurement_date_time'],
-        miniSODAR_instrument['mx_height'],
-        miniSODAR_instrument['u_noise'],
-        miniSODAR_instrument['v_noise'],
-        miniSODAR_instrument['w_noise']
-    ]
-    cur.execute(insert_measurement_stmt, insert_args)
-
-    select_measurement_stmt = "SELECT MAX(MeasurementID) FROM MiniSODARMeasurement;"
-    cur.execute(select_measurement_stmt)
-
-    return cur.fetchone()[0]
-
-
 def get_asset_id(asset_name):
     asset_search = "SELECT AssetID FROM MiniSODARInstrument WHERE `Name` = %s"
     cur.execute(asset_search, [asset_name])
@@ -164,6 +145,7 @@ def upload_raw(file_key):
         Key=file_key
     )
 
+    #use asset name in filename to grab asset id
     asset_name = file_key.split('.')[1]
     asset_id = get_asset_id(asset_name)
 
@@ -199,6 +181,7 @@ def upload_raw(file_key):
     insertions = []
     gate_num = 0
 
+    #each iteration is a cleaned row of gate record data (not including the last array of empty space)
     for gate_record in [ line[1:] for line in lines[4:len(lines) - 1] ]:
         gate_num += 1
         attributes = [gate_num] + gate_record
@@ -206,7 +189,9 @@ def upload_raw(file_key):
         insertions.append( attributes )
 
     insert_gate_records = """INSERT INTO `MiniSODARGateResponse`(`MeasurementID`,`GateNum`, {})
-                            VALUES({}, {});""".format(", ".join(lines[3][1:]), str(measurement_id), ", ".join(["%s" for attr in range(len(lines[3][1:]) + 1)]))
+                            VALUES({}, {});""".format(", ".join(lines[3][1:]),
+                                                        str(measurement_id),
+                                                        ", ".join(["%s" for attr in range(len(lines[3][1:]) + 1)]))
 
     try:
         response = cur.executemany(insert_gate_records, insertions)
@@ -220,41 +205,24 @@ def upload_raw(file_key):
     return response
 
 
-    '''
+def insert_measurement(miniSODAR_instrument):
+    insert_measurement_stmt = """INSERT INTO MiniSODARMeasurement(AssetId, MeasurementDateTime, MxHeight, UNoise, VNoise, WNoise)
+                                VALUES(%s, %s, %s, %s, %s, %s)"""
+    insert_args = [
+        miniSODAR_instrument['asset_id'],
+        miniSODAR_instrument['measurement_date_time'],
+        miniSODAR_instrument['mx_height'],
+        miniSODAR_instrument['u_noise'],
+        miniSODAR_instrument['v_noise'],
+        miniSODAR_instrument['w_noise']
+    ]
+    cur.execute(insert_measurement_stmt, insert_args)
 
-    #------------------------------------ raw --------------------------------------
+    select_measurement_stmt = "SELECT MAX(MeasurementID) FROM MiniSODARMeasurement;"
+    cur.execute(select_measurement_stmt)
 
-    with open(raw_file_path, "r") as raw_file:
+    return cur.fetchone()[0]
 
-        print("RAW!")
-
-        file_rows = [line.split() for line in raw_file]
-        
-        miniSODAR_instrument = {
-            "asset_id": None,
-            "measurement_date_time": " ".join(file_rows[0][1:3]),
-            "mx_height": file_rows[2][10],
-            "u_noise": file_rows[2][12],
-            "v_noise": file_rows[2][14],
-            "w_noise": file_rows[2][16]
-        }
-
-        insert_measurement_stmt = """INSERT INTO MiniSODARMeasurement(AssetId, MeasurementDateTime, MxHeight, UNoise, VNoise, WNoise)
-                                    VALUES({}, '{}', {}, {}, {}, {})""".format(miniSODAR_instrument['asset_id'], miniSODAR_instrument['measurement_date_time'], miniSODAR_instrument['mx_height'], miniSODAR_instrument['u_noise'], miniSODAR_instrument['v_noise'], miniSODAR_instrument['w_noise'])
-
-        print(insert_measurement_stmt)
-        print("\n" + "MeasurementId returned by statement execution (ex. 123)" + "\n")
-
-        data = file_rows[4:]
-
-        insert_stmt = """INSERT INTO MiniSODARGateResponse(MeasurementID, GateNum, HT, ...)
-                        VALUES(123, {});""".format(", ".join(data[0])) #skip row[0] b/c it's the row identifier
-        print(insert_stmt)
-
-
-        #data = [line.split() for line in raw_file][4:]
-        #print(data)
-    '''
 
 if __name__ == "__main__":
     main()
