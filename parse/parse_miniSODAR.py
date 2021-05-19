@@ -1,4 +1,5 @@
 import sys
+import re
 from datetime import datetime
 from db_config import RDS_HOST, NAME, PASSWORD, DB_NAME
 import pymysql
@@ -54,8 +55,8 @@ def main():
     for measurement in csv:
         successful_inserts += upload_csv(measurement)
     
-    #for measurement in raw:
-    #    print("handle raw measurement: {}".format(measurement))
+    for measurement in raw:
+        successful_inserts += upload_raw(measurement)
 
     print("{0} file(s) were parsed with {1} total insertion(s)".format( str(len(file_names)), str(successful_inserts) ))
 
@@ -92,7 +93,7 @@ def upload_csv(file_key):
         return 0
     
     try:
-        measurement_id = insert_measurement(miniSODAR_instrument)
+        measurement_id = insert_measurement(miniSODAR_instrument.copy())
     except Exception as e:
         print("Could not insert miniSODAR measurement: {}".format(miniSODAR_instrument))
         print(e)
@@ -100,14 +101,14 @@ def upload_csv(file_key):
 
     insertions = []
 
-    for row in lines[7:]:
+    for row in lines[7:len(lines) - 1]:
         try:
             if miniSODAR_codes.get(row[0]) == "gate_record":
                 insertions.append( row.split(',')[1:] )
             else:
                 print("encountered gate_record without proper gate code: {}".format(row))
         except Exception as e:
-            print("exception occured with lin: {}".format(row))
+            print("exception occured with line: {}".format(e))
     
     insert_gate_records = """INSERT INTO `MiniSODARGateResponse`(`MeasurementID`,`GateNum`,`HT`,`HT_QCFLAG`,`SPD`,`SPD_QCFLAG`,`DIR`,`DIR_QCFLAG`,`GSPD`,`GSPD_QCFLAG`,
                                                                 `GDIR`,`GDIR_QCFLAG`,`W`,`W_QCFLAG`,`SDW`,`SDW_QCFLAG`,`NW`,`NW_QCFLAG`,`IW`,`IW_QCFLAG`,
@@ -128,7 +129,6 @@ def upload_csv(file_key):
         print(str(e))
 
     conn.commit()
-    print(response)
     return response
 
 
@@ -150,15 +150,74 @@ def insert_measurement(miniSODAR_instrument):
 
     return cur.fetchone()[0]
 
+
+def get_asset_id(asset_name):
+    asset_search = "SELECT AssetID FROM MiniSODARInstrument WHERE `Name` = %s"
+    cur.execute(asset_search, [asset_name])
+
+    return cur.fetchone()[0]
+
+
 def upload_raw(file_key):
     response = s3.get_object(
         Bucket=BUCKET,
         Key=file_key
     )
 
-    lines = response['Body'].read().decode('utf-8').split('\n')
+    asset_name = file_key.split('.')[1]
+    asset_id = get_asset_id(asset_name)
 
-    return lines
+    lines = [re.split('\s+',line) for line in response['Body'].read().decode('utf-8').split('\n')]
+   
+   #verify full header
+    if len(lines) < 4: #invalid raw file header
+        print("file <{}> doesn't contain enough gate record data".format(file_key))
+        return 0
+
+    try:
+        miniSODAR_instrument = {
+            "asset_id": asset_id,
+            "measurement_date_time": datetime.strftime(datetime.strptime(lines[0][1] + " " +  lines[0][2], "%m/%d/%Y %H:%M:%S"), "%Y-%m-%d %H:%M:%S"),
+            "mx_height": lines[2][lines[2].index("MXHT") + 1],
+            "u_noise": lines[2][lines[2].index("UNOISE") + 1],
+            "v_noise": lines[2][lines[2].index("VNOISE") + 1],
+            "w_noise": lines[2][lines[2].index("WNOISE") + 1]
+        }
+    except Exception as e:
+        print("could not parse header information")
+        print(lines[2])
+        print(e)
+        return 0
+
+    try:
+        measurement_id = insert_measurement(miniSODAR_instrument.copy())
+    except Exception as e:
+        print("Could not insert miniSODAR measurement: {}".format(miniSODAR_instrument))
+        print(e)
+        return 0
+
+    insertions = []
+    gate_num = 0
+
+    for gate_record in [ line[1:] for line in lines[4:len(lines) - 1] ]:
+        gate_num += 1
+        attributes = [gate_num] + gate_record
+
+        insertions.append( attributes )
+
+    insert_gate_records = """INSERT INTO `MiniSODARGateResponse`(`MeasurementID`,`GateNum`, {})
+                            VALUES({}, {});""".format(", ".join(lines[3][1:]), str(measurement_id), ", ".join(["%s" for attr in range(len(lines[3][1:]) + 1)]))
+
+    try:
+        response = cur.executemany(insert_gate_records, insertions)
+        if response < len(insertions):
+            raise Exception("{} dropped execution(s)".format(str(len(insertions) - response)))
+    except Exception as e:
+        print("Failed to execute all insertions for file: {}".format(file_key))
+        print(str(e))
+
+    conn.commit()
+    return response
 
 
     '''
