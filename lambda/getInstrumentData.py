@@ -175,36 +175,46 @@ def get_minisodar_measurements(asset_id, start_date_time_utc = None, end_date_ti
 
 
 def get_gate_responses(measurement_id):
-    gate_responses_stmt = """SELECT `MiniSODARGateResponse`.`MeasurementID`,
-                                    `MiniSODARGateResponse`.`GateNum`,
-                                    `MiniSODARGateResponse`.`HT`,
-                                    `MiniSODARGateResponse`.`SPD`,
-                                    `MiniSODARGateResponse`.`DIR`,
-                                    `MiniSODARGateResponse`.`GSPD`,
-                                    `MiniSODARGateResponse`.`GDIR`,
-                                    `MiniSODARGateResponse`.`W`,
-                                    `MiniSODARGateResponse`.`SDW`,
-                                    `MiniSODARGateResponse`.`NW`,
-                                    `MiniSODARGateResponse`.`IW`,
-                                    `MiniSODARGateResponse`.`SNRW`,
-                                    `MiniSODARGateResponse`.`U`,
-                                    `MiniSODARGateResponse`.`SDU`,
-                                    `MiniSODARGateResponse`.`NU`,
-                                    `MiniSODARGateResponse`.`IU`,
-                                    `MiniSODARGateResponse`.`SNRU`,
-                                    `MiniSODARGateResponse`.`V`,
-                                    `MiniSODARGateResponse`.`SDV`,
-                                    `MiniSODARGateResponse`.`NV`,
-                                    `MiniSODARGateResponse`.`IV`,
-                                    `MiniSODARGateResponse`.`SNRV`,
-                                    `MiniSODARGateResponse`.`SDW5`,
-                                    `MiniSODARGateResponse`.`SDW10`
+    attributes = [
+        "GateNum",
+        "HT",
+        "SPD",
+        "DIR",
+        "GSPD",
+        "GDIR",
+        "W",
+        "SDW",
+        "NW",
+        "IW",
+        "SNRW",
+        "U",
+        "SDU",
+        "NU",
+        "IU",
+        "SNRU",
+        "V",
+        "SDV",
+        "NV",
+        "IV",
+        "SNRV",
+        "SDW5",
+        "SDW10"
+    ]
+    gate_responses_stmt = """SELECT {}
                             FROM `MiniSODARGateResponse`
-                            WHERE MeasurementID = %s;"""
+                            WHERE MeasurementID = %s;""".format(",".join(attributes))
     cur.execute(gate_responses_stmt, [measurement_id])
 
     response = cur.fetchall()
-    return [[gate_response] for gate_response in response]
+    record_data = []
+    gate = {}
+
+    for gate_response in response:
+        for i in range(len(attributes)):
+            gate[attributes[i]] = gate_response[i]
+        record_data.append( gate.copy() )
+
+    return record_data
 
 
 
