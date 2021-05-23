@@ -2,11 +2,15 @@ import sys
 from datetime import datetime
 from db_config import RDS_HOST, NAME, PASSWORD, DB_NAME
 import pymysql
+import logging
 import boto3
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 BUCKET="dxhub-vafb-xui-weather-data-raw"
 
-s3 = boto3.client('s3')
+s3 = boto3.resource('s3')
 
 try:
     conn = pymysql.connect(host=RDS_HOST, user=NAME, password=PASSWORD, database=DB_NAME, connect_timeout=5)
@@ -17,23 +21,28 @@ except Exception as e:
     print(str(e))
     sys.exit()
 
-def main():
+
+def lambda_handler(event, context):
     #------------------------------------ csv --------------------------------------
+    #get() does not store in memory
+    try:
+        key = event['Records'][0]['s3']['object']['key']
+        obj = s3.Object(BUCKET, key).get()['Body']
+    except Exception as e:
+        logger.error("key: {}".format(key))
+        logger.error(e)
+        logger.error("S3 Object could not be opened.")
+        sys.exit()
+
     successful_inserts = 0
 
-    response = s3.list_objects(
-        Bucket=BUCKET,
-        Prefix="tower/",
-        MaxKeys=1000 #should be toggled when dealing with larger sets
-    )
+    try:
+        successful_inserts = insert_into_db(key)
+    except Exception as e:
+        logger.error("{0}: {1}".format(key, e))
+        sys.exit()
 
-    file_names = [val['Key'] for val in response['Contents']]
-
-    for tower in file_names:
-        #for presentation, insert_into_db returns # of insertions performed per file
-        successful_inserts += insert_into_db(tower)
-
-    print("{0} file(s) were parsed with {1} total insertion(s)".format( str(len(file_names)), str(successful_inserts) ))
+    logger.info("{0} was successfully parsed with {1} total insertion(s)".format(key, str(successful_inserts) ))
     
     conn.close()
     return None
@@ -74,15 +83,11 @@ def insert_into_db(file_key):
 
     insert_products_stmt = "INSERT INTO TowerCodeResponse(MeasurementID, ProductCode, HeightMeasurement, Value) VALUES({}, %s, %s, %s)".format(measurement_id)
 
-    try:
-        #returns the number of executions
-        response = cur.executemany(insert_products_stmt, insertions)
-        
-        if response < len(insertions):
-            raise Exception("{} dropped execution(s)".format(str(len(insertions) - response)))
-    except Exception as e:
-        print("Failed to execute all insertions for file: {}".format(file_key))
-        print(str(e))
+    #returns the number of executions
+    response = cur.executemany(insert_products_stmt, insertions)
+    
+    if response < len(insertions):
+        raise Exception("{} dropped execution(s)".format(str(len(insertions) - response)))
 
     conn.commit()
 
