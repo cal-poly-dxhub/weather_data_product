@@ -82,7 +82,7 @@ def lambda_handler(event, context):
             return request_error(response, 400, "could not determine instrument info from assetId")
         
         try:
-            body['tower'] = get_tower(body['instrument']['towerId'])
+            body['tower'] = get_tower(body['instrument']['tower_id'])
         except Exception as e:
             logger.error(e)
             return request_error(response, 500, "asset ID in DB not connected to a tower")
@@ -108,9 +108,9 @@ def get_instrument(asset_id):
     response = cur.fetchone()
 
     instrument = {
-        "assetId": response[0],
-        "towerId": response[1],
-        "assetName": response[2]
+        "asset_id": response[0],
+        "tower_id": response[1],
+        "asset_name": response[2]
     }
     return instrument
 
