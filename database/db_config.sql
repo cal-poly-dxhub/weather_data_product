@@ -33,6 +33,8 @@ CREATE TABLE `TowerMeasurement` (
 
     `TowerID` SMALLINT UNSIGNED,
     
+    `FileLocation` VARCHAR(128),
+    
     `MeasurementDateTime` DATETIME,
 
     FOREIGN KEY (`TowerID`) REFERENCES Tower(`ArchiveNumber`)
@@ -72,6 +74,8 @@ CREATE TABLE `MiniSODARInstrument` (
 CREATE TABLE `MiniSODARMeasurement` (
     `MeasurementID` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 
+	`FileLocation` VARCHAR(128),
+
     `AssetID` SMALLINT UNSIGNED, #(integer) (nnnn)
     
     `MeasurementDateTime` DATETIME, #(string) (dd/mm/yyyy hh:mm:ss)
@@ -83,7 +87,7 @@ CREATE TABLE `MiniSODARMeasurement` (
     `VNoise` SMALLINT, #Noise level of the V measurement in millivolts (int) (nnnn) [ID 0003]
     
     `WNoise` SMALLINT, #Noise level of the W measurement in millivolts (int) (nnnn) [ID 0004]
-	
+    
     FOREIGN KEY (`AssetID`) REFERENCES `MiniSODARInstrument`(`AssetID`)
 );
 
@@ -207,11 +211,13 @@ CREATE TABLE `ProfilerInstrument` (
 # A single Temperature Profiler instrument measurement at a given date/time
 CREATE TABLE `TemperatureProfilerMeasurement` (
     `MeasurementID` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    
+    `FileLocation` VARCHAR(128),
 
     `AssetID` SMALLINT UNSIGNED, #(integer) (nnnn)
 
     `MeasurementDateTime` DATETIME, #(string) (dd/mm/yyyy hh:mm:ss)
-
+    
     FOREIGN KEY (`AssetID`) REFERENCES `ProfilerInstrument`(`AssetID`)
 );
 
@@ -273,6 +279,8 @@ CREATE TABLE `TemperatureProfilerGateResponse` (
 # A single Wind Profiler instrument measurement at a given date/time
 CREATE TABLE `WindProfilerMeasurement` (
     `MeasurementID` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    
+    `FileLocation` VARCHAR(128),
 
     `AssetID` SMALLINT UNSIGNED, #(integer) (nnnn)
 
@@ -297,7 +305,7 @@ CREATE TABLE `WindProfilerMeasurement` (
     `EL-4` DOUBLE(3,1), #Elevation of radial (beam) 1 – 5 (float) (nn.n)
 
     `EL-5` DOUBLE(3,1), #Elevation of radial (beam) 1 – 5 (float) (nn.n)
-	
+    
     FOREIGN KEY (`AssetID`) REFERENCES `ProfilerInstrument`(`AssetID`)
 );
 
@@ -390,6 +398,8 @@ CREATE TABLE `WindProfilerGateResponse` (
 /*
 CREATE TABLE `Amps2Measurements` (
    # `BalloonType` VARCHAR(16),
+   
+   `FileLocation` VARCHAR(128),
 
    # `OperationNumber` VARCHAR(16),
     
@@ -441,11 +451,7 @@ CREATE TABLE `Amps2Measurements` (
 
     `Edit` TINYINT,
     
-    `TowerID` SMALLINT,
-
     PRIMARY KEY (`OperationNumber`, `MeasurementDateTime`),
-    
-    FOREIGN KEY (`TowerID`) REFERENCES `Tower`(`ArchiveNumber`)
 );
 */
 #-------------------------------------------------------------------------------
@@ -462,10 +468,11 @@ CREATE TABLE `AsosInstrument` (
     FOREIGN KEY (`TowerID`) REFERENCES `Tower`(`ArchiveNumber`)
 );
 
-#second ASOS column (csv files) can be ignored
 
 CREATE TABLE `AsosMeasurements` (
     `AssetID` SMALLINT UNSIGNED,
+    
+    `FileLocation` VARCHAR(128),
 
     `MeasurementDateTime` DATETIME,
 
@@ -540,7 +547,8 @@ CREATE TABLE `AsosMeasurements` (
     `asos_temperature` DOUBLE(4,1), #code:1020 (floating point) (nnn.n) [F]
 
     `asos_temperature_QCFLAG` BIT(3),
-
+    
     PRIMARY KEY(`AssetID`, `MeasurementDateTime`),
+    
     FOREIGN KEY (`AssetID`) REFERENCES `AsosInstrument`(`AssetID`)
 );
