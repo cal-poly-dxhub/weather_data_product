@@ -66,7 +66,7 @@ def insert_into_db(file_key):
     measurement_date_time = datetime.strftime(datetime.strptime(lines[1], "%d/%m/%Y %H:%M:%S"), "%Y-%m-%d %H:%M:%S")
 
     #returns the ID associated from the newly-created record
-    measurement_id = insert_measurement(tower_archive_num, measurement_date_time)
+    measurement_id = insert_measurement(tower_archive_num, measurement_date_time, file_key)
 
     insertions = []
 
@@ -94,11 +94,11 @@ def insert_into_db(file_key):
     return response
 
 
-def insert_measurement(tower_archive_num, measurement_date_time):
+def insert_measurement(tower_archive_num, measurement_date_time, file_key):
     #insert header information
-    insert_measurement_stmt = "INSERT INTO TowerMeasurement(TowerID, MeasurementDateTime) VALUES(%s, %s)"
+    insert_measurement_stmt = "INSERT INTO TowerMeasurement(TowerID, FileLocation, MeasurementDateTime) VALUES(%s, %s, %s)"
 
-    cur.execute(insert_measurement_stmt, [tower_archive_num, measurement_date_time])
+    cur.execute(insert_measurement_stmt, [tower_archive_num, file_key, measurement_date_time])
     
     #grab MeasurementID to associate with the following tower product code recordings
     select_measurement_stmt = "SELECT MAX(MeasurementID) FROM TowerMeasurement;"
@@ -106,7 +106,3 @@ def insert_measurement(tower_archive_num, measurement_date_time):
     cur.execute(select_measurement_stmt)
     
     return cur.fetchone()[0]
-
-
-if __name__ == "__main__":
-    main()
