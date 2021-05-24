@@ -40,9 +40,8 @@ def lambda_handler(event, context):
         successful_inserts = insert_into_db(key)
     except Exception as e:
         logger.error("{0}: {1}".format(key, e))
-        sys.exit()
 
-    logger.info("{0} was successfully parsed with {1} total insertion(s)".format(key, str(successful_inserts) ))
+    logger.info("{0} was parsed with {1} total insertion(s)".format(key, str(successful_inserts) ))
     
     conn.close()
     return None
@@ -72,13 +71,10 @@ def insert_into_db(file_key):
 
     #iterate over slice not including header to build list of data to perform bulk insert
     for row in lines[2:]:
-        try:
-            #validate row[0] is a product code before appending to the insertion set?
-            if len(row) >= 3:
-                insertions.append( row.split(',')[:3] )
-        except Exception as e:
-            print("exception occurred with line: {}".format(row))
-            print(str(e))
+        if len(row) >= 3:
+            insertions.append( row.split(',')[:3] )
+        else:
+            logger.error("row in improper format; expected 3 entries: {}".format(row))
         
 
     insert_products_stmt = "INSERT INTO TowerCodeResponse(MeasurementID, ProductCode, HeightMeasurement, Value) VALUES({}, %s, %s, %s)".format(measurement_id)
