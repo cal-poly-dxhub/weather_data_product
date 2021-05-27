@@ -41,7 +41,7 @@ CREATE TABLE `TowerMeasurement` (
 );
 
 
-CREATE TABLE `TowerCodeResponse` (
+CREATE TABLE `TowerGateResponse` (
     `MeasurementID` INT UNSIGNED,
 
     `ProductCode` SMALLINT UNSIGNED,
