@@ -56,32 +56,23 @@ def lambda_handler(event. context):
     
     try:
         key = event['Records'][0]['s3']['object']['key']
+
+        file_type = key.split(".")[-1]
     except Exception as e:
         logger.error("key: {}".format(key))
         logger.error(e)
-        logger.error("S3 Object could not be opened.")
         sys.exit()
 
     successful_inserts = 0
 
-    response = s3.list_objects(
-        Bucket=BUCKET,
-        Prefix="mini-sodar/",
-        MaxKeys=1000 #should be toggled when dealing with larger sets
-    )
+    if file_type == "csv":
+        successful_inserts = upload_csv(key)
+    elif file_type == "raw":
+        successful_inserts = upload_raw(key)
+    else:
+        logger.error("unknown file type <{}> from file: {}".format(file_type, key))
 
-    file_names = [val['Key'] for val in response['Contents']]
-
-    csv = [file for file in file_names if file.endswith(".csv")]
-    raw = [file for file in file_names if file.endswith(".raw")]
-
-    for measurement in csv:
-        successful_inserts += upload_csv(measurement)
-    
-    for measurement in raw:
-        successful_inserts += upload_raw(measurement)
-
-    print("{0} file(s) were parsed with {1} total insertion(s)".format( str(len(file_names)), str(successful_inserts) ))
+    print("{0} was parsed with {1} total insertion(s)".format( key, str(successful_inserts) ))
 
     return None
 
