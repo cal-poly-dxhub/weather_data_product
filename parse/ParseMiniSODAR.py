@@ -52,11 +52,9 @@ except Exception as e:
     print(str(e))
     sys.exit()
 
-def lambda_handler(event. context):
-    
+def lambda_handler(event, context):
     try:
         key = event['Records'][0]['s3']['object']['key']
-
         file_type = key.split(".")[-1]
     except Exception as e:
         logger.error("key: {}".format(key))
@@ -74,6 +72,7 @@ def lambda_handler(event. context):
 
     print("{0} was parsed with {1} total insertion(s)".format( key, str(successful_inserts) ))
 
+    conn.close()
     return None
 
 
@@ -84,22 +83,23 @@ def upload_csv(file_key):
     )
 
     lines = response['Body'].read().decode('utf-8').split('\n')
+    lines = [line.split(",") for line in lines]
 
     #verify full header
     if (len(lines) < 7 or                               #invalid csv file header
-        len(lines[6].split(',')) < 2 or                 #invalid gate_num specification
-        len(lines) < (7 + int(lines[6].split(',')[1]))):#file size does not match header specification
+        len(lines[6]) < 2 or                 #invalid gate_num specification
+        len(lines) < (7 + int(lines[6][1]))):#file size does not match header specification
         print("file <{}> doesn't contain enough gate record data".format(file_key))
         return 0
     
     try:
         miniSODAR_instrument = {
-            "asset_id": int(lines[0]),
-            "measurement_date_time": datetime.strftime(datetime.strptime(lines[1], "%d/%m/%Y %H:%M:%S"), "%Y-%m-%d %H:%M:%S"),
-            "mx_height": lines[2].split(',')[1],
-            "u_noise": lines[3].split(',')[1],
-            "v_noise": lines[4].split(',')[1],
-            "w_noise": lines[5].split(',')[1]
+            "asset_id": int(lines[0][0]),
+            "measurement_date_time": datetime.strftime(parse(lines[1][0], dayfirst=True), "%Y-%m-%d %H:%M:%S"),
+            "mx_height": lines[2][1],
+            "u_noise": lines[3][1],
+            "v_noise": lines[4][1],
+            "w_noise": lines[5][1]
         }
     except Exception as e:
         print("could not parse header information")
@@ -107,7 +107,7 @@ def upload_csv(file_key):
         return 0
     
     try:
-        measurement_id = insert_measurement(miniSODAR_instrument.copy())
+        measurement_id = insert_measurement(miniSODAR_instrument.copy(), file_key)
     except Exception as e:
         print("Could not insert miniSODAR measurement: {}".format(miniSODAR_instrument))
         print(e)
@@ -118,7 +118,7 @@ def upload_csv(file_key):
     for row in lines[7:len(lines) - 1]:
         try:
             if miniSODAR_codes.get(row[0]) == "gate_record":
-                insertions.append( row.split(',')[1:] )
+                insertions.append( row[1:] )
             else:
                 print("encountered gate_record without proper gate code: {}".format(row))
         except Exception as e:
@@ -135,15 +135,15 @@ def upload_csv(file_key):
                                     %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
                                     %s,%s,%s,%s,%s,%s);""".format(str(measurement_id))
     try:
-        response = cur.executemany(insert_gate_records, insertions)
-        if response < len(insertions):
-            raise Exception("{} dropped execution(s)".format(str(len(insertions) - response)))
+        successful_inserts = cur.executemany(insert_gate_records, insertions)
+        if successful_inserts < len(insertions):
+            raise Exception("{} dropped execution(s)".format(str(len(insertions) - successful_inserts)))
     except Exception as e:
         print("Failed to execute all insertions for file: {}".format(file_key))
         print(str(e))
 
     conn.commit()
-    return response
+    return successful_inserts
 
 
 def get_asset_id(asset_name):
@@ -165,7 +165,7 @@ def upload_raw(file_key):
 
     lines = [re.split('\s+',line) for line in response['Body'].read().decode('utf-8').split('\n')]
    
-   #verify full header
+    #verify full header
     if len(lines) < 4: #invalid raw file header
         print("file <{}> doesn't contain enough gate record data".format(file_key))
         return 0
@@ -186,7 +186,7 @@ def upload_raw(file_key):
         return 0
 
     try:
-        measurement_id = insert_measurement(miniSODAR_instrument.copy())
+        measurement_id = insert_measurement(miniSODAR_instrument.copy(), file_key)
     except Exception as e:
         print("Could not insert miniSODAR measurement: {}".format(miniSODAR_instrument))
         print(e)
@@ -203,32 +203,33 @@ def upload_raw(file_key):
         insertions.append( attributes )
 
     insert_gate_records = """INSERT INTO `MiniSODARGateResponse`(`MeasurementID`,`GateNum`, {})
-                            VALUES({}, {});""".format(", ".join(lines[3][1:]),
+                            VALUES({}, {});""".format(", ".join(lines[3][1:]), #header info details attribute names
                                                         str(measurement_id),
                                                         ", ".join(["%s" for attr in range(len(lines[3][1:]) + 1)]))
 
     try:
-        response = cur.executemany(insert_gate_records, insertions)
-        if response < len(insertions):
-            raise Exception("{} dropped execution(s)".format(str(len(insertions) - response)))
+        successful_inserts = cur.executemany(insert_gate_records, insertions)
+        if successful_inserts < len(insertions):
+            raise Exception("{} dropped execution(s)".format(str(len(insertions) - successful_inserts)))
     except Exception as e:
         print("Failed to execute all insertions for file: {}".format(file_key))
         print(str(e))
 
     conn.commit()
-    return response
+    return successful_inserts
 
 
-def insert_measurement(miniSODAR_instrument):
-    insert_measurement_stmt = """INSERT INTO MiniSODARMeasurement(AssetId, MeasurementDateTime, MxHeight, UNoise, VNoise, WNoise)
-                                VALUES(%s, %s, %s, %s, %s, %s)"""
+def insert_measurement(miniSODAR_instrument, file_key):
+    insert_measurement_stmt = """INSERT INTO MiniSODARMeasurement(AssetId, MeasurementDateTime, MxHeight, UNoise, VNoise, WNoise, FileLocation)
+                                VALUES(%s, %s, %s, %s, %s, %s, %s)"""
     insert_args = [
         miniSODAR_instrument['asset_id'],
         miniSODAR_instrument['measurement_date_time'],
         miniSODAR_instrument['mx_height'],
         miniSODAR_instrument['u_noise'],
         miniSODAR_instrument['v_noise'],
-        miniSODAR_instrument['w_noise']
+        miniSODAR_instrument['w_noise'],
+        file_key
     ]
     cur.execute(insert_measurement_stmt, insert_args)
 
