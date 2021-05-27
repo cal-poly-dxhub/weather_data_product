@@ -94,7 +94,7 @@ def insert_into_db(file_key):
             logger.error("row in improper format; expected 3 entries: {}".format(row))
         
 
-    insert_products_stmt = "INSERT INTO TowerCodeResponse(MeasurementID, ProductCode, HeightMeasurement, Value) VALUES({}, %s, %s, %s)".format(measurement_id)
+    insert_products_stmt = "INSERT INTO TowerGateResponse(MeasurementID, ProductCode, HeightMeasurement, Value) VALUES({}, %s, %s, %s)".format(measurement_id)
 
     #returns the number of executions
     response = cur.executemany(insert_products_stmt, insertions)

@@ -8,7 +8,6 @@ def get_logger():
 
 
 def get_secret(secret_name):
-    secret_name = "slojhAppAccess"
     client = boto3.client("secretsmanager")
 
     response = client.get_secret_value(
