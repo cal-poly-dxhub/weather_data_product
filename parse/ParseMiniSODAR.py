@@ -10,7 +10,6 @@ import pymysql
 BUCKET="dxhub-vafb-xui-weather-data-raw"
 SECRET_NAME="Aurora"
 
-s3_resource = boto3.resource('s3')
 s3_client = boto3.client('s3')
 
 miniSODAR_instrument = {
@@ -53,8 +52,15 @@ except Exception as e:
     print(str(e))
     sys.exit()
 
-def main():
-    #------------------------------------ csv --------------------------------------
+def lambda_handler(event. context):
+    
+    try:
+        key = event['Records'][0]['s3']['object']['key']
+    except Exception as e:
+        logger.error("key: {}".format(key))
+        logger.error(e)
+        logger.error("S3 Object could not be opened.")
+        sys.exit()
 
     successful_inserts = 0
 
@@ -239,7 +245,3 @@ def insert_measurement(miniSODAR_instrument):
     cur.execute(select_measurement_stmt)
 
     return cur.fetchone()[0]
-
-
-if __name__ == "__main__":
-    main()

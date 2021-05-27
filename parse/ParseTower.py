@@ -11,7 +11,6 @@ logger = get_logger()
 BUCKET="dxhub-vafb-xui-weather-data-raw"
 SECRET_NAME="Aurora"
 
-s3_resource = boto3.resource('s3')
 s3_client = boto3.client('s3')
 
 try:
@@ -42,7 +41,6 @@ def lambda_handler(event, context):
     #get() does not store in memory
     try:
         key = event['Records'][0]['s3']['object']['key']
-        obj = s3_resource.Object(BUCKET, key).get()['Body']
     except Exception as e:
         logger.error("key: {}".format(key))
         logger.error(e)
