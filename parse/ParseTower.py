@@ -1,7 +1,6 @@
 import sys
 from datetime import datetime
 from dateutil.parser import parse
-from db_config import RDS_HOST, NAME, PASSWORD, DB_NAME
 from utility import get_secret, get_logger
 
 import pymysql
