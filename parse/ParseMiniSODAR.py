@@ -1,13 +1,17 @@
 import sys
 import re
 from datetime import datetime
-from db_config import RDS_HOST, NAME, PASSWORD, DB_NAME
-import pymysql
+from dateutil.parser import parse
 import boto3
 
-BUCKET="dxhub-vafb-xui-weather-data-raw"
+from utility import get_secret, get_logger
+import pymysql
 
-s3 = boto3.client('s3')
+BUCKET="dxhub-vafb-xui-weather-data-raw"
+SECRET_NAME="Aurora"
+
+s3_resource = boto3.resource('s3')
+s3_client = boto3.client('s3')
 
 miniSODAR_instrument = {
     "asset_id": None,
@@ -28,7 +32,20 @@ miniSODAR_codes = {
 }
 
 try:
-    conn = pymysql.connect(host=RDS_HOST, user=NAME, password=PASSWORD, database=DB_NAME, connect_timeout=5)
+    db_credentials = eval(get_secret(SECRET_NAME))
+except Exception as e:
+    logger.error(e)
+    logger.error("could not obtain secret")
+    sys.exit()
+
+try:
+    conn = pymysql.connect(
+        host=db_credentials['host'],
+        user=db_credentials['username'],
+        password=db_credentials['password'],
+        database=db_credentials['dbname'],
+        connect_timeout=5
+    )
     cur = conn.cursor()
 
 except Exception as e:
