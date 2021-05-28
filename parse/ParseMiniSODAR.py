@@ -10,6 +10,8 @@ import pymysql
 BUCKET="dxhub-vafb-xui-weather-data-raw"
 SECRET_NAME="Aurora"
 
+logger = get_logger()
+
 s3_client = boto3.client('s3')
 
 miniSODAR_instrument = {
@@ -77,7 +79,7 @@ def lambda_handler(event, context):
 
 
 def upload_csv(file_key):
-    response = s3.get_object(
+    response = s3_client.get_object(
         Bucket=BUCKET,
         Key=file_key
     )
@@ -118,6 +120,8 @@ def upload_csv(file_key):
     for row in lines[7:len(lines) - 1]:
         try:
             if miniSODAR_codes.get(row[0]) == "gate_record":
+                for i in range(len(row[1:])): #filters the input row to translate string representations to proper format
+                    row[i + 1] = int(row[i + 1]) if row[i + 1].isdigit() else float(row[i + 1])
                 insertions.append( row[1:] )
             else:
                 print("encountered gate_record without proper gate code: {}".format(row))
@@ -154,7 +158,7 @@ def get_asset_id(asset_name):
 
 
 def upload_raw(file_key):
-    response = s3.get_object(
+    response = s3_client.get_object(
         Bucket=BUCKET,
         Key=file_key
     )
@@ -164,6 +168,7 @@ def upload_raw(file_key):
     asset_id = get_asset_id(asset_name)
 
     lines = [re.split('\s+',line) for line in response['Body'].read().decode('utf-8').split('\n')]
+    logger.info(lines)
    
     #verify full header
     if len(lines) < 4: #invalid raw file header
