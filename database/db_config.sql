@@ -61,6 +61,10 @@ CREATE TABLE `TowerGateResponse` (
 
 CREATE TABLE `MiniSODARInstrument` (
     `AssetID` SMALLINT UNSIGNED PRIMARY KEY, #(integer) (nnnn)
+    
+    `Latitude` DOUBLE(9,6) SIGNED,
+    
+    `Longitude` DOUBLE(9,6) SIGNED,
 
     `TowerID` SMALLINT UNSIGNED,
 

@@ -101,7 +101,10 @@ def lambda_handler(event, context):
 def get_instrument(asset_id):
     select_instrument = """ SELECT 	MiniSODARInstrument.`AssetID`,
                                     MiniSODARInstrument.`TowerID`,
-                                    MiniSODARInstrument.`Name`
+                                    MiniSODARInstrument.`Name`,
+                                    MiniSODARInstrument.`Latitude`,
+                                    MiniSODARInstrument.`Longitude`,
+                                    MiniSODARInstrument.`AssetHeight`
                             FROM MiniSODARInstrument
                             WHERE MiniSODARInstrument.`AssetID` = %s;"""
     cur.execute(select_instrument, [asset_id])
@@ -111,7 +114,10 @@ def get_instrument(asset_id):
     instrument = {
         "asset_id": response[0],
         "tower_id": response[1],
-        "asset_name": response[2]
+        "asset_name": response[2],
+        "latitude": response[3],
+        "longitude": response[4],
+        "height": response[5]
     }
     return instrument
 
