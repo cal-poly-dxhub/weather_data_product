@@ -55,7 +55,6 @@ def lambda_handler(event, context):
     
     instrument = event['resource']
 
-    #if event.get('queryStringParameters'):
     try:
         asset_id = event['queryStringParameters']['assetId']
     except:
@@ -64,15 +63,17 @@ def lambda_handler(event, context):
     start_date_time_utc = event['queryStringParameters'].get('startDateTimeUTC')
     end_date_time_utc = event['queryStringParameters'].get('endDateTimeUTC')
     
-    if start_date_time_utc and end_date_time_utc:
+    if start_date_time_utc:
         try:
             start_date_time_utc = datetime.strftime(datetime.strptime(start_date_time_utc, "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d %H:%M:%S")
+        except:
+            return request_error(response, 400, "required datetime format: YYYY-MM-DDTHH:MM:SS")
+
+    if end_date_time_utc:
+        try:
             end_date_time_utc = datetime.strftime(datetime.strptime(end_date_time_utc, "%Y-%m-%dT%H:%M:%S"), "%Y-%m-%d %H:%M:%S")
         except:
             return request_error(response, 400, "required datetime format: YYYY-MM-DDTHH:MM:SS")
-    
-    elif (start_date_time_utc and not end_date_time_utc) or (end_date_time_utc and not start_date_time_utc):
-        return request_error(response, 400, "must provide both start and end datetime values in format")
 
     if instrument == "/mini-sodar":
         try:
@@ -147,8 +148,18 @@ def get_minisodar_measurements(asset_id, start_date_time_utc = None, end_date_ti
                                     MiniSODARMeasurement.`VNoise`,
                                     MiniSODARMeasurement.`WNoise`
                             FROM MiniSODARMeasurement
-                            WHERE MiniSODARMeasurement.AssetID = %s {}""".format("") #start_date, end_date
-    cur.execute(select_instrument, [asset_id])
+                            WHERE MiniSODARMeasurement.AssetID = %s """
+    args = [asset_id]
+    
+    if start_date_time_utc:
+        select_instrument += "AND MiniSODARMeasurement.MeasurementDateTime >= %s "
+        args.append(start_date_time_utc)
+    
+    if end_date_time_utc:
+        select_instrument += "AND MiniSODARMeasurement.MeasurementDateTime <= %s "
+        args.append(end_date_time_utc)    
+
+    cur.execute(select_instrument, args)
 
     response = cur.fetchall()
     measurements = []
