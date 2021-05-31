@@ -93,9 +93,29 @@ def lambda_handler(event, context):
         except Exception as e:
             logger.error(e)
             return request_error(response, 400, "could not determine instrument from asset ID")
+    
+    elif instrument == "/tower":
+        try:
+            body['tower'] = get_tower(asset_id)
+        except Exception as e:
+            logger.error(e)
+            return request_error(response, 400, "could not determine tower from assetId")
+
+        try:
+            body['measurements'] = get_tower_measurements(asset_id, start_date_time_utc, end_date_time_utc)
+        except Exception as e:
+            logger.error(e)
+            return request_error(response, 400, "could not acquire tower measurements")
+    
+    else:
+        return request_error(response, 404, "unknown path parameter: {}".format(instrument))
 
     response['body'] = json.dumps(body)
     return response
+
+
+def get_tower_measurements(asset_id, start_date_time_utc, end_date_time_utc):
+    return {}
 
 
 def get_instrument(asset_id):
