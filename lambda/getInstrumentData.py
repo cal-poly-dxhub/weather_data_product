@@ -7,6 +7,8 @@ from utility import get_logger, get_secret
 
 logger = get_logger()
 
+SECRET_NAME = 'Aurora'
+
 try:
     db_credentials = eval(get_secret(SECRET_NAME))
 except Exception as e:
@@ -128,7 +130,60 @@ def lambda_handler(event, context):
 
 
 def get_tower_measurements(asset_id, start_date_time_utc, end_date_time_utc):
-    return {}
+    select_instrument = """ SELECT 	TowerMeasurement.`MeasurementID`,
+                                    TowerMeasurement.`MeasurementDateTime`
+                            FROM TowerMeasurement
+                            WHERE TowerMeasurement.`TowerID` = %s"""
+    args = [asset_id]
+    
+    if start_date_time_utc:
+        select_instrument += "AND TowerID.`MeasurementDateTime` >= %s "
+        args.append( start_date_time_utc )
+    
+    if end_date_time_utc:
+        select_instrument += "AND TowerID.`MeasurementDateTime` <= %s "
+        args.append( end_date_time_utc )    
+
+    cur.execute(select_instrument, args)
+
+    response = cur.fetchall()
+    measurements = []
+    for measurement in response:
+        metadata = {
+            "measurement_id": measurement[0],
+            "measurement_date_time": str(measurement[1])
+        }
+
+        gate_query = """SELECT	TowerGateResponse.`ProductCode`,
+                                TowerGateResponse.`HeightMeasurement`,
+                                TowerGateResponse.`Value`
+                        FROM TowerGateResponse
+                        WHERE MeasurementID = %s"""
+        args = [metadata['measurement_id']]
+
+        cur.execute(gate_query, args)
+
+        response = cur.fetchall()
+
+        record_data = []
+        gate = {}
+
+        for gate_record in response:
+            gate = {
+                "product_code": gate_record[0],
+                "height": gate_record[1],
+                "value": gate_record[2]
+            }
+            record_data.append( gate.copy() )
+
+        measurements.append(
+            {
+                "metadata": metadata.copy(),
+                "gateResponses": record_data
+            }
+        )
+
+    return measurements
 
 
 def get_instrument(asset_id):
