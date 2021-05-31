@@ -1,14 +1,27 @@
 import json
-import pymysql
 import logging
 from datetime import datetime
-from db_config import RDS_HOST, NAME, PASSWORD, DB_NAME
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+import pymysql
+from utility import get_logger, get_secret
+
+logger = get_logger()
 
 try:
-    conn = pymysql.connect(host=RDS_HOST, user=NAME, password=PASSWORD, database=DB_NAME, connect_timeout=5)
+    db_credentials = eval(get_secret(SECRET_NAME))
+except Exception as e:
+    logger.error(e)
+    logger.error("could not obtain secret")
+    sys.exit()
+
+try:
+    conn = pymysql.connect(
+        host=db_credentials['host'],
+        user=db_credentials['username'],
+        password=db_credentials['password'],
+        database=db_credentials['dbname'],
+        connect_timeout=5
+    )
     cur = conn.cursor()
 
 except Exception as e:
