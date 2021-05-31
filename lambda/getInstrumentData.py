@@ -137,11 +137,11 @@ def get_tower_measurements(asset_id, start_date_time_utc, end_date_time_utc):
     args = [asset_id]
     
     if start_date_time_utc:
-        select_instrument += "AND TowerID.`MeasurementDateTime` >= %s "
+        select_instrument += "AND TowerMeasurement.`MeasurementDateTime` >= %s "
         args.append( start_date_time_utc )
     
     if end_date_time_utc:
-        select_instrument += "AND TowerID.`MeasurementDateTime` <= %s "
+        select_instrument += "AND TowerMeasurement.`MeasurementDateTime` <= %s "
         args.append( end_date_time_utc )    
 
     cur.execute(select_instrument, args)
