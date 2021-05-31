@@ -117,6 +117,12 @@ def lambda_handler(event, context):
             return request_error(response, 400, "could not determine tower from assetId")
 
         try:
+            body['codes'] = get_tower_codes()
+        except Exception as e:
+            logger.error(e)
+            return request_error(response, 500, "could not retrieve tower product codes")
+
+        try:
             body['measurements'] = get_tower_measurements(asset_id, start_date_time_utc, end_date_time_utc)
         except Exception as e:
             logger.error(e)
@@ -127,6 +133,29 @@ def lambda_handler(event, context):
 
     response['body'] = json.dumps(body)
     return response
+
+
+def get_tower_codes():
+    query_codes = """   SELECT  TowerProductCode.`Code`,
+                                TowerProductCode.`Description`,
+                                TowerProductCode.`Unit`,
+                                TowerProductCode.`UnitDescription`
+                        FROM TowerProductCode;"""
+    cur.execute(query_codes)
+    response = cur.fetchall()
+
+    codes = []
+    
+    for code in response:
+        codes.append(
+            {
+                "code": code[0],
+                "description": code[1],
+                "unit": code[2],
+                "unit_description": code[3]
+            }
+        )
+    return codes
 
 
 def get_tower_measurements(asset_id, start_date_time_utc, end_date_time_utc):
