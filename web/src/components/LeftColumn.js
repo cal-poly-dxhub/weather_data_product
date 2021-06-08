@@ -61,10 +61,11 @@ function LeftColumn(props) {
               <Typography variant="body1" style={{fontWeight: 'bold'}}>
                 Tower {bull} {props['tower']['tower_num']}
               </Typography>
-              <IconButton edge="start" className={classes.menuButton}>
+              <IconButton edge="start" className={classes.menuButton} style={{marginLeft: 0}}>
                 <UnfoldMoreIcon/>
               </IconButton>
             </Button>
+            
             <Menu
               id="simple-menu"
               anchorEl={anchorEl}
