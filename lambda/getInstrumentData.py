@@ -94,27 +94,6 @@ def lambda_handler(event, context):
     response['body'] = json.dumps(body)
     return response
 
-    '''
-    if instrument == "mini-sodar":
-        try:
-            body['instrument'] = get_instrument(asset_id)
-        except Exception as e:
-            logger.error(e)
-            return request_error(response, 400, "could not determine instrument info from assetId")
-        
-        try:
-            body['tower'] = get_tower(body['instrument']['tower_id'])
-        except Exception as e:
-            logger.error(e)
-            return request_error(response, 500, "asset ID in DB not connected to a tower")
-        
-        try:
-            body['measurements'] = get_minisodar_measurements(asset_id, start_date_time_utc, end_date_time_utc)
-        except Exception as e:
-            logger.error(e)
-            return request_error(response, 400, "could not determine instrument from asset ID")
-    '''
-
 def list_towers():
     response = []
     list_towers_stmt = """  SELECT	`Tower`.`ArchiveNumber` AS archive_number,
@@ -127,7 +106,7 @@ def list_towers():
     cur.execute(list_towers_stmt)
     towers = cur.fetchall()
 
-    minisodars = get_minisodar()
+    minisodars = list_minisodar(abbrev=True)
     logger.info("minisodar: {}".format(minisodars))
 
     profilers = get_profilers()
@@ -167,11 +146,14 @@ def list_towers():
         response.append( tower_obj.copy() )
     return response
 
-
-def get_minisodar():
+#abbrev provides shortened query when aggregated with other API call (list towers includes collocated instruments)
+def list_minisodar(abbrev = False):
     list_minisodar_stmt = """   SELECT	`MiniSODARInstrument`.`AssetID` AS asset_id,
-                                        `MiniSODARInstrument`.`TowerID` AS archive_number,
-                                        `MiniSODARInstrument`.`Name` AS asset_name
+                                        `MiniSODARInstrument`.`TowerID` AS archive_num,
+                                        `MiniSODARInstrument`.`Name` AS asset_name,
+                                        `MiniSODARInstrument`.`Latitude` AS latitude,
+                                        `MiniSODARInstrument`.`Longitude` AS longitude,
+                                        `MiniSODARInstrument`.`AssetHeight` AS height
                                 FROM `MiniSODARInstrument`;"""
     cur.execute(list_minisodar_stmt)
     minisodar = cur.fetchall()
@@ -183,6 +165,10 @@ def get_minisodar():
             "archive_number": instrument[1],
             "asset_name": instrument[2]
         }
+        if not abbrev:
+            obj['latitude'] = instrument[3]
+            obj['longitude'] = instrument[4]
+            obj['height'] = instrument[5]
         response.append( obj.copy() )
 
     return response
