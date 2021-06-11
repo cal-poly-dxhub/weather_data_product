@@ -1,0 +1,24 @@
+.App {
+}
+
+section {
+  background-color: #1C1A1E;
+  padding-right: 4rem;
+  padding-left: 4rem;
+}
+
+.App-header {
+  background-color: #1C1A1E;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  min-height: 10vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  color: black;
+}
+
+.App-link {
+  color: #61dafb;
+}

@@ -1,0 +1,12 @@
+{
+  "domain": "dev.auth-fips.us-gov-west-1.amazoncognito.com",
+  "scope": [
+    "email",
+    "profile",
+    "openid",
+    "aws.cognito.signin.user.admin"
+  ],
+  "redirectSignIn": "https://localhost:3000",
+  "redirectSignOut": "https://localhost:3000",
+  "responseType": "token"
+}
