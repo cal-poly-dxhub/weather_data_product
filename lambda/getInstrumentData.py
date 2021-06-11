@@ -49,34 +49,18 @@ def lambda_handler(event, context):
     }
 
     body = {}
-    ''' #expected output
-    {
-        "tower": {
-            ...
-        },
-        "instrument": {
-            ...
-        },
-        "measurements": [
-            {
-                "metadata": {...},
-                "gateResponses": [{...},...,{...}]
-            },
-            ...,
-            {...}
-        ]
-    }
-    '''
     
-    instrument = event['resource']
-
     try:
-        asset_id = event['queryStringParameters']['assetId']
-    except:
-        return request_error(response, 400, "assetId missing from request parameters")
+        path_args = event['path'].split("/")[1:]
+
+        instrument = path_args[0]
+        asset_id = path_args[1] if len(path_args) > 1 else None
+    except Exception as e:
+        logger.error("parse path arguments: {}".format(e))
+        return request_error(response, 500, "could not parse path arguments")
     
-    start_date_time_utc = event['queryStringParameters'].get('startDateTimeUTC')
-    end_date_time_utc = event['queryStringParameters'].get('endDateTimeUTC')
+    start_date_time_utc = event.get('queryStringParameters') and event['queryStringParameters'].get('startDateTimeUTC')
+    end_date_time_utc = event.get('queryStringParameters') and event['queryStringParameters'].get('endDateTimeUTC')
     
     if start_date_time_utc:
         try:
@@ -90,7 +74,28 @@ def lambda_handler(event, context):
         except:
             return request_error(response, 400, "required datetime format: YYYY-MM-DDTHH:MM:SS")
 
-    if instrument == "/mini-sodar":
+    if instrument == "mini-sodar":
+        try:
+            body = list_minisodar() if not asset_id else get_minisodar_measurements(asset_id, start_date_time_utc, end_date_time_utc)
+        except Exception as e:
+            logger.error("unable to {} mini-sodar: {}".format("get" if asset_id else "list", e))
+            return request_error(response, 500, "Could not retrieve mini-sodar data")
+
+    elif instrument == "tower":
+        try:
+            body = list_towers() if not asset_id else get_tower_measurements(asset_id, start_date_time_utc, end_date_time_utc)
+        except Exception as e:
+            logger.error("unable to {} tower: {}".format("get" if asset_id else "list", e))
+            return request_error(response, 500, "Could not retrieve tower data")
+    
+    else:
+        return request_error(response, 404, "unknown path parameter: {}".format(instrument))
+
+    response['body'] = json.dumps(body)
+    return response
+
+    '''
+    if instrument == "mini-sodar":
         try:
             body['instrument'] = get_instrument(asset_id)
         except Exception as e:
@@ -108,31 +113,100 @@ def lambda_handler(event, context):
         except Exception as e:
             logger.error(e)
             return request_error(response, 400, "could not determine instrument from asset ID")
-    
-    elif instrument == "/tower":
-        try:
-            body['tower'] = get_tower(asset_id)
-        except Exception as e:
-            logger.error(e)
-            return request_error(response, 400, "could not determine tower from assetId")
+    '''
 
-        try:
-            body['codes'] = get_tower_codes()
-        except Exception as e:
-            logger.error(e)
-            return request_error(response, 500, "could not retrieve tower product codes")
+def list_towers():
+    response = []
+    list_towers_stmt = """  SELECT	`Tower`.`ArchiveNumber` AS archive_number,
+                                    `Tower`.`TowerNumber` AS tower_number,
+                                    `Tower`.`Latitude` AS latitude,
+                                    `Tower`.`Longitude` AS longitude,
+                                    `Tower`.`MSLElevation` AS msl_elevation,
+                                    `Tower`.`Location` AS location
+                            FROM `Tower`;"""
+    cur.execute(list_towers_stmt)
+    towers = cur.fetchall()
 
-        try:
-            body['measurements'] = get_tower_measurements(asset_id, start_date_time_utc, end_date_time_utc)
-        except Exception as e:
-            logger.error(e)
-            return request_error(response, 400, "could not acquire tower measurements")
-    
-    else:
-        return request_error(response, 404, "unknown path parameter: {}".format(instrument))
+    minisodars = get_minisodar()
+    logger.info("minisodar: {}".format(minisodars))
 
-    response['body'] = json.dumps(body)
+    profilers = get_profilers()
+    logger.info("profilers: {}".format(profilers))
+
+    for tower in towers:
+        tower_obj = {
+            "archive_number": tower[0],
+            "tower_number": tower[1],
+            "latitude": tower[2],
+            "longitude": tower[3],
+            "msl_elevation": tower[4],
+            "location": tower[5],
+            "collocated_instruments": {
+                "minisodar": [],
+                "915_profiler": [],
+                "asos": []
+            }
+        }
+
+        for instrument in profilers:
+            if int(instrument["archive_number"]) == int(tower_obj['archive_number']):
+                profiler = {
+                    "asset_id": instrument["asset_id"],
+                    "asset_name": instrument["asset_name"]
+                }
+                tower_obj['collocated_instruments']['915_profiler'].append( profiler.copy() )
+
+        for instrument in minisodars:
+            if int(instrument["archive_number"]) == int(tower_obj['archive_number']):
+                minisodar = {
+                    "asset_id": instrument["asset_id"],
+                    "asset_name": instrument["asset_name"]
+                }
+                tower_obj['collocated_instruments']['minisodar'].append( minisodar.copy() )
+
+        response.append( tower_obj.copy() )
     return response
+
+
+def get_minisodar():
+    list_minisodar_stmt = """   SELECT	`MiniSODARInstrument`.`AssetID` AS asset_id,
+                                        `MiniSODARInstrument`.`TowerID` AS archive_number,
+                                        `MiniSODARInstrument`.`Name` AS asset_name
+                                FROM `MiniSODARInstrument`;"""
+    cur.execute(list_minisodar_stmt)
+    minisodar = cur.fetchall()
+    response = []
+
+    for instrument in minisodar:
+        obj = {
+            "asset_id": instrument[0],
+            "archive_number": instrument[1],
+            "asset_name": instrument[2]
+        }
+        response.append( obj.copy() )
+
+    return response
+
+
+def get_profilers():
+    list_profilers_stmt = """   SELECT 	`ProfilerInstrument`.`AssetID` AS asset_id,
+                                        `ProfilerInstrument`.`TowerID` AS archive_number,
+                                        `ProfilerInstrument`.`Name` AS asset_name
+                                FROM `ProfilerInstrument`;"""
+    cur.execute(list_profilers_stmt)
+    profilers = cur.fetchall()
+    response = []
+
+    for instrument in profilers:
+        obj = {
+            "asset_id": instrument[0],
+            "archive_number": instrument[1],
+            "asset_name": instrument[2]
+        }
+        response.append( obj.copy() )
+
+    return response
+
 
 
 def get_tower_codes():
