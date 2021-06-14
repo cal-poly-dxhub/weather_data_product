@@ -48,72 +48,74 @@ function TablePanel(props) {
   };
 
   return (
-    <div>
+    <Grid container direction="column" spacing={2}>
       {props.measurements['measurements'].map(measurement => 
-        <TableContainer style={{ borderColor: '#464646'}} component={Paper} variant="outlined" key={measurement['metadata']['measurement_id']}>
-          <Toolbar style={{backgroundColor: '#242026'}}>
-            <Grid container justify='space-between' alignItems="center">
-              <Button aria-controls="simple-menu" aria-haspopup="true" variant="text" onClick={handleClick}>
-                <Typography variant="body1" style={{fontWeight: 'bold'}}>
-                  Wind
+        <Grid item>
+          <TableContainer style={{ borderColor: '#464646'}} component={Paper} variant="outlined" key={measurement['metadata']['measurement_id']}>
+            <Toolbar style={{backgroundColor: '#242026'}}>
+              <Grid container justify='space-between' alignItems="center">
+                <Button aria-controls="simple-menu" aria-haspopup="true" variant="text" onClick={handleClick}>
+                  <Typography variant="body1" style={{fontWeight: 'bold'}}>
+                    Wind
+                  </Typography>
+                  <IconButton edge="start" style={{color: '#9E9C98', marginLeft: 0}}>
+                    <UnfoldMoreIcon/>
+                  </IconButton>
+                </Button>
+
+                <Menu
+                  id="simple-menu"
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                >
+                  <MenuItem onClick={handleClose} style={{color: '#000000'}}>Wind</MenuItem>
+                  <MenuItem onClick={handleClose} style={{color: '#000000'}}>Gust</MenuItem>
+                </Menu>
+
+                <Typography variant="body1" style={{fontWeight: 'bold', color: '#9B9B9B'}}>
+                  Last Updated: {measurement['metadata']['measurement_date_time']}
                 </Typography>
-                <IconButton edge="start" style={{color: '#9E9C98', marginLeft: 0}}>
-                  <UnfoldMoreIcon/>
-                </IconButton>
-              </Button>
+              </Grid>
+            </Toolbar>
 
-              <Menu
-                id="simple-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={handleClose} style={{color: '#000000'}}>Wind</MenuItem>
-                <MenuItem onClick={handleClose} style={{color: '#000000'}}>Gust</MenuItem>
-              </Menu>
+            <Divider style={{backgroundColor: '#623A3A'}}/>
 
-              <Typography variant="body1" style={{fontWeight: 'bold', color: '#9B9B9B'}}>
-                Last Updated: {measurement['metadata']['measurement_date_time']}
-              </Typography>
-            </Grid>
-          </Toolbar>
+            <Table style={{backgroundColor: '#242026'}}>
 
-          <Divider style={{backgroundColor: '#623A3A'}}/>
-
-          <Table style={{backgroundColor: '#242026'}}>
-
-            <TableHead>
-              <TableRow>
-                <TableCell>Tower Height</TableCell>
-                <TableCell align="right">Wind Speed (m/s)</TableCell>
-                <TableCell align="right">Wind Direction (deg)</TableCell>
-                <TableCell align="right">Sample Size</TableCell>
-                <TableCell align="right">Vertical Wind (m/s)</TableCell>
-                <TableCell align="right">Wind (SD)</TableCell>
-                <TableCell align="right">Signal to Noise Ratio</TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {measurement['gateResponses'].map(response => (
-                <TableRow key={response['GateNum']}>
-                  <TableCell component="th" scope="row">
-                    {response['HT']}
-                  </TableCell>
-                  <TableCell align="right">{removeMissingData(response['SPD'])}</TableCell>
-                  <TableCell align="right">{removeMissingData(response['DIR'])}</TableCell>
-                  <TableCell align="right">{removeMissingData(response['NW'])}</TableCell>
-                  <TableCell align="right">{removeMissingData(response['W'])}</TableCell>
-                  <TableCell align="right">{removeMissingData(response['SDW'])}</TableCell>
-                  <TableCell align="right">{removeMissingData(response['SNRW'])}</TableCell>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Tower Height</TableCell>
+                  <TableCell align="right">Wind Speed (m/s)</TableCell>
+                  <TableCell align="right">Wind Direction (deg)</TableCell>
+                  <TableCell align="right">Sample Size</TableCell>
+                  <TableCell align="right">Vertical Wind (m/s)</TableCell>
+                  <TableCell align="right">Wind (SD)</TableCell>
+                  <TableCell align="right">Signal to Noise Ratio</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+
+              <TableBody>
+                {measurement['gateResponses'].map(response => (
+                  <TableRow key={response['GateNum']}>
+                    <TableCell component="th" scope="row">
+                      {response['HT']}
+                    </TableCell>
+                    <TableCell align="right">{removeMissingData(response['SPD'])}</TableCell>
+                    <TableCell align="right">{removeMissingData(response['DIR'])}</TableCell>
+                    <TableCell align="right">{removeMissingData(response['NW'])}</TableCell>
+                    <TableCell align="right">{removeMissingData(response['W'])}</TableCell>
+                    <TableCell align="right">{removeMissingData(response['SDW'])}</TableCell>
+                    <TableCell align="right">{removeMissingData(response['SNRW'])}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
       )}
-    </div>
+    </Grid>
   );
 }
 

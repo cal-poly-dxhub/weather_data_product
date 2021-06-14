@@ -39,6 +39,7 @@ export default function Navbar() {
   return (
     <ThemeProvider theme={theme}>
       <Toolbar className={classes.root}>
+        <img style={{width: 40}} src='https://user-images.githubusercontent.com/22374768/121132655-19ccb000-c7cd-11eb-8e26-89c10ca8a8c6.png'/>
         <Grid container spacing={0} justify='space-evenly' direction='column'>
           <Grid item xs={12}>
             <Typography variant="subtitle2" className={classes.title}>

@@ -16,7 +16,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/mini-sodar';
+    const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/prod/mini-sodar';
 
     Auth.currentSession()
     .then(session => {
