@@ -1,0 +1,53 @@
+#!/bin/bash
+
+unpackTarget () {
+   targets=($(ls $1))
+   next=()
+   files=0
+
+   for target in ${targets[@]}; do
+      filePath="$1/${target}"
+      file=${target%.*}
+      ext=${target##*.}
+
+      if [[ $ext == "zip" ]]
+      then
+         echo "Unpacking the zip file $filePath"
+         unzip -q $filePath
+         rm $filePath
+         next+=("$1/${file}")
+      elif [[ $ext == "gz" ]]
+      then
+         echo "Unpacking the gz  file $filePath"
+         gunzip -q $filePath
+         files=$((files + 1))
+      elif [[ $ext == "tar" ]]
+      then
+         echo "Unpacking the tar file $filePath"
+         newDir="$1/$(echo ${file} | tr '.' '_')"
+         mkdir $newDir
+         tar -C $newDir -xf $filePath
+         rm $filePath
+         next+=($newDir)
+      elif [[ -d $filePath ]]
+      then
+         next+=($filePath)
+      fi
+   done
+
+   if [[ $files -gt 0 ]]
+   then
+      next=($1)
+   fi
+
+   for target in ${next[@]}; do
+      unpackTarget $target
+   done
+}
+
+if [[ $1 == "" ]]
+then
+   unpackTarget .
+else
+   unpackTarget $1
+fi
