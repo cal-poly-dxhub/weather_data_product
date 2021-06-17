@@ -6,6 +6,17 @@ import './App.css';
 import Columns from './components/Columns'
 import Navbar from './components/Navbar'
 import Authenticator from './components/Authenticator';
+import InstrumentChips from './components/InstrumentChips';
+
+import { makeStyles } from '@material-ui/core/styles';
+import Chip from '@material-ui/core/Chip';
+import Box from '@material-ui/core/Box';
+import TagFacesIcon from '@material-ui/icons/TagFaces';
+
+import { ThemeProvider } from '@material-ui/styles';
+import theme from './theme'
+
+import { UserProvider } from './contexts/UserProvider'
 
 class App extends Component {  
   state = {
@@ -47,15 +58,23 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <Navbar/>
-          {/* <Authenticator/> */}
-        </header>
-        <section>
-          <Columns measurements={this.state.measurements} tower={this.state.tower}/>
-        </section>
-      </div>
+      <UserProvider>
+        <ThemeProvider theme={theme}>
+          <div className="App">
+            <nav className="App-header">
+              <Navbar/>
+            </nav>
+            <body>
+              <section>
+                <InstrumentChips/>
+              </section>
+              <section>
+                <Columns measurements={this.state.measurements} tower={this.state.tower}/>
+              </section>
+            </body>
+          </div>
+        </ThemeProvider>
+      </UserProvider>
     );
   }
 }

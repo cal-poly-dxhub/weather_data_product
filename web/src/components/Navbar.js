@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -7,11 +8,13 @@ import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import { colors } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/styles';
-import theme from '../theme'
 import Brightness4Icon from '@material-ui/icons/Brightness4';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box'
+
+import theme from '../theme'
+import ReportBuilder from './ReportBuilder';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -35,6 +38,7 @@ const useStyles = makeStyles(() => ({
 
 export default function Navbar() {
   const classes = useStyles();
+  const [drawerIsOpen, setDrawerOpen] = useState(false);
 
   return (
     <ThemeProvider theme={theme}>
@@ -53,20 +57,25 @@ export default function Navbar() {
           </Grid>
         </Grid>
         <Button className={classes.menuButton} variant="text" size="small" color="primary">
-          <Typography variant="body1" display="block" style={{ margin: "0.5rem", color: "#9C9C9C", marginLeft: '3rem', marginRight: '3rem' }}>
-            API Docs
-          </Typography>
+          <a style={{textDecoration: 'none'}} href="https://dxhub.awsapps.com/workdocs/index.html#/document/c8bbad636ca17bea83fb62e3fd1ddd402630bb422d4f30a8238f71a40438c992">
+            <Typography variant="body1" display="block" style={{ margin: "0.5rem", color: "#9C9C9C", marginLeft: '3rem', marginRight: '3rem' }}>
+              API Docs
+            </Typography>
+          </a>
         </Button>
         <Button className={classes.feedbackButton} size="large" color="primary">
-          <Typography variant="body1" style={{ margin: "0.5rem", marginLeft: '3rem', marginRight: '3rem', fontWeight: "bold" }}>
-            Give Feedback
-          </Typography>
+          <a style={{textDecoration: 'none'}} href="mailto:jaschrei@calpoly.edu?subject=React Feedback (Spacesport Weather Archive)&body=Write your feedback here...">
+            <Typography variant="body1" style={{ margin: "0.5rem", marginLeft: '3rem', marginRight: '3rem', fontWeight: "bold" }}>
+              Give Feedback
+            </Typography>
+          </a>
         </Button>
-        <IconButton edge="start" className={classes.menuButton} aria-label="dark mode">
+        <IconButton disableRipple edge="start" className={classes.menuButton} aria-label="dark mode">
           <Brightness4Icon/>
         </IconButton>
-        <IconButton edge="start" className={classes.menuButton} aria-label="report">
+        <IconButton edge="start" className={classes.menuButton} onClick={() => setDrawerOpen(!drawerIsOpen)} aria-label="report">
           <PostAddIcon/>
+          <ReportBuilder setDrawerOpen={() => setDrawerOpen(false)} open={drawerIsOpen}></ReportBuilder>
         </IconButton>
       </Toolbar>
     </ThemeProvider>

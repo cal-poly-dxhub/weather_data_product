@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component, useState, useEffect } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -9,24 +9,41 @@ import Radio from '@material-ui/core/Radio';
 import Paper from '@material-ui/core/Paper';
 
 import LeftColumn from './LeftColumn'
-import TablePanel from './TablePanel'
-
-import { ThemeProvider } from '@material-ui/styles';
-import theme from '../theme'
+import SodarTable from '../sodar/SodarTable'
+import TowerTable from '../tower/TowerTable';
+import { UserContext } from "../contexts/UserProvider"
 
 function Columns(props) {
-  return (
-    <ThemeProvider theme={theme}>
-      <Grid container direction="row" spacing={2} justify='center'>
-        <Grid item xs style={{maxWidth: 900}}>
-          <LeftColumn tower={props['tower']}/>
+  const [ state, dispatch ] = React.useContext(UserContext)
+
+  useEffect(() => {
+    console.log('wowie', props)
+  }, [])
+
+  switch (state.instruments.index) {
+    case 0:
+      return (
+        <Grid container direction="row" spacing={2} justify='center'>
+          <Grid item xs style={{maxWidth: 900}}>
+            <LeftColumn type='tower' tower={props['tower']}/>
+          </Grid>
+          <Grid item s style={{maxWidth: 900}}>
+            <TowerTable/>
+          </Grid>
         </Grid>
-        <Grid item s style={{maxWidth: 900}}>
-          <TablePanel measurements={props}/>
+      )
+    default:
+      return (
+        <Grid container direction="row" spacing={2} justify='center'>
+          <Grid item xs style={{maxWidth: 900}}>
+            <LeftColumn type='mini-sodar' tower={props['tower']}/>
+          </Grid>
+          <Grid item s style={{maxWidth: 900}}>
+            <SodarTable/>
+          </Grid>
         </Grid>
-      </Grid>
-    </ThemeProvider>
-  );
+      );
+  }
 }
 
 export default Columns;
