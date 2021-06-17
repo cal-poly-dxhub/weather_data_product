@@ -17,6 +17,15 @@ transfer () {
    elif [[ $filePath == *"915ProfilerWind"* ]]
    then
       dest="${destination}/915-profiler/wind"
+   elif [[ $filePath == *"Asos"* ]]
+   then
+      dest="${destination}/asos"
+   elif [[ $filePath == *"Mini-SODAR"* ]]
+   then
+      dest="${destination}/mini-sodar"
+   elif [[ $filePath == *"MetTower"* ]]
+   then
+      dest="${destination}/tower"
    fi
 
    if [[ $dest != "" ]]
