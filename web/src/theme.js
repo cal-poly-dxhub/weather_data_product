@@ -27,6 +27,9 @@ const theme = createMuiTheme({
       primary: '#ffffff',
       secondary: '#ffffff'
     },
+    outlined: {
+      primary: '#ffffff'
+    }
   },
   overrides: {
     MuiCardContent: {
@@ -45,6 +48,12 @@ const theme = createMuiTheme({
       },
       body: {
         borderColor: '#464646',
+      }
+    },
+    MuiChip: {
+      root: {
+        color: '#ffffff',
+        borderColor: '#ffffff'
       }
     }
   }

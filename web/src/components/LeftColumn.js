@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -13,6 +13,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 import UnfoldMoreIcon from '@material-ui/icons/UnfoldMore';
 import IconButton from '@material-ui/core/IconButton';
+
+import { UserContext } from "../contexts/UserProvider"
 
 const useStyles = makeStyles({
   root: {
@@ -33,11 +35,12 @@ const useStyles = makeStyles({
 
 function LeftColumn(props) {
   const classes = useStyles();
+
   const bull = <span className={classes.bullet}>•</span>;
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const [instrument, setInstrument] = React.useState(null)
+  const [ state, dispatch ] = React.useContext(UserContext)
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -47,9 +50,9 @@ function LeftColumn(props) {
     setAnchorEl(null);
   };
 
-  // useEffect(() => {
-  //   // Your code here
-  // }, []);
+  useEffect(() => {
+    console.log('reefreshed')
+  }, [props.id]);
 
   return (
     <Grid container direction="column" spacing={2}>
@@ -59,7 +62,7 @@ function LeftColumn(props) {
 
             <Button aria-controls="simple-menu" aria-haspopup="true" variant="text" onClick={handleClick}>
               <Typography variant="body1" style={{fontWeight: 'bold'}}>
-                Tower {bull} {props['tower']['tower_num']}
+                {state.instruments.index == 0 ? 'Tower' : 'Sodar'} {bull} {props['tower']['tower_num']}
               </Typography>
               <IconButton edge="start" className={classes.menuButton} style={{marginLeft: 0}}>
                 <UnfoldMoreIcon/>
