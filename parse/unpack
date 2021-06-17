@@ -1,53 +1,108 @@
 #!/bin/bash
 
-unpackTarget () {
-   targets=($(ls $1))
-   next=()
-   files=0
+destination="../../weather-data-raw"
 
-   for target in ${targets[@]}; do
-      filePath="$1/${target}"
-      file=${target%.*}
-      ext=${target##*.}
+src="."
+verbose=1
+moveFiles=1
 
-      if [[ $ext == "zip" ]]
-      then
-         echo "Unpacking the zip file $filePath"
-         unzip -q $filePath
-         rm $filePath
-         next+=("$1/${file}")
-      elif [[ $ext == "gz" ]]
-      then
-         echo "Unpacking the gz  file $filePath"
-         gunzip -q $filePath
-         files=$((files + 1))
-      elif [[ $ext == "tar" ]]
-      then
-         echo "Unpacking the tar file $filePath"
-         newDir="$1/$(echo ${file} | tr '.' '_')"
-         mkdir $newDir
-         tar -C $newDir -xf $filePath
-         rm $filePath
-         next+=($newDir)
-      elif [[ -d $filePath ]]
-      then
-         next+=($filePath)
-      fi
-   done
 
-   if [[ $files -gt 0 ]]
+transfer () {
+   local filePath=$1
+   local dest=""
+
+   if [[ $filePath == *"915ProfilerTemp"* ]]
    then
-      next=($1)
+      dest="${destination}/915-profiler/temp"
+   elif [[ $filePath == *"915ProfilerWind"* ]]
+   then
+      dest="${destination}/915-profiler/wind"
    fi
 
-   for target in ${next[@]}; do
-      unpackTarget $target
-   done
+   if [[ $dest != "" ]]
+   then
+      if [[ $moveFiles == 1 ]]
+      then
+         mv $filePath $dest
+      fi
+   fi
 }
 
-if [[ $1 == "" ]]
-then
-   unpackTarget .
-else
-   unpackTarget $1
-fi
+unpackTarget () {
+   local filePath=$1
+   local path=${filePath%/*}
+   local fileName=${filePath##*/}
+   local file=${fileName%.*}
+   local ext=${fileName#"${file}"}
+
+   if [[ -d $filePath ]]
+   then
+      targets=($(ls $filePath))
+
+      for target in ${targets[@]}
+      do
+         unpackTarget "$filePath/${target}"
+      done
+
+      if [[ $(ls $filePath) == "" ]]
+      then
+         rm -d $filePath
+      fi
+   elif [[ $ext == ".zip" ]]
+   then
+      if [[ $verbose == 1 ]]
+      then
+         echo "Unpacking the zip file $filePath"
+      fi
+      unzip -q $filePath
+      rm $filePath
+      unpackTarget "${path}/${file}"
+   elif [[ $ext == ".gz" ]]
+   then
+      if [[ $verbose == 1 ]]
+      then
+         echo "Unpacking the gz  file $filePath"
+      fi
+      gunzip -q $filePath
+      unpackTarget "${path}/${file}"
+   elif [[ $ext == ".tar" ]]
+   then
+      if [[ $verbose == 1 ]]
+      then
+         echo "Unpacking the tar file $filePath"
+      fi
+      newDir="$path/$(echo ${file} | tr '.' '_')"
+      mkdir $newDir
+      tar -C $newDir -xf $filePath
+      rm $filePath
+      unpackTarget $newDir
+   else
+      transfer $filePath
+   fi
+}
+
+
+for arg in $@
+do
+   if [[ $arg == "--help" ]]
+   then
+      echo "Usage: ./unpack [<path> | -s | -v | -nomv | -mv]"
+      exit 0
+   elif [[ $arg == "-s" ]]
+   then
+      verbose=0
+   elif [[ $arg == "-v" ]]
+   then
+      verbose=1
+   elif [[ $arg == "-nomv" ]]
+   then
+      moveFiles=0
+   elif [[ $arg == "-mv" ]]
+   then
+      moveFiles=1
+   else
+      src=$arg
+   fi
+done
+
+unpackTarget $src
