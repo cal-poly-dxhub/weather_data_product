@@ -1,0 +1,122 @@
+#!/bin/bash
+
+destination="../../weather-data-raw"
+
+src="."
+verbose=1
+moveFiles=1
+
+
+transfer () {
+   local filePath=$1
+   local dest=""
+
+   if [[ $filePath == *"915ProfilerTemp"* ]]
+   then
+      dest="${destination}/915-profiler/temp"
+   elif [[ $filePath == *"915ProfilerWind"* ]]
+   then
+      dest="${destination}/915-profiler/wind"
+   elif [[ $filePath == *"Asos"* ]]
+   then
+      dest="${destination}/asos"
+   elif [[ $filePath == *"Mini-SODAR"* ]]
+   then
+      dest="${destination}/mini-sodar"
+   elif [[ $filePath == *"MetTower"* ]]
+   then
+      dest="${destination}/tower"
+   fi
+
+   if [[ $dest != "" ]]
+   then
+      if [[ $moveFiles == 1 ]]
+      then
+         mv $filePath $dest
+      fi
+   fi
+}
+
+unpackTarget () {
+   local filePath=$1
+   local path=${filePath%/*}
+   local fileName=${filePath##*/}
+   local file=${fileName%.*}
+   local ext=${fileName#"${file}"}
+
+   if [[ $file == "__MACOSX" ]]
+   then
+      rm -rf $filePath
+   elif [[ -d $filePath ]]
+   then
+      targets=($(ls $filePath))
+
+      for target in ${targets[@]}
+      do
+         unpackTarget "${filePath}/${target}"
+      done
+
+      if [[ $(ls $filePath) == "" ]]
+      then
+         rm -d $filePath
+      fi
+   elif [[ $ext == ".zip" ]]
+   then
+      if [[ $verbose == 1 ]]
+      then
+         echo "Unpacking the zip file $filePath"
+      fi
+      newDir="${path}/$(echo ${file} | tr '.' '_')"
+      mkdir $newDir
+      unzip -q $filePath -d $newDir
+      rm -f $filePath
+      unpackTarget $newDir
+   elif [[ $ext == ".gz" ]]
+   then
+      if [[ $verbose == 1 ]]
+      then
+         echo "Unpacking the gz  file $filePath"
+      fi
+      gunzip -q $filePath
+      unpackTarget "${path}/${file}"
+   elif [[ $ext == ".tar" ]]
+   then
+      if [[ $verbose == 1 ]]
+      then
+         echo "Unpacking the tar file $filePath"
+      fi
+      newDir="${path}/$(echo ${file} | tr '.' '_')"
+      mkdir $newDir
+      tar -C $newDir -xf $filePath
+      rm -f $filePath
+      unpackTarget $newDir
+   else
+      transfer $filePath
+   fi
+}
+
+
+for arg in $@
+do
+   if [[ $arg == "--help" ]]
+   then
+      echo "Usage: ./unpack [<path> | -s | -v | -nomv | -mv]"
+      exit 0
+   elif [[ $arg == "-s" ]]
+   then
+      verbose=0
+   elif [[ $arg == "-v" ]]
+   then
+      verbose=1
+   elif [[ $arg == "-nomv" ]]
+   then
+      moveFiles=0
+   elif [[ $arg == "-mv" ]]
+   then
+      moveFiles=1
+   else
+      src=$arg
+   fi
+done
+
+unpackTarget $src
