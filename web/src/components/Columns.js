@@ -25,7 +25,7 @@ function Columns(props) {
       return (
         <Grid container direction="row" spacing={2} justify='center'>
           <Grid item xs style={{maxWidth: 900}}>
-            <LeftColumn type='tower' tower={props['tower']}/>
+            <LeftColumn type='tower'/>
           </Grid>
           <Grid item s style={{maxWidth: 900}}>
             <TowerTable/>
@@ -36,7 +36,7 @@ function Columns(props) {
       return (
         <Grid container direction="row" spacing={2} justify='center'>
           <Grid item xs style={{maxWidth: 900}}>
-            <LeftColumn type='mini-sodar' tower={props['tower']}/>
+            <LeftColumn type='mini-sodar'/>
           </Grid>
           <Grid item s style={{maxWidth: 900}}>
             <SodarTable/>

@@ -16,6 +16,8 @@ import IconButton from '@material-ui/core/IconButton';
 
 import { UserContext } from "../contexts/UserProvider"
 
+import axios from 'axios';
+
 const useStyles = makeStyles({
   root: {
     minWidth: 275,
@@ -42,6 +44,8 @@ function LeftColumn(props) {
 
   const [ state, dispatch ] = React.useContext(UserContext)
 
+  const [tower, setTower] = useState({});
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -51,8 +55,24 @@ function LeftColumn(props) {
   };
 
   useEffect(() => {
-    console.log('reefreshed')
-  }, [props.id]);
+    const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/prod/' + props.type;
+
+    axios.get(baseUrl, {
+      params: {
+        assetId: props.type == "mini-sodar" ? 518 : 70
+      },
+      headers: {
+        'Accept': '*/*',
+        'x-api-key': 'k7Zq8E1jzJ7yUFzPWhmwcalkdRRSnIPp5yNMDgdB'
+      }
+    })
+    .then(res => {
+      console.log('baseUrl' + baseUrl)
+      // console.log("data:", res['data']);
+      setTower(res['data']['tower']);
+    })
+    .catch(err => console.log(err));
+  }, [props.type]);
 
   return (
     <Grid container direction="column" spacing={2}>
@@ -62,7 +82,7 @@ function LeftColumn(props) {
 
             <Button aria-controls="simple-menu" aria-haspopup="true" variant="text" onClick={handleClick}>
               <Typography variant="body1" style={{fontWeight: 'bold'}}>
-                {state.instruments.index == 0 ? 'Tower' : 'Sodar'} {bull} {props['tower']['tower_num']}
+                {state.instruments.index == 0 ? 'Tower' : 'Sodar'} {bull} {tower['tower_num']}
               </Typography>
               <IconButton edge="start" className={classes.menuButton} style={{marginLeft: 0}}>
                 <UnfoldMoreIcon/>
@@ -76,7 +96,7 @@ function LeftColumn(props) {
               open={Boolean(anchorEl)}
               onClose={handleClose}
             >
-              <MenuItem onClick={handleClose} style={{color: '#000000'}}>Tower {bull} {props['tower']['tower_num']}</MenuItem>
+              <MenuItem onClick={handleClose} style={{color: '#000000'}}>Tower {bull} {tower['tower_num']}</MenuItem>
               <MenuItem onClick={handleClose} style={{color: '#000000'}}>Tower {bull} 73</MenuItem>
             </Menu>
 
@@ -87,7 +107,7 @@ function LeftColumn(props) {
                 ARCHIVE NUM
               </Typography>
               <Typography variant="body1" style={{fontWeight: 'bold'}}>
-                {props['tower']['archive_num']}
+                {tower['archive_num']}
               </Typography>
             </Grid>
 
@@ -98,7 +118,7 @@ function LeftColumn(props) {
                 LATITUDE
               </Typography>
               <Typography variant="body1" style={{fontWeight: 'bold'}}>
-                {props['tower']['latitude']}
+                {tower['latitude']}
               </Typography>
             </Grid>
 
@@ -109,7 +129,7 @@ function LeftColumn(props) {
                 LONGITUDE
               </Typography>
               <Typography variant="body1" style={{fontWeight: 'bold'}}>
-                {props['tower']['longitude']}
+                {tower['longitude']}
               </Typography>
             </Grid>
 
@@ -120,7 +140,7 @@ function LeftColumn(props) {
                 MSL ELEVATION
               </Typography>
               <Typography variant="body1" style={{fontWeight: 'bold'}}>
-                {props['tower']['msl_elevation']}
+                {tower['msl_elevation']}
               </Typography>
             </Grid>
 
@@ -131,7 +151,7 @@ function LeftColumn(props) {
                 LOCATION
               </Typography>
               <Typography variant="body1" style={{fontWeight: 'bold'}}>
-                {props['tower']['location']}
+                {tower['location']}
               </Typography>
             </Grid>
 
