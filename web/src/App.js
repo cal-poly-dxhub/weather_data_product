@@ -5,8 +5,8 @@ import './App.css';
 
 import Columns from './components/Columns'
 import Navbar from './components/Navbar'
-import Authenticator from './components/Authenticator';
 import InstrumentChips from './components/InstrumentChips';
+import SnapshotGrid from './components/SnapshotGrid'
 
 import { makeStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
@@ -69,7 +69,7 @@ class App extends Component {
                 <InstrumentChips/>
               </section>
               <section>
-                <Columns measurements={this.state.measurements} tower={this.state.tower}/>
+                <SnapshotGrid/>
               </section>
             </body>
           </div>
