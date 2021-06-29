@@ -1,6 +1,6 @@
 export const reducer = (state, action) => {
     switch (action.type) {
-        case "instrument/selector":
+        case "instruments/selector":
             return {
                 ...state,
                 instruments: {
@@ -35,9 +35,9 @@ export const initialState = {
     instruments: {
         index: 0,
         options: [
-            { key: 0, label: 'Tower' },
+            { key: 0, label: 'Sodar' },
             { key: 1, label: 'Profiler' },
-            { key: 2, label: 'Sodar' },
+            { key: 2, label: 'Tower' },
             { key: 3, label: 'AMPS' },
             { key: 4, label: 'FBWOS' }
         ]

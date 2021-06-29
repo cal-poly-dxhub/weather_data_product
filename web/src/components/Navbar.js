@@ -63,6 +63,13 @@ export default function Navbar() {
             </Typography>
           </a>
         </Button>
+        <Button className={classes.menuButton} variant="text" size="small" color="primary">
+          {/* <a style={{textDecoration: 'none'}} href="https://dxhub.awsapps.com/workdocs/index.html#/document/c8bbad636ca17bea83fb62e3fd1ddd402630bb422d4f30a8238f71a40438c992"> */}
+            <Typography variant="body1" display="block" style={{ margin: "0.5rem", color: "#9C9C9C", marginLeft: '3rem', marginRight: '3rem' }}>
+              Archive
+            </Typography>
+          {/* </a> */}
+        </Button>
         <Button className={classes.feedbackButton} size="large" color="primary">
           <a style={{textDecoration: 'none'}} href="mailto:jaschrei@calpoly.edu?subject=React Feedback (Spacesport Weather Archive)&body=Write your feedback here...">
             <Typography variant="body1" style={{ margin: "0.5rem", marginLeft: '3rem', marginRight: '3rem', fontWeight: "bold" }}>

@@ -2,10 +2,15 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import { makeStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
+import { Typography } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 
-import PreviewCard from './SnapshotCard';
+import { BrowserRouter, Route } from "react-router-dom"
+
+import SnapshotCard from './SnapshotCard';
+import snapshotsJSON from '../snapshots.json'
+import LocationChips from './LocationChips';
+import InstrumentChips from './InstrumentChips';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,20 +38,41 @@ export default function NestedGrid() {
       }
     })
     .then(res => {
+      console.log(res.data);
       setSnapshots(res.data);
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      console.log(err)
+    });
+
+    // setSnapshots(snapshotsJSON)
   }, [])
 
   return (
-    <div className={classes.root}>
-      <Grid container spacing={1}>
-        {snapshots.map((snapshot) => (
-        <Grid item xs>
-          <PreviewCard snapshot={snapshot}/>
-        </Grid>
-        ))}
+    <Grid container className={classes.root} justify='space-between'>
+      <Grid container alignItems='center'>
+        <Typography variant="p" style={{color: 'gray', fontWeight: 'bold'}}>
+          Instruments
+        </Typography>
+        <InstrumentChips/>
       </Grid>
-    </div>
+      <Grid container alignItems='center' style={{marginBottom: 20}}>
+        <Typography variant="p" style={{color: 'gray', fontWeight: 'bold'}}>
+          Locations
+        </Typography>
+        <LocationChips locations={snapshots.map(snapshot => snapshot.instrument.asset_name)}/>
+      </Grid>
+      <Grid container spacing={2}>
+        <BrowserRouter>
+          {snapshots.map((snapshot) => (
+            <Route path='/'>
+              <Grid item xs={12} md={6} lg={4} xl={3}>
+                <SnapshotCard snapshot={snapshot}/>
+              </Grid>
+            </Route>
+          ))}
+        </BrowserRouter>
+      </Grid>
+    </Grid>
   );
 }

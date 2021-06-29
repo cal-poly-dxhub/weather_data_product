@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
 import Box from '@material-ui/core/Box';
@@ -21,35 +20,29 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function InstrumentChips() {
+export default function LocationChips(props) {
   const [ state, dispatch ] = React.useContext(UserContext)
   const classes = useStyles();
 
   return (
     <Box component="ul" className={classes.root}>
-      {state.instruments.options.map((instrument) => {
+      {props.locations.map((location) => {
         let icon;
 
-        let isClickable = (instrument.label == "Sodar" );
-
-        if (instrument.label === 'React') {
-        icon = <TagFacesIcon />;
-        }
-
         return (
-        <li key={instrument.key}>
+        <li key={location}>
             <Chip
             icon={icon}
-            label={instrument.label}
-            color={isClickable ? "primary" : "secondary"}
+            label={location}
+            color="primary"
             onDelete={undefined}
             className={classes.chip}
-            variant={instrument.key == state.instruments.index ? "default" : "outlined"}
-            clickable={isClickable}
-            onClick={() => {
-              if (isClickable) {
-                dispatch({ type: "instrument/selector", payload: instrument.key })}
-              }}
+            variant="outlined"
+            clickable={true}
+            // onClick={() => {
+            //   if (isClickable) {
+            //     dispatch({ type: "instrument/selector", payload: instrument.key })}
+            //   }}
             />
         </li>
         );
