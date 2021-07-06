@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 
 import { makeStyles } from '@material-ui/core/styles';
-import { Typography } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 
 import { BrowserRouter, Route } from "react-router-dom"
 
 import SnapshotCard from './SnapshotCard';
 import snapshotsJSON from '../snapshots.json'
-import LocationChips from './LocationChips';
-import InstrumentChips from './InstrumentChips';
+import { UserContext } from '../contexts/UserProvider';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,18 +21,21 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function NestedGrid() {
+export default function SnapshotGrid(props) {
   const classes = useStyles();
   const [snapshots, setSnapshots] = useState([]);
+  const [leftSnapshot, setLeftSnapshot] = useState({});
+  const [isTwoColumn, changeToTwoColumn] = useState(false);
+  const [state, dispatch] = useContext(UserContext);
 
   useEffect(() => {
-    const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/mini-sodar/snapshot';
+    const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' + props.path + 'snapshot/';
 
     axios.get(baseUrl, {
       params: {},
       headers: {
         'Accept': '*/*',
-        'x-api-key': 'k7Zq8E1jzJ7yUFzPWhmwcalkdRRSnIPp5yNMDgdB',
+        'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
       }
     })
     .then(res => {
@@ -46,32 +47,39 @@ export default function NestedGrid() {
     });
 
     // setSnapshots(snapshotsJSON)
-  }, [])
+  }, [props.path, state.instruments.index])
+
+  useEffect(() => {
+    console.log("contains an object", Object.keys(leftSnapshot).length > 0)
+    changeToTwoColumn(Object.keys(leftSnapshot).length > 0);
+  }, [leftSnapshot])
 
   return (
-    <Grid container className={classes.root} justify='space-between'>
-      <Grid container alignItems='center'>
-        <Typography variant="p" style={{color: 'gray', fontWeight: 'bold'}}>
-          Instruments
-        </Typography>
-        <InstrumentChips/>
-      </Grid>
-      <Grid container alignItems='center' style={{marginBottom: 20}}>
-        <Typography variant="p" style={{color: 'gray', fontWeight: 'bold'}}>
-          Locations
-        </Typography>
-        <LocationChips locations={snapshots.map(snapshot => snapshot.instrument.asset_name)}/>
-      </Grid>
-      <Grid container spacing={2}>
-        <BrowserRouter>
-          {snapshots.map((snapshot) => (
-            <Route path='/'>
-              <Grid item xs={12} md={6} lg={4} xl={3}>
-                <SnapshotCard snapshot={snapshot}/>
-              </Grid>
-            </Route>
+    <Grid container direction='column' className={classes.root} justify='space-between'>
+      <Grid container justify='space-between'>
+        {
+          isTwoColumn
+            ?
+            <Grid item xs={6}>
+              <SnapshotCard snapshot={leftSnapshot} numRows={35}/>
+            </Grid>
+            :
+              <div></div>
+        }
+        <Grid container spacing={2} xs={isTwoColumn ? 6 : 12}>
+          {snapshots.filter((snapshot) => {
+            return(
+              isTwoColumn
+                ? (snapshot.instrument.location != leftSnapshot.instrument.location)
+                : true
+            )
+            
+          }).map((snapshot) => (
+            <Grid item xs={isTwoColumn ? 12 : 12} md={isTwoColumn ? 12 : 6} lg={isTwoColumn ? 6 : 4} xl={isTwoColumn ? 6 : 3} onClick={() => {setLeftSnapshot(snapshot)}}>
+              <SnapshotCard snapshot={snapshot} numRows={5}/>
+            </Grid>
           ))}
-        </BrowserRouter>
+        </Grid>
       </Grid>
     </Grid>
   );

@@ -4,6 +4,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
 import Box from '@material-ui/core/Box';
 import TagFacesIcon from '@material-ui/icons/TagFaces';
+import { Grid } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 
 import { UserContext } from "../contexts/UserProvider"
 
@@ -21,39 +23,47 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function InstrumentChips() {
+export default function InstrumentChips(props) {
   const [ state, dispatch ] = React.useContext(UserContext)
   const classes = useStyles();
 
   return (
-    <Box component="ul" className={classes.root}>
-      {state.instruments.options.map((instrument) => {
-        let icon;
+    <Grid container direction='column' alignItems='flex-start'>
+      <Typography variant="p" style={{color: 'gray', fontWeight: 'bold'}}>
+        Instruments
+      </Typography>
 
-        let isClickable = (instrument.label == "Sodar" );
+      <Box component="ul" className={classes.root}>
+        {state.instruments.options.map((instrument) => {
+          // let icon;
 
-        if (instrument.label === 'React') {
-        icon = <TagFacesIcon />;
-        }
+          let isClickable = (instrument.label != "FBWOS" );
 
-        return (
-        <li key={instrument.key}>
-            <Chip
-            icon={icon}
-            label={instrument.label}
-            color={isClickable ? "primary" : "secondary"}
-            onDelete={undefined}
-            className={classes.chip}
-            variant={instrument.key == state.instruments.index ? "default" : "outlined"}
-            clickable={isClickable}
-            onClick={() => {
-              if (isClickable) {
-                dispatch({ type: "instrument/selector", payload: instrument.key })}
-              }}
-            />
-        </li>
-        );
-        })}
-    </Box>
+          // if (instrument.label === 'React') {
+          // icon = <TagFacesIcon />;
+          // }
+
+          return (
+          <li key={instrument.key}>
+              <Chip
+              // icon={icon}
+              label={instrument.label}
+              color={isClickable ? "primary" : "secondary"}
+              onDelete={undefined}
+              className={classes.chip}
+              variant={instrument.key == state.instruments.index ? "default" : "outlined"}
+              clickable={isClickable}
+              onClick={() => {
+                if (isClickable) {
+                  dispatch({ type: "instruments/selector", payload: instrument.key });
+                  props.setPath(instrument.variants[0].path);
+                }
+                }}
+              />
+          </li>
+          );
+          })}
+      </Box>
+    </Grid>
   );
 }

@@ -976,7 +976,7 @@
   {
     "asset_id": 521,
     "instrument": {
-      "asset_name": "Name",
+      "asset_name": "Name 3",
       "tower_id": 42,
       "latitude": 344,
       "longitude": 234,
@@ -1950,7 +1950,7 @@
   {
     "asset_id": 522,
     "instrument": {
-      "asset_name": "Name",
+      "asset_name": "Name 2",
       "tower_id": 42,
       "latitude": 344,
       "longitude": 234,

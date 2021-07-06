@@ -15,9 +15,11 @@ import Paper from '@material-ui/core/Paper';
 
 const useStyles = makeStyles({
   root: {
-    minWidth: 275, 
+    // minWidth: 275, 
+    height: "100%",
+    backgroundColor: '#242026',
     '&:hover': {
-      
+      borderColor: '#ffffff',
     }
   },
   bullet: {
@@ -68,23 +70,23 @@ function QuickMetadata(props) {
 
 function QuickMetadataGrid(props) {
   return (
-    <Grid container alignItems='center' justify='space-between'>
-      <Grid container direction='column' xs={6}>
+    <Grid container alignItems='center'>
+      {/* <Grid container direction='column' xs={6}> */}
         <Grid item xs={6}>
-          <QuickMetadata title="ID" value={props.instrument.tower_id}/>
+          <QuickMetadata title="ID" value={props.instrument.asset_ID}/>
         </Grid>
         {/* <Grid item xs={6}>
           <QuickMetadata title="LAT" value={props.instrument.latitude}/>
         </Grid> */}
-      </Grid>
-      <Grid container direction='column' xs={6}>
+      {/* </Grid> */}
+      {/* <Grid container direction='column' xs={6}> */}
         <Grid item xs={6}>
-          <QuickMetadata title="HEIGHT" value={props.instrument.height}/>
+          <QuickMetadata title="HEIGHT" value={props.instrument.asset_height}/>
         </Grid>
         {/* <Grid item xs={6}>
           <QuickMetadata title="LONG" value={props.instrument.longitude}/>
         </Grid> */}
-      </Grid>
+      {/* </Grid> */}
     </Grid>
   )
 }
@@ -97,21 +99,21 @@ function GateResponsePreview(props) {
     const keys = Object.keys(props.response.gateResponses[0]);
     setHeaders(keys)
     console.log("response", props)
-  }, [])
+  }, [props.response])
 
   return (
       <Table size="small" variant='outlined' aria-label="a dense table" className={classes.table} rows>
         <TableHead>
           <TableRow>
-            {headers.map((header) => (
+            {headers.slice(1, props.numRows).map((header) => (
               <TableCell align="right">{header}</TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.response.gateResponses.slice(0, 3).map((row) => (
+          {props.response.gateResponses.slice(props.numRows > 5 ? 0 : props.response.gateResponses.length-5, props.response.gateResponses.length).map((row) => (
             <TableRow key={row.name}>
-              {headers.map((header) => (
+              {headers.slice(1, props.numRows).map((header) => (
                 <TableCell align="right">{removeMissingData(row[header])}</TableCell>
               ))}
             </TableRow>
@@ -124,10 +126,13 @@ function GateResponsePreview(props) {
 // props: snapshot, slice_min, slice_max
 export default function SnapshotCard(props) {
   const classes = useStyles();
+  const [numRows, setNumRows] = useState(5);
+
 
   useEffect(() => {
-    console.log("instrument", props.snapshot.instrument)
-  }, [])
+    setNumRows(props.numRows);
+    console.log(numRows)
+  }, [props.numRows])
 
   return (
     <Card className={classes.root} variant="outlined">
@@ -136,7 +141,7 @@ export default function SnapshotCard(props) {
           <Grid container justify='space-around' alignItems='center' style={{marginBottom: 20}}>
             <Grid item>
               <Typography variant="h4" style={{fontWeight: 'bold'}}>
-                {props.snapshot.instrument.asset_name}
+                {props.snapshot.instrument.location}
               </Typography>
             </Grid>
             <Grid item>
@@ -144,7 +149,7 @@ export default function SnapshotCard(props) {
             </Grid>
           </Grid>
           <Grid item>
-            <GateResponsePreview response={props.snapshot.measurements[0]}/>
+            <GateResponsePreview response={props.snapshot.measurements[0]} numRows={props.numRows}/>
           </Grid>
         </Grid>
       </CardContent>
