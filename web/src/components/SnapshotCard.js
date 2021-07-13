@@ -13,6 +13,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
+import { UserContext } from '../contexts/UserProvider';
+
 const useStyles = makeStyles({
   root: {
     // minWidth: 275, 
@@ -71,22 +73,29 @@ function QuickMetadata(props) {
 function QuickMetadataGrid(props) {
   return (
     <Grid container alignItems='center'>
-      {/* <Grid container direction='column' xs={6}> */}
-        <Grid item xs={6}>
-          <QuickMetadata title="ID" value={props.instrument.asset_ID}/>
-        </Grid>
-        {/* <Grid item xs={6}>
-          <QuickMetadata title="LAT" value={props.instrument.latitude}/>
-        </Grid> */}
-      {/* </Grid> */}
-      {/* <Grid container direction='column' xs={6}> */}
-        <Grid item xs={6}>
-          <QuickMetadata title="HEIGHT" value={props.instrument.asset_height}/>
-        </Grid>
-        {/* <Grid item xs={6}>
-          <QuickMetadata title="LONG" value={props.instrument.longitude}/>
-        </Grid> */}
-      {/* </Grid> */}
+      {
+        (props.index == 4)
+          ? (
+            <div>
+              <Grid item xs={6}>
+                <QuickMetadata title="BALLOON TYPE" value={props.instrument.BalloonType}/>
+              </Grid>
+              <Grid item xs={6}>
+                <QuickMetadata title="LAUNCH" value={props.instrument.location}/>
+              </Grid>
+            </div>
+          )
+          : (
+            <div>
+              <Grid item xs={6}>
+                <QuickMetadata title="ID" value={props.instrument.asset_ID}/>
+              </Grid>
+              <Grid item xs={6}>
+                <QuickMetadata title="HEIGHT" value={props.instrument.asset_height}/>
+              </Grid>  
+            </div>
+          )
+      }
     </Grid>
   )
 }
@@ -105,7 +114,7 @@ function GateResponsePreview(props) {
       <Table size="small" variant='outlined' aria-label="a dense table" className={classes.table} rows>
         <TableHead>
           <TableRow>
-            {headers.slice(1, props.numRows).map((header) => (
+            {headers.slice(1, 5).map((header) => (
               <TableCell align="right">{header}</TableCell>
             ))}
           </TableRow>
@@ -113,8 +122,8 @@ function GateResponsePreview(props) {
         <TableBody>
           {props.response.gateResponses.slice(props.numRows > 5 ? 0 : props.response.gateResponses.length-5, props.response.gateResponses.length).map((row) => (
             <TableRow key={row.name}>
-              {headers.slice(1, props.numRows).map((header) => (
-                <TableCell align="right">{removeMissingData(row[header])}</TableCell>
+              {headers.slice(1, 5).map((header) => (
+                <TableCell align="right">{(row[header])}</TableCell>
               ))}
             </TableRow>
           ))}
@@ -127,6 +136,7 @@ function GateResponsePreview(props) {
 export default function SnapshotCard(props) {
   const classes = useStyles();
   const [numRows, setNumRows] = useState(5);
+  const [ state, dispatch ] = React.useContext(UserContext);
 
 
   useEffect(() => {
@@ -141,11 +151,15 @@ export default function SnapshotCard(props) {
           <Grid container justify='space-around' alignItems='center' style={{marginBottom: 20}}>
             <Grid item>
               <Typography variant="h4" style={{fontWeight: 'bold'}}>
-                {props.snapshot.instrument.location}
+                { (state.instruments.index == 4)
+                  ? props.snapshot.instrument.BalloonName
+                  : props.snapshot.instrument.location
+
+                }
               </Typography>
             </Grid>
             <Grid item>
-              <QuickMetadataGrid instrument={props.snapshot.instrument}/>
+              <QuickMetadataGrid instrument={props.snapshot.instrument} index={state.instruments.index}/>
             </Grid>
           </Grid>
           <Grid item>

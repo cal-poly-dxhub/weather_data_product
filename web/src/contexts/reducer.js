@@ -98,7 +98,7 @@ export const initialState = {
             ]},
 
             { key: 4, label: 'AMPS', variants: [
-                { path: 'fbwos/',
+                { path: 'amps/',
                   label: 'Unknown',
                   data: []
                 },

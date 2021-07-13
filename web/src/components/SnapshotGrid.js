@@ -3,6 +3,7 @@ import axios from 'axios';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
+import { DataGrid } from '@material-ui/data-grid';
 
 import { BrowserRouter, Route } from "react-router-dom"
 
@@ -31,20 +32,43 @@ export default function SnapshotGrid(props) {
   useEffect(() => {
     const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' + props.path + 'snapshot/';
 
-    axios.get(baseUrl, {
-      params: {},
-      headers: {
-        'Accept': '*/*',
-        'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
+    if (state.instruments.index == 1) {
+      if (state.instruments.options[state.instruments.index].variants[0].data.length === 0 || state.instruments.options[state.instruments.index].variants[1].data.length === 0) {
+        axios.get(baseUrl, {
+          params: {},
+          headers: {
+            'Accept': '*/*',
+            'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
+          }
+        })
+        .then(res => {
+          console.log(res.data);
+          setSnapshots(res.data);
+        })
+        .catch(err => {
+          console.log(err)
+        });
       }
-    })
-    .then(res => {
-      console.log(res.data);
-      setSnapshots(res.data);
-    })
-    .catch(err => {
-      console.log(err)
-    });
+    } else {
+      if (state.instruments.options[state.instruments.index].variants[0].data.length === 0) {
+        axios.get(baseUrl, {
+          params: {},
+          headers: {
+            'Accept': '*/*',
+            'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
+          }
+        })
+        .then(res => {
+          console.log(res.data);
+          setSnapshots(res.data);
+        })
+        .catch(err => {
+          console.log(err)
+        });
+      } else {
+        setSnapshots(state.instruments.options[state.instruments.index].variants[0].data);
+      }
+    }
 
     // setSnapshots(snapshotsJSON)
   }, [props.path, state.instruments.index])
@@ -54,6 +78,11 @@ export default function SnapshotGrid(props) {
     changeToTwoColumn(Object.keys(leftSnapshot).length > 0);
   }, [leftSnapshot])
 
+  useEffect(() => {
+    changeToTwoColumn(false);
+  }, [state.instruments.index])
+
+
   return (
     <Grid container direction='column' className={classes.root} justify='space-between'>
       <Grid container justify='space-between'>
@@ -61,7 +90,7 @@ export default function SnapshotGrid(props) {
           isTwoColumn
             ?
             <Grid item xs={6}>
-              <SnapshotCard snapshot={leftSnapshot} numRows={35}/>
+               <SnapshotCard snapshot={leftSnapshot} numRows={35}/>
             </Grid>
             :
               <div></div>
