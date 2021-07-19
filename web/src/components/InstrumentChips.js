@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
@@ -24,7 +24,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function InstrumentChips(props) {
-  const [ state, dispatch ] = React.useContext(UserContext)
+  const [selected, changeSelectionTo] = useState(0);
+  const [state, dispatch] = useContext(UserContext);
   const classes = useStyles();
 
   return (
@@ -34,35 +35,23 @@ export default function InstrumentChips(props) {
       </Typography>
 
       <Box component="ul" className={classes.root}>
-        {state.instruments.options.map((instrument) => {
-          // let icon;
-
-          let isClickable = (instrument.label != "FBWOS" );
-
-          // if (instrument.label === 'React') {
-          // icon = <TagFacesIcon />;
-          // }
-
-          return (
-          <li key={instrument.key}>
+        {
+          Object.keys(state.instruments).map((key, index) => (
+            <li key={key}>
               <Chip
-              // icon={icon}
-              label={instrument.label}
-              color={isClickable ? "primary" : "secondary"}
+              label={key.toUpperCase()}
+              color={"primary"}
               onDelete={undefined}
               className={classes.chip}
-              variant={instrument.key == state.instruments.index ? "default" : "outlined"}
-              clickable={isClickable}
+              variant={index == selected ? "default" : "outlined"}
               onClick={() => {
-                if (isClickable) {
-                  dispatch({ type: "instruments/selector", payload: instrument.key });
-                  props.setPath(instrument.variants[0].path);
-                }
+                changeSelectionTo(index)
+                props.setInstrument(key);
                 }}
               />
-          </li>
-          );
-          })}
+            </li>
+          )) 
+        }
       </Box>
     </Grid>
   );

@@ -1,42 +1,43 @@
 export const reducer = (state, action) => {
     switch (action.type) {
-        case "instruments/selector":
-            return {
-                ...state,
-                instruments: {
-                    ...state.instruments,
-                    index: action.payload
-                }
-            }
-
         // PAYLOAD instruments/data
         // {
-        //     key: '0,
-        //     label: 'Wind'
-        //     path: 'mini-sodar',
-        //     data: []
+        //     key: 'profiler_temp',
+        //     data: [...]
         // }
 
         case "instruments/data":
-            return {
-                ...state,
-                instruments: {
-                    ...state.instruments,
-                    options: [
-                        ...state.instruments.options.slice(0, action.payload.key),
-                        { key: action.payload.key,
-                          label: state.instruments.options[action.payload.key].label,
-                          variants: state.instruments.options[action.payload.key].variants.map((variant) => {
-                              return(
-                                  variant.path === action.payload.path
-                                    ? { path: variant.path,
-                                        data: action.payload.data }
-                                    : variant
-                              )
-                          })
+
+            const keys = action.payload.key.split("/").filter(key => key)
+            console.log("keys: ", keys)
+
+            if (keys.length == 2) {
+                return {
+                    ...state,
+                    instruments: {
+                        ...state.instruments,
+                        [keys[0]]: {
+                            ...state.instruments[keys[0]],
+                            [keys[1]]: {
+                                ...state.instruments[keys[0]][keys[1]],
+                                data: action.payload.data
+                            }
                         }
-                    ]
+                    }
                 }
+            } else if (keys.length == 1) {
+                return {
+                    ...state,
+                    instruments: {
+                        ...state.instruments,
+                        [keys[0]]: {
+                            ...state.instruments[keys[0]],
+                            data: action.payload.data
+                        }
+                    }
+                }
+            } else {
+                return state
             }
         case "settings/temp_imperial":
             return {
@@ -63,48 +64,35 @@ export const reducer = (state, action) => {
 
 export const initialState = {
     instruments: {
-        index: 1,
-        options: [
-            { key: 0, label: 'Sodar', variants: [
-                { path: 'mini-sodar/',
-                  label: 'Wind & Gust',
-                  data: []
-                },
-            ]},
-
-            { key: 1, label: 'Profiler', variants: [
-                { path: '915-profiler/temp/',
-                  label: 'Temperature',
-                  data: []
-                },
-                { path: '915-profiler/wind/',
-                  label: 'Wind',
-                  data: []
-                },
-            ]},
-
-            { key: 2, label: 'Tower', variants: [
-                { path: 'tower/',
-                  label: 'Unknown',
-                  data: []
-                },
-            ]},
-
-            { key: 3, label: 'ASOS', variants: [
-                { path: 'asos/',
-                  label: 'Unknown',
-                  data: []
-                },
-            ]},
-
-            { key: 4, label: 'AMPS', variants: [
-                { path: 'amps/',
-                  label: 'Unknown',
-                  data: []
-                },
-            ]},
-        ]
+        sodar: {
+            path: "mini-sodar/",
+            data: []
+        },
+        profiler: {
+            path: "915-profiler/",
+            temp: {
+                path: "temp/",
+                data: []
+            },
+            wind: {
+                path: "wind/",
+                data: []
+            }
+        },
+        tower: {
+            path: "tower/",
+            data: []
+        },
+        asos: {
+            path: "asos/",
+            data: []
+        },
+        amps: {
+            path: "amps/",
+            data: []
+        },
     },
+
     settings: {
         temp_imperial: true,
         distance_imperial: true

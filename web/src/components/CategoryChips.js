@@ -26,39 +26,40 @@ export default function CategoryChips(props) {
   const [ state, dispatch ] = React.useContext(UserContext)
   const classes = useStyles();
 
-  if (state.instruments.options[state.instruments.index].variants.length > 1) {
-    return (
-      <Grid container direction='column' alignItems='flex-start'>
-        <Typography variant="p" style={{color: 'gray', fontWeight: 'bold'}}>
-          Category
-        </Typography>
+  useEffect(() => {
+    console.log("look at me!!!" + props.category)
+  }, [props.category]);
 
-        <Box component="ul" className={classes.root}>
-           {state.instruments.options[state.instruments.index].variants.map((variant) => {
-            let icon;
+  return (
+    <Grid container direction='column' alignItems='flex-start'>
+      <Typography variant="p" style={{color: 'gray', fontWeight: 'bold'}}>
+        Category
+      </Typography>
+
+      <Box component="ul" className={classes.root}>
+          {Object.keys(props.instrument).map((key, index) => {
+
+            if (index == 0 ){ return }
 
             return (
-            <li key={variant.path}>
-                <Chip
-                icon={icon}
-                label={variant.label}
-                color="primary"
-                onDelete={undefined}
-                className={classes.chip}
-                variant="outlined"
-                clickable={true}
-                onClick={() => {
-                   props.setPath(variant.path)
-                }}
-                />
-            </li>
+              <li key={key}>
+                  <Chip
+                  label={key.toUpperCase()}
+                  color="primary"
+                  onDelete={undefined}
+                  variant={key == props.category ? "default" : "outlined"}
+                  className={classes.chip}
+                  onClick={() => {
+                    props.setCategory(key)
+                  }}
+                  />
+              </li>
             );
-            })}
-        </Box>
-      </Grid>
+          })}
+      </Box>
+    </Grid>
 
-    );
-  }
+  );
 
   return <div/>
 }

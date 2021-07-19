@@ -7,7 +7,7 @@ import { ThemeProvider } from '@material-ui/styles';
 import theme from './theme';
 
 import { UserContext, UserProvider } from './contexts/UserProvider';
-import SnapshotHub from './SnapshotHub';
+import SnapshotHub from './components/SnapshotHub';
 
 export default function App() {
   return (

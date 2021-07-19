@@ -107,7 +107,7 @@ function GateResponsePreview(props) {
   useEffect(() => {
     const keys = Object.keys(props.response.gateResponses[0]);
     setHeaders(keys)
-    console.log("response", props)
+    // console.log("response", props)
   }, [props.response])
 
   return (
@@ -138,10 +138,14 @@ export default function SnapshotCard(props) {
   const [numRows, setNumRows] = useState(5);
   const [ state, dispatch ] = React.useContext(UserContext);
 
+  useEffect(() => {
+    console.log("snapshot: ", props.snapshot)
+  }, [])
+
 
   useEffect(() => {
     setNumRows(props.numRows);
-    console.log(numRows)
+    // console.log(props.snapshot)
   }, [props.numRows])
 
   return (
@@ -151,11 +155,11 @@ export default function SnapshotCard(props) {
           <Grid container justify='space-around' alignItems='center' style={{marginBottom: 20}}>
             <Grid item>
               <Typography variant="h4" style={{fontWeight: 'bold'}}>
-                { (state.instruments.index == 4)
-                  ? props.snapshot.instrument.BalloonName
-                  : props.snapshot.instrument.location
+                {/* { (state.instruments.index == 4) */}
+                  {/* ? props.snapshot.instrument.BalloonName */}
+                  {props.snapshot.instrument.location}
 
-                }
+                {/* } */}
               </Typography>
             </Grid>
             <Grid item>
