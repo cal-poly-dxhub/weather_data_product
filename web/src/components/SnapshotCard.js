@@ -267,30 +267,6 @@ function FullToolbar(props) {
 
   return (
     <Grid container justify="space-between" alignItems="center">
-      {/* <Grid item xs={2}>
-        {("BalloonType" in props.instrument)
-          ? (
-            <Grid container>
-              <Grid item xs={6}>
-                <QuickMetadataItem title="BALLOON TYPE" value={props.instrument.BalloonType}/>
-              </Grid>
-              <Grid item xs={6}>
-                <QuickMetadataItem title="LAUNCH" value={props.instrument.location}/>
-              </Grid>
-            </Grid>
-          )
-          : (
-            <Grid container>
-              <Grid item xs={6}>
-                <QuickMetadataItem title="HEIGHT" value={height}/>
-              </Grid>
-              <Grid item xs={6}>
-                <QuickMetadataItem title="ID" value={"asset_id" in props.instrument ? props.instrument.asset_id : props.instrument.asset_ID}/>
-              </Grid>
-            </Grid>  
-        )}
-      </Grid> */}
-
       <Grid item xs={8} style={{ paddingLeft: 60, paddingRight: 60 }}>
         <Slider
           defaultValue={20}
@@ -351,7 +327,67 @@ function FullTable(props) {
   )
 }
 
+// DETAIL: Header
 
+function DetailHeader(props) {  
+  const classes = useStyles();
+  const [headers, setHeaders] = useState([]);
+  const [height, setHeight] = React.useState(props.snapshot.instrument.asset_height);
+  const Spacer = require('react-spacer')
+
+  useEffect(() => {
+    setHeight(
+      props.isMetric 
+      ? (0.5 * props.snapshot.instrument.asset_height)
+      : (2 * props.snapshot.instrument.asset_height)
+    )
+  }, [props.isMetric])
+
+  return (
+    <div style={{ display: 'flex' }}>
+      <div>
+        <IconButton edge="start" className={classes.menuButton} aria-label="units" onClick={() => {
+          props.didMoveToDetail(false);
+          props.highlightSnapshot("");
+        }}>
+          <ArrowBackIcon/>
+        </IconButton>
+      </div>
+    
+      <div item xs={1}>
+        <Typography variant="h3" style={{fontWeight: "bold", textAlign: "center", paddingBottom: 20}}>
+          {props.snapshot.instrument.location}
+        </Typography>
+      </div>
+
+      <Spacer grow='1'/>
+
+      <div>
+        {("BalloonType" in props.snapshot.instrument)
+          ? (
+            <Grid container>
+              <Grid item xs={6}>
+                <QuickMetadataItem title="BALLOON TYPE" value={props.snapshot.instrument.BalloonType}/>
+              </Grid>
+              <Grid item xs={6}>
+                <QuickMetadataItem title="LAUNCH" value={props.snapshot.instrument.location}/>
+              </Grid>
+            </Grid>
+          )
+          : (
+            <Grid container>
+              <Grid item xs={6}>
+                <QuickMetadataItem title="HEIGHT" value={height}/>
+              </Grid>
+              <Grid item xs={6}>
+                <QuickMetadataItem title="ID" value={"asset_id" in props.snapshot.instrument ? props.snapshot.instrument.asset_id : props.snapshot.instrument.asset_ID}/>
+              </Grid>
+            </Grid>  
+        )}
+      </div>
+    </div>
+  )
+}
 
 
 
@@ -383,48 +419,7 @@ export default function SnapshotCard(props) {
     {props.isDetail
       ? (
         <Grid container direction="column">
-          <Grid container>
-            <Grid item>
-              <IconButton edge="start" className={classes.menuButton} aria-label="units" onClick={() => {
-                
-              }}>
-                <ArrowBackIcon/>
-              </IconButton>
-            </Grid>
-            
-            <Grid item>
-              <Typography variant="h3" style={{fontWeight: "bold", textAlign: "center", paddingBottom: 20}}>
-                {props.snapshot.instrument.location}
-              </Typography>
-            </Grid>
-            <Grid item xs={7}>
-
-            </Grid>
-            <Grid item xs={3}>
-              {("BalloonType" in props.snapshot.instrument)
-                ? (
-                  <Grid container>
-                    <Grid item xs={6}>
-                      <QuickMetadataItem title="BALLOON TYPE" value={props.snapshot.instrument.BalloonType}/>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <QuickMetadataItem title="LAUNCH" value={props.snapshot.instrument.location}/>
-                    </Grid>
-                  </Grid>
-                )
-                : (
-                  <Grid container>
-                    <Grid item xs={6}>
-                      <QuickMetadataItem title="HEIGHT" value={height}/>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <QuickMetadataItem title="ID" value={"asset_id" in props.snapshot.instrument ? props.snapshot.instrument.asset_id : props.snapshot.instrument.asset_ID}/>
-                    </Grid>
-                  </Grid>  
-              )}
-            </Grid>
-
-          </Grid>
+          { DetailHeader(props) }
           <Grid item>
             <Card className={classes.root} variant="outlined">
               <CardContent>

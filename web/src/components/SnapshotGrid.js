@@ -116,15 +116,13 @@ const locations = ["LF06", "Motor Pool", "LF-03", "Boathouse", "SLC-3", "HSF", "
     <Grid container className={classes.root} justify='center'>
       <CustomGrid
         component="ul"
-        // columns={isInDetail ? 1 : 3}
+        columns={isInDetail ? 1 : 3}
         columnWidth={isInDetail ? 1000 : 375}
         gutterWidth={40}
         gutterHeight={40}
         itemHeight={308}
         springConfig={{ stiffness: 170, damping: 26 }}
-        enter={enter}
-        entered={entered}
-        exit={exit}
+        style={{listStyle: "none"}}
       >
       {snapshots.length == 0 ?
         (
@@ -147,18 +145,19 @@ const locations = ["LF06", "Motor Pool", "LF-03", "Boathouse", "SLC-3", "HSF", "
                 : true
             ))
             .map((snapshot) => (
-              <li key={snapshot.instrument.location} style={{width: isInDetail ? "1000px" : "400px", height: isInDetail ? "1000px" : "335px"}} onClick={() => (
-                isInDetail
-                  ? (
-                    didMoveToDetail(false), highlightSnapshot({})
-                  )
-                  : highlightSnapshot(snapshot)
-              )}>
+              <li key={snapshot.instrument.location} style={{width: isInDetail ? "100%" : "400px", height: isInDetail ? "Auto" : "335px"}} onClick={() => {
+                if (!isInDetail) {
+                  highlightSnapshot(snapshot)
+                }
+                }}>
                 <SnapshotCard 
                   snapshot={snapshot} 
                   numRows={5} 
                   isMetric={state.settings.imperial} 
-                  isDetail={isInDetail && snapshotHighlighted.instrument.location == snapshot.instrument.location}/>
+                  isDetail={isInDetail && snapshotHighlighted.instrument.location == snapshot.instrument.location}
+                  highlightSnapshot={highlightSnapshot}
+                  didMoveToDetail={didMoveToDetail}
+                />
               </li>
             ))
         )
