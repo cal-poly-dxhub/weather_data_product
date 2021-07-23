@@ -84,7 +84,9 @@ export default function SnapshotGrid(props) {
   useEffect(() => {
     const key = props.instrument + "/" + props.category
 
-    setSnapshots([])
+    setSnapshots([]);
+    didMoveToDetail(false);
+    highlightSnapshot("");
 
     if (state.instruments[props.instrument].data != undefined && 
       state.instruments[props.instrument].data.length > 0) 
