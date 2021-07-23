@@ -24,20 +24,20 @@ export default function SnapshotHub() {
   function renderSwitch() {
     switch(instrument) {
       case "sodar":
-        return <SnapshotGrid instrument={instrument} category={category}/>;
+        return <SnapshotGrid instrument="sodar" category={category}/>;
       case "profiler":
         return (<div>
           <CategoryChips instrument={state.instruments[instrument]} category={category} setCategory={setCategory}/>
-          <SnapshotGrid instrument={instrument} category={category}/>
+          <SnapshotGrid instrument="profiler" category={category}/>
         </div>);
       case "tower":
-        return <SnapshotGrid instrument={instrument} category={category}/>;
+        return <SnapshotGrid instrument="tower" category={category}/>;
       case "asos":
-        return <SnapshotGrid instrument={instrument} category={category}/>;
+        return <SnapshotGrid instrument="asos" category={category}/>;
       case "amps":
-        return <SnapshotGrid instrument={instrument} category={category}/>;
+        return <SnapshotGrid instrument="amps" category={category}/>;
       default:
-        return <SnapshotGrid instrument={instrument} category={category}/>;
+        return <SnapshotGrid instrument="sodar" category={category}/>;
     }
   }
 

@@ -123,6 +123,7 @@ const locations = ["LF06", "Motor Pool", "LF-03", "Boathouse", "SLC-3", "HSF", "
         itemHeight={308}
         springConfig={{ stiffness: 170, damping: 26 }}
         style={{listStyle: "none"}}
+        enter={enter}
       >
       {snapshots.length == 0 ?
         (
