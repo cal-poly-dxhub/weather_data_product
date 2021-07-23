@@ -17,9 +17,9 @@ export default function App() {
           <nav className="App-header">
             <Navbar/>
           </nav>
-          <body>
+          <section>
             <SnapshotHub/>
-          </body>
+          </section>
         </div>
       </ThemeProvider>
     </UserProvider>

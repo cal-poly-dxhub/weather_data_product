@@ -7,7 +7,6 @@ export const reducer = (state, action) => {
         // }
 
         case "instruments/data":
-
             const keys = action.payload.key.split("/").filter(key => key)
             console.log("keys: ", keys)
 
@@ -39,21 +38,12 @@ export const reducer = (state, action) => {
             } else {
                 return state
             }
-        case "settings/temp_imperial":
+        case "settings/imperial":
             return {
                 ...state,
                 settings: {
                     ...state.settings,
-                    temp_imperial: action.payload
-                }
-            }
-
-        case "settings/distance_imperial":
-            return {
-                ...state,
-                settings: {
-                    ...state.settings,
-                    distance_imperial: action.payload
+                    imperial: action.payload
                 }
             }
 
@@ -94,7 +84,6 @@ export const initialState = {
     },
 
     settings: {
-        temp_imperial: true,
-        distance_imperial: true
+        imperial: true
     }
 }

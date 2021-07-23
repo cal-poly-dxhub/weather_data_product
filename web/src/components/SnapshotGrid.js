@@ -3,7 +3,11 @@ import axios from 'axios';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import { DataGrid } from '@material-ui/data-grid';
+import { BorderColor } from '@material-ui/icons';
+import { Card, CardContent } from '@material-ui/core';
+
+import { SpringGrid, measureItems, makeResponsive, enterExitStyle } from 'react-stonecutter';
+import Shimmer from "react-shimmer-effect";
 
 import { BrowserRouter, Route } from "react-router-dom"
 
@@ -20,171 +24,146 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center',
     color: theme.palette.text.secondary,
   },
+  // circle: {
+  //   height: "56px",
+  //   width: "56px",
+  //   borderRadius: "50%"
+  // },
+  line: {
+    width: "340px",
+    height: "8px",
+    alignSelf: "center",
+    marginLeft: "16px",
+    borderRadius: "8px",
+  }
 }));
 
 export default function SnapshotGrid(props) {
   const classes = useStyles();
   const [snapshots, setSnapshots] = useState([]);
-  const [leftSnapshot, setLeftSnapshot] = useState({});
+  const [snapshotHighlighted, highlightSnapshot] = useState({});
+  const [isInDetail, didMoveToDetail] = useState(false);
   const [state, dispatch] = useContext(UserContext);
 
+  const { enter, entered, exit } = enterExitStyle.foldUp;
+
+  const sendGetRequest = async (key) => {
+    try {
+      const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
+      + state.instruments[props.instrument].path 
+      + (state.instruments[props.instrument][props.category] != undefined ? state.instruments[props.instrument][props.category].path : "") 
+      + "snapshot/";
+
+      const resp = await axios.get(baseUrl, {
+        params: {},
+        headers: {
+          'Accept': '*/*',
+          'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
+        }
+      });
+
+      console.log("wowieeeee: ", resp.data)
+
+      setSnapshots(resp.data)
+      dispatch({
+        type: "instruments/data",
+        payload: {
+          key: key,
+          data: resp.data
+        }
+      })
+    } catch (err) {
+        console.error("async error: ", err);
+    }
+  };
+
   useEffect(() => {
-    if (state.instruments[props.instrument].data != undefined && state.instruments[props.instrument].data.length > 0) {
+    didMoveToDetail(Object.keys(snapshotHighlighted).length > 0)
+  }, [snapshotHighlighted])
+
+  useEffect(() => {
+    const key = props.instrument + "/" + props.category
+
+    setSnapshots([])
+
+    if (state.instruments[props.instrument].data != undefined && 
+      state.instruments[props.instrument].data.length > 0) 
+    {
       setSnapshots(state.instruments[props.instrument].data)
-    } else if (state.instruments[props.instrument][props.category] != undefined && state.instruments[props.instrument][props.category].data.length > 0) { 
+    } else if (props.category != "" && 
+      state.instruments[props.instrument][props.category] != undefined && 
+      state.instruments[props.instrument][props.category].data.length > 0) 
+    {
       setSnapshots(state.instruments[props.instrument][props.category].data)
     } else {
-
-      console.log("i shouldn't be seeing this: ", state.instruments[props.instrument])
-
-      const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
-        + state.instruments[props.instrument].path 
-        + (state.instruments[props.instrument][props.category] != undefined ? state.instruments[props.instrument][props.category].path : "") 
-        + "snapshot/";
-
-        axios.get(baseUrl, {
-          params: {},
-          headers: {
-            'Accept': '*/*',
-            'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
-          }
-        })
-        .then(res => {
-          console.log(res.data)
-          // console.log(props.instrument + "/" + props.category);
-          setSnapshots(res.data);
-          dispatch({
-            type: "instruments/data", 
-            payload: {
-              key: props.instrument + "/" + props.category,
-              data: res.data
-          }})
-        })
-        .catch(err => {
-          console.log(err)
-        });
+      sendGetRequest(key)
     }
   }, [props.instrument, props.category])
 
-  return (    
-    <Grid container className={classes.root} justify='space-between'>
-      {/* <Grid item xs={leftSnapshot == {} ? 6 : 0}>
-          <SnapshotCard snapshot={leftSnapshot} numRows={35}/>
-      </Grid> */}
+  const CustomGrid = makeResponsive(SpringGrid, {
+    maxWidth: 1920,
+    minPadding: 100
+  });
 
-      {/* <Grid container spacing={2} xs={leftSnapshot != {} ? 6 : 12}> */}
-        {snapshots
-        // .filter((snapshot) => {
-        //   let isTwoColumn = leftSnapshot != {}
-          
-        //   return(
-        //     isTwoColumn
-        //       ? (snapshot.instrument.location != leftSnapshot.instrument.location)
-        //       : true
-        //   )
-          
-        // })
-        .map((snapshot) => (
-          <Grid item onClick={() => {setLeftSnapshot(snapshot)}}>
-            <SnapshotCard snapshot={snapshot} numRows={5}/>
-          </Grid>
-        ))}
-      {/* </Grid> */}
+  function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+const locations = ["LF06", "Motor Pool", "LF-03", "Boathouse", "SLC-3", "HSF", "NASA", "Diosa Rd", "Taurus", "MM", "WR1"]
+  return (    
+    <Grid container className={classes.root} justify='center'>
+      <CustomGrid
+        component="ul"
+        // columns={isInDetail ? 1 : 3}
+        columnWidth={isInDetail ? 1000 : 375}
+        gutterWidth={40}
+        gutterHeight={40}
+        itemHeight={308}
+        springConfig={{ stiffness: 170, damping: 26 }}
+        enter={enter}
+        entered={entered}
+        exit={exit}
+      >
+      {snapshots.length == 0 ?
+        (
+          [...Array(getRandomInt(1, 10)).keys()].map((customKey) => (
+            <li key={locations[customKey]}>
+              <Card style={{backgroundColor: "#242026", width: "400px", height: "335px"}} variant="outlined">
+                <CardContent style={{backgroundColor: "#242026"}}>
+                  <Shimmer>
+                    <div className={classes.line}/>
+                  </Shimmer>
+                </CardContent>
+              </Card>
+            </li>
+          ))        
+        ) : (
+          snapshots
+            .filter((snapshot) => (
+              isInDetail
+                ? snapshotHighlighted.instrument.location == snapshot.instrument.location
+                : true
+            ))
+            .map((snapshot) => (
+              <li key={snapshot.instrument.location} style={{width: isInDetail ? "1000px" : "400px", height: isInDetail ? "1000px" : "335px"}} onClick={() => (
+                isInDetail
+                  ? (
+                    didMoveToDetail(false), highlightSnapshot({})
+                  )
+                  : highlightSnapshot(snapshot)
+              )}>
+                <SnapshotCard 
+                  snapshot={snapshot} 
+                  numRows={5} 
+                  isMetric={state.settings.imperial} 
+                  isDetail={isInDetail && snapshotHighlighted.instrument.location == snapshot.instrument.location}/>
+              </li>
+            ))
+        )
+      }
+      </CustomGrid>
     </Grid>
   );
 }
-
-
-
-
-
-
-
-
-
-// useEffect(() => {
-//   const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' + props.path + 'snapshot/';
-
-//   if (state.instruments.index == 1) {
-//     if (state.instruments.options[state.instruments.index].variants[0].data.length === 0 || state.instruments.options[state.instruments.index].variants[1].data.length === 0) {
-      // axios.get(baseUrl, {
-      //   params: {},
-      //   headers: {
-      //     'Accept': '*/*',
-      //     'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
-      //   }
-      // })
-      // .then(res => {
-      //   console.log(res.data);
-      //   setSnapshots(res.data);
-      // })
-      // .catch(err => {
-      //   console.log(err)
-      // });
-//     }
-//   } else {
-//     if (state.instruments.options[state.instruments.index].variants[0].data.length === 0) {
-//       axios.get(baseUrl, {
-//         params: {},
-//         headers: {
-//           'Accept': '*/*',
-//           'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
-//         }
-//       })
-//       .then(res => {
-//         console.log(res.data);
-//         setSnapshots(res.data);
-//       })
-//       .catch(err => {
-//         console.log(err)
-//       });
-//     } else {
-//       setSnapshots(state.instruments.options[state.instruments.index].variants[0].data);
-//     }
-//   }
-
-//   // setSnapshots(snapshotsJSON)
-// }, [props.path, state.instruments.index])
-
-// useEffect(() => {
-//   console.log("contains an object", Object.keys(leftSnapshot).length > 0)
-//   changeToTwoColumn(Object.keys(leftSnapshot).length > 0);
-// }, [leftSnapshot])
-
-// useEffect(() => {
-//   changeToTwoColumn(false);
-// }, [state.instruments.index])
-
-
-
-
-
-
-
-
-
-
-
-
-// return (
-//   <Grid container className={classes.root} justify='space-between'>
-//     <Grid item xs={isTwoColumn ? 6 : 0}>
-//         <SnapshotCard snapshot={leftSnapshot} numRows={35}/>
-//     </Grid>
-
-//     <Grid container spacing={2} xs={isTwoColumn ? 6 : 12}>
-//       {snapshots.filter((snapshot) => {
-//         return(
-//           isTwoColumn
-//             ? (snapshot.instrument.location != leftSnapshot.instrument.location)
-//             : true
-//         )
-        
-//       }).map((snapshot) => (
-//         <Grid item xs={isTwoColumn ? 12 : 12} md={isTwoColumn ? 12 : 6} lg={isTwoColumn ? 6 : 4} xl={isTwoColumn ? 6 : 3} onClick={() => {setLeftSnapshot(snapshot)}}>
-//           <SnapshotCard snapshot={snapshot} numRows={5}/>
-//         </Grid>
-//       ))}
-//     </Grid>
-//   </Grid>
-// );
