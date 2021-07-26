@@ -126,6 +126,8 @@ const locations = ["LF06", "Motor Pool", "LF-03", "Boathouse", "SLC-3", "HSF", "
         springConfig={{ stiffness: 170, damping: 26 }}
         style={{listStyle: "none"}}
         enter={enter}
+        exit={exit}
+        entered={entered}
       >
       {snapshots.length == 0 ?
         (

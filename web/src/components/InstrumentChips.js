@@ -45,7 +45,7 @@ export default function InstrumentChips(props) {
               className={classes.chip}
               variant={index == selected ? "default" : "outlined"}
               onClick={() => {
-                changeSelectionTo(index)
+                changeSelectionTo(index);
                 props.setInstrument(key);
                 }}
               />

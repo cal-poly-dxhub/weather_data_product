@@ -417,7 +417,7 @@ export default function SnapshotCard(props) {
   return (
     <div style={{height: "100%"}}>
     {props.isDetail
-      ? (
+      ? (   // Detail View
         <Grid container direction="column">
           { DetailHeader(props) }
           <Grid item>
@@ -429,7 +429,7 @@ export default function SnapshotCard(props) {
           </Grid>
         </Grid>
       )
-      : (
+      : (   // Preview
         <Card className={classes.root} variant="outlined">
           <CardContent>
             {PreviewCard(props)}

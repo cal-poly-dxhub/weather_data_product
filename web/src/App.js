@@ -9,6 +9,8 @@ import theme from './theme';
 import { UserContext, UserProvider } from './contexts/UserProvider';
 import SnapshotHub from './components/SnapshotHub';
 
+import { Router, BrowserRouter as Router } from '@material-ui/icons';
+
 export default function App() {
   return (
     <UserProvider>
