@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import { Box, Grid } from '@material-ui/core';
 
+import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+
 import InstrumentChips from './InstrumentChips';
 import CategoryChips from './CategoryChips';
 import SnapshotGrid from './SnapshotGrid';
@@ -22,24 +24,43 @@ export default function SnapshotHub() {
   }, [instrument]);
 
   function renderSwitch() {
-    switch(instrument) {
-      case "sodar":
-        return <SnapshotGrid instrument="sodar" category={category}/>;
-      case "profiler":
-        return (<div>
-          <CategoryChips instrument={state.instruments[instrument]} category={category} setCategory={setCategory}/>
-          <SnapshotGrid instrument="profiler" category={category}/>
-        </div>);
-      case "tower":
-        return <SnapshotGrid instrument="tower" category={category}/>;
-      case "asos":
-        return <SnapshotGrid instrument="asos" category={category}/>;
-      case "amps":
-        return <SnapshotGrid instrument="amps" category={category}/>;
-      default:
-        return <SnapshotGrid instrument="sodar" category={category}/>;
-    }
+    <Router>
+      <Switch>
+        <Route path={instrument} render={(props) => {
+          <SnapshotGrid {...props} instrument="sodar" category=""/>
+        }}/>
+
+        <Route path={instrument} render={(props) => {
+          <SnapshotGrid {...props} instrument="sodar" category=""/>
+        }}/>
+      </Switch>
+    </Router>
   }
+
+
+
+
+  switch(instrument) {
+    case "sodar":
+      return <SnapshotGrid instrument="sodar" category={category}/>;
+    case "profiler":
+      return (<div>
+        <CategoryChips instrument={state.instruments[instrument]} category={category} setCategory={setCategory}/>
+        <SnapshotGrid instrument="profiler" category={category}/>
+      </div>);
+    case "tower":
+      return <SnapshotGrid instrument="tower" category={category}/>;
+    case "asos":
+      return <SnapshotGrid instrument="asos" category={category}/>;
+    case "amps":
+      return <SnapshotGrid instrument="amps" category={category}/>;
+    default:
+      return <SnapshotGrid instrument="sodar" category={category}/>;
+  }
+
+
+
+
 
   return (
     <Box>
