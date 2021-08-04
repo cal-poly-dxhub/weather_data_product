@@ -1,10 +1,8 @@
 export const reducer = (state, action) => {
     switch (action.type) {
         // PAYLOAD instruments/data
-        // {
-        //     key: 'profiler_temp',
-        //     data: [...]
-        // }
+        //      key:     'profiler_temp',
+        //      data:    [...]
 
         case "instruments/data":
             const keys = action.payload.key.split("/").filter(key => key)
@@ -38,6 +36,41 @@ export const reducer = (state, action) => {
             } else {
                 return state
             }
+
+        // PAYLOAD exports/add
+        //     instrument:  'mini-sodar',
+        //     category:    '',
+        //     assetID:     '522',
+        //     location:    'LF06'
+        //     from:        '2017-05-24T10:30',
+        //     to:          '2017-05-25T11:30'
+
+        case "exports/add":
+            console.log(action.payload)
+            return {
+                ...state,
+                exports: [
+                    ...state.exports,
+                    action.payload
+                ]    
+            }
+
+        // PAYLOAD exports/delete
+        //     instrument:  'mini-sodar',
+        //     category:    '',
+        //     assetID:     '522',
+        //     from:        '2017-05-24T10:30',
+        //     to:          '2017-05-25T11:30'
+
+        // case "exports/delete":
+        //     return {
+        //         ...state,
+        //         exports: [
+        //             ...state.exports,
+        //             action.payload
+        //         ]
+        //     }
+    
         case "settings/imperial":
             return {
                 ...state,
@@ -82,6 +115,8 @@ export const initialState = {
             data: []
         },
     },
+
+    exports: [],
 
     settings: {
         imperial: true

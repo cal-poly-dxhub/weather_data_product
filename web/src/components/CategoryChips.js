@@ -6,12 +6,14 @@ import TagFacesIcon from '@material-ui/icons/TagFaces';
 import { Grid } from '@material-ui/core';
 import { Typography } from '@material-ui/core';
 
+import { Link, useRouteMatch } from 'react-router-dom';
+
 import { UserContext } from "../contexts/UserProvider"
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'leading',
     flexWrap: 'wrap',
     listStyle: 'none',
     padding: theme.spacing(0.5),
@@ -25,10 +27,9 @@ const useStyles = makeStyles((theme) => ({
 export default function CategoryChips(props) {
   const [ state, dispatch ] = React.useContext(UserContext)
   const classes = useStyles();
+  const match = useRouteMatch()
 
-  useEffect(() => {
-    console.log("look at me!!!" + props.category)
-  }, [props.category]);
+  useEffect(() => { }, []);
 
   return (
     <Grid container direction='column' alignItems='flex-start'>
@@ -43,6 +44,7 @@ export default function CategoryChips(props) {
 
             return (
               <li key={key}>
+                <Link to={`${match.url}/${key}`}>
                   <Chip
                   label={key.toUpperCase()}
                   color="primary"
@@ -53,6 +55,7 @@ export default function CategoryChips(props) {
                     props.setCategory(key)
                   }}
                   />
+                </Link>
               </li>
             );
           })}

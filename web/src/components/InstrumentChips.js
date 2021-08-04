@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
@@ -7,12 +7,14 @@ import TagFacesIcon from '@material-ui/icons/TagFaces';
 import { Grid } from '@material-ui/core';
 import { Typography } from '@material-ui/core';
 
+import { Link, useRouteMatch } from 'react-router-dom';
+
 import { UserContext } from "../contexts/UserProvider"
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'leading',
     flexWrap: 'wrap',
     listStyle: 'none',
     padding: theme.spacing(0.5),
@@ -24,9 +26,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function InstrumentChips(props) {
-  const [selected, changeSelectionTo] = useState(0);
   const [state, dispatch] = useContext(UserContext);
   const classes = useStyles();
+  const match = useRouteMatch();
+
+  useEffect(() => {
+    // console.log("url: " + `${match.url}`)
+
+    // Object.keys(state.instruments).map((key, index) => (
+    //   console.log(`${match.url}/${key}`)
+    // ))
+  }, [])
 
   return (
     <Grid container direction='column' alignItems='flex-start'>
@@ -34,21 +44,23 @@ export default function InstrumentChips(props) {
         Instruments
       </Typography>
 
-      <Box component="ul" className={classes.root}>
+      <Box component="ul" className={classes.root} display="flex" flexWrap="nowrap">
         {
           Object.keys(state.instruments).map((key, index) => (
             <li key={key}>
-              <Chip
-              label={key.toUpperCase()}
-              color={"primary"}
-              onDelete={undefined}
-              className={classes.chip}
-              variant={index == selected ? "default" : "outlined"}
-              onClick={() => {
-                changeSelectionTo(index);
-                props.setInstrument(key);
-                }}
-              />
+              <Link to={`${match.url}/${key}`}>
+                <Chip
+                label={key.toUpperCase()}
+                color={"primary"}
+                onDelete={undefined}
+                className={classes.chip}
+                variant={key == props.instrument ? "default" : "outlined"}
+                onClick={() => {
+                  props.setInstrument(key);
+                  localStorage.setItem("instrumentKey", key)
+                  }}
+                />
+              </Link>
             </li>
           )) 
         }

@@ -4,22 +4,23 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import { Typography } from '@material-ui/core';
 import Table from '@material-ui/core/Table';
+import TableContainer from '@material-ui/core/TableContainer';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
-import Button from '@material-ui/core/Button';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Slider from '@material-ui/core/Slider';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import IconButton from '@material-ui/core/IconButton';
+import { Typography } from '@material-ui/core';
+import { Box } from '@material-ui/core';
+
+import { useRouteMatch, Switch, Route, useHistory } from "react-router-dom"
 
 import { UserContext } from '../contexts/UserProvider';
+import DetailView from './DetailView';
 
 const useStyles = makeStyles({
   root: {
-    // minWidth: 275, 
+    width: "100%",
     height: "100%",
     backgroundColor: '#242026',
     '&:hover': {
@@ -62,15 +63,20 @@ function removeMissingData(num) {
 // PREVIEW: Asset ID, Asset Height
 
 function QuickMetadataItem(props) {
+  const Spacer = require('react-spacer');
+
   return (
-    <Grid container direction='column' style={{marginLeft: 30}}>
-      <Grid item style={{color: 'gray', fontWeight: 'bold', textAlign: 'center', marginTop: 10}}>
+    <Box display="flex" style={{width: "100%"}}>
+      <Box justifyContent="flex-end" display="flex" style={{color: 'gray', fontWeight: 'bold', minWidth: "47%"}}>
         {props.title}
-      </Grid>
-      <Grid item style={{color: 'white', textAlign: 'center'}}>
+      </Box>
+
+      <Spacer grow={1}/>
+
+      <Box style={{color: 'white', textAlign: 'leading', minWidth: "47%"}}>
         {props.value}
-      </Grid>
-    </Grid>
+      </Box>
+    </Box>
   )
 }
 
@@ -88,32 +94,27 @@ function QuickMetadataRow(props) {
   }, [props.isMetric])
 
   return (
-    <Grid container alignItems='center'>
-      {
-        ("BalloonType" in props.instrument)
-          ? (
-            <Grid container>
-              <Grid item xs={6}>
-                <QuickMetadataItem title="BALLOON TYPE" value={props.instrument.BalloonType}/>
-              </Grid>
-              <Grid item xs={6}>
-                <QuickMetadataItem title="LAUNCH" value={props.instrument.location}/>
-              </Grid>
+    "BalloonType" in props.instrument)
+        ? (
+          <Grid container direction="column">
+            <Grid item>
+              <QuickMetadataItem title="BALLOON TYPE" value={props.instrument.BalloonType}/>
             </Grid>
-          )
-          : (
-            <Grid container>
-              <Grid item xs={6}>
-                <QuickMetadataItem title="HEIGHT" value={height}/>
-              </Grid>
-              <Grid item xs={6}>
-                <QuickMetadataItem title="ID" value={"asset_id" in props.instrument ? props.instrument.asset_id : props.instrument.asset_ID}/>
-              </Grid>  
+            <Grid item>
+              <QuickMetadataItem title="LAUNCH" value={props.instrument.location}/>
             </Grid>
-          )
-      }
-    </Grid>
-  )
+          </Grid>
+        )
+        : (
+          <Grid container direction="column">
+            <Grid>
+              <QuickMetadataItem title="HEIGHT" value={height}/>
+            </Grid>
+            <Grid>
+              <QuickMetadataItem title="ID" value={"asset_id" in props.instrument ? props.instrument.asset_id : props.instrument.asset_ID}/>
+            </Grid>  
+          </Grid>
+        )
 }
 
 // PREVIEW: Table Data
@@ -129,10 +130,10 @@ function GateResponsePreview(props) {
   }, [props.response])
 
   return (
-      <Table size="small" variant='outlined' aria-label="a dense table" className={classes.table} rows>
+      <Table size="small" aria-label="a dense table" className={classes.table}>
         <TableHead>
           <TableRow>
-            {headers.slice(1, 5).map((header) => (
+            {headers.slice(1, 4).map((header) => (
               <TableCell align="right">{header}</TableCell>
             ))}
           </TableRow>
@@ -140,7 +141,7 @@ function GateResponsePreview(props) {
         <TableBody>
           {props.response.gateResponses.slice(props.numRows > 5 ? 0 : props.response.gateResponses.length - props.numRows, props.response.gateResponses.length).map((row) => (
             <TableRow key={row.name}>
-              {headers.slice(1, 5).map((header) => (
+              {headers.slice(1, 4).map((header) => (
                 <TableCell align="right">{
                   props.isMetric
                     ? (0.5 * removeMissingData(row[header]))
@@ -153,257 +154,17 @@ function GateResponsePreview(props) {
       </Table>
   )
 }
-
-// PREVIEW CARD
-
-function PreviewCard(props) {
-  const [ state, dispatch ] = React.useContext(UserContext);
-
-  return (
-    <Grid container direction='column'>
-      <Grid container justify='space-around' alignItems='center' style={{marginBottom: 20}}>
-        <Grid item>
-          <Typography variant="h4" style={{fontWeight: 'bold'}}>
-            {props.snapshot.instrument.location}
-          </Typography>
-        </Grid>
-        <Grid item>
-          <QuickMetadataRow instrument={props.snapshot.instrument} index={state.instruments.index} isMetric={props.isMetric}/>
-        </Grid>
-      </Grid>
-      <Grid item>
-        <GateResponsePreview response={props.snapshot.measurements[0]} numRows={props.numRows} isMetric={props.isMetric}/>
-      </Grid>
-    </Grid>
-  )
-}
-
-
-
-
-
-
-
-
-// DETAIL CARD
-
-function DetailCard(props) {
-  const [ state, dispatch ] = React.useContext(UserContext);
-
-  return (
-    <Grid container direction='column'>
-      <Grid container justify="space-evenly" alignItems="center" style={{marginBottom: 20}}>
-        {/* <Grid item xs={2}>
-          <Typography variant="h4" style={{ fontWeight: 'bold', textAlign: "left" }}>
-            {props.snapshot.instrument.location}
-          </Typography>
-        </Grid> */}
-        <Grid item xs={12}>
-          <FullToolbar instrument={props.snapshot.instrument} index={state.instruments.index} isMetric={props.isMetric}/>
-        </Grid>
-      </Grid>
-      <Grid item>
-        <FullTable response={props.snapshot.measurements[0]} numRows={props.numRows} isMetric={props.isMetric}/>
-      </Grid>
-    </Grid>
-  )
-}
-
-// DETAIL: Toolbar
-
-function FullToolbar(props) {
-  // const [height, setHeight] = React.useState(props.instrument.asset_height);
-
-  const marks = [
-    {
-      value: 0,
-      label: '5 MIN',
-    },
-    {
-      value: 20,
-      label: '4 MIN',
-    },
-    {
-      value: 40,
-      label: '3 MIN',
-    },
-    {
-      value: 50,
-      label: '2 MIN',
-    },
-    {
-      value: 65,
-      label: '1 MIN',
-    },
-    {
-      value: 80,
-      label: '45 SEC',
-    },
-    {
-      value: 90,
-      label: '30 SEC',
-    },
-    {
-      value: 100,
-      label: 'NOW',
-    },
-  ];
-  
-  function valuetext(value) {
-    return `${value}°C`;
-  }
-  
-  function valueLabelFormat(value) {
-    return marks.findIndex((mark) => mark.value === value) + 1;
-  }  
-
-  // useEffect(() => {
-  //   setHeight(
-  //     props.isMetric 
-  //     ? (0.5 * props.instrument.asset_height)
-  //     : (2 * props.instrument.asset_height)
-  //   )
-  // }, [props.isMetric])
-
-  return (
-    <Grid container justify="space-between" alignItems="center">
-      <Grid item xs={8} style={{ paddingLeft: 60, paddingRight: 60 }}>
-        <Slider
-          defaultValue={20}
-          valueLabelFormat={valueLabelFormat}
-          getAriaValueText={valuetext}
-          aria-labelledby="discrete-slider-restrict"
-          step={null}
-          valueLabelDisplay="auto"
-          marks={marks}
-          style={{backgroundColor: "#2b262e"}}
-        />
-      </Grid>
-
-      <Grid item xs={2}>
-        <Button variant="contained" color="primary" disableElevation>
-          Add to Archive
-        </Button>
-      </Grid>
-    </Grid>
-  )
-}
-
-// DETAIL: Data Table
-
-function FullTable(props) {  
-  const classes = useStyles();
-  const [headers, setHeaders] = useState([]);
-
-  useEffect(() => {
-    const keys = Object.keys(props.response.gateResponses[0]);
-    setHeaders(keys)
-    // console.log("response", props)
-  }, [props.response])
-
-  return (
-      <Table size="small" variant='outlined' aria-label="a dense table" className={classes.table} rows>
-        <TableHead>
-          <TableRow>
-            {headers.slice(1, 5).map((header) => (
-              <TableCell align="right">{header}</TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {props.response.gateResponses.slice(0, props.response.gateResponses.length).map((row) => (
-            <TableRow key={row.name}>
-              {headers.slice(1, 5).map((header) => (
-                <TableCell align="right">{
-                  props.isMetric
-                    ? (0.5 * removeMissingData(row[header]))
-                    : (2* removeMissingData(row[header]))
-                }</TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-  )
-}
-
-// DETAIL: Header
-
-function DetailHeader(props) {  
-  const classes = useStyles();
-  const [headers, setHeaders] = useState([]);
-  const [height, setHeight] = React.useState(props.snapshot.instrument.asset_height);
-  const Spacer = require('react-spacer')
-
-  useEffect(() => {
-    setHeight(
-      props.isMetric 
-      ? (0.5 * props.snapshot.instrument.asset_height)
-      : (2 * props.snapshot.instrument.asset_height)
-    )
-  }, [props.isMetric])
-
-  return (
-    <div style={{ display: 'flex' }}>
-      <div>
-        <IconButton edge="start" className={classes.menuButton} aria-label="units" onClick={() => {
-          props.didMoveToDetail(false);
-          props.highlightSnapshot("");
-        }}>
-          <ArrowBackIcon/>
-        </IconButton>
-      </div>
-    
-      <div item xs={1}>
-        <Typography variant="h3" style={{fontWeight: "bold", textAlign: "center", paddingBottom: 20}}>
-          {props.snapshot.instrument.location}
-        </Typography>
-      </div>
-
-      <Spacer grow='1'/>
-
-      <div>
-        {("BalloonType" in props.snapshot.instrument)
-          ? (
-            <Grid container>
-              <Grid item xs={6}>
-                <QuickMetadataItem title="BALLOON TYPE" value={props.snapshot.instrument.BalloonType}/>
-              </Grid>
-              <Grid item xs={6}>
-                <QuickMetadataItem title="LAUNCH" value={props.snapshot.instrument.location}/>
-              </Grid>
-            </Grid>
-          )
-          : (
-            <Grid container>
-              <Grid item xs={6}>
-                <QuickMetadataItem title="HEIGHT" value={height}/>
-              </Grid>
-              <Grid item xs={6}>
-                <QuickMetadataItem title="ID" value={"asset_id" in props.snapshot.instrument ? props.snapshot.instrument.asset_id : props.snapshot.instrument.asset_ID}/>
-              </Grid>
-            </Grid>  
-        )}
-      </div>
-    </div>
-  )
-}
-
-
-
-
-
-
-
 
 // props: snapshot, slice_min, slice_max
 export default function SnapshotCard(props) {
   const classes = useStyles();
   const [height, setHeight] = React.useState(props.snapshot.instrument.asset_height);
   const [ state, dispatch ] = React.useContext(UserContext);
+  const match = useRouteMatch()
+  const Spacer = require('react-spacer');
 
   // useEffect(() => {
-  //   console.log("snapshot: ", props.snapshot.instrument)
+  //   console.log(`${match.path}/${props.snapshot.instrument.location}/detail`)
   // }, [])
 
   useEffect(() => {
@@ -415,28 +176,40 @@ export default function SnapshotCard(props) {
   }, [props.isMetric])
 
   return (
-    <div style={{height: "100%"}}>
-    {props.isDetail
-      ? (   // Detail View
-        <Grid container direction="column">
-          { DetailHeader(props) }
-          <Grid item>
-            <Card className={classes.root} variant="outlined">
-              <CardContent>
-                {DetailCard(props)}
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      )
-      : (   // Preview
-        <Card className={classes.root} variant="outlined">
-          <CardContent>
-            {PreviewCard(props)}
-          </CardContent>
-        </Card>
-      )
-    }
-    </div>
+    <Card className={classes.root} variant="outlined">
+      <CardContent>
+        <Box flexDirection='row' display="flex">
+          <Box flexDirection='column' display="flex" style={{minWidth: "35%"}}>
+            <Spacer grow={1}/>
+
+            <Box display="flex" alignItems="center" justifyContent="center">
+              <Typography variant="h4" style={{fontWeight: 'bold', textAlign: "center"}}>
+                {props.snapshot.instrument.location}
+              </Typography>
+            </Box>
+
+            <Spacer height={10}/>
+
+            <Box>
+              <QuickMetadataRow 
+              instrument={props.snapshot.instrument} 
+              index={state.instruments.index} 
+              isMetric={props.isMetric}/>
+            </Box>
+
+            <Spacer grow={1}/>
+          </Box>
+
+          <Spacer width={20}/>
+
+          <TableContainer>
+            <GateResponsePreview 
+            response={props.snapshot.measurements[0]} 
+            numRows={props.numRows} 
+            isMetric={props.isMetric}/>
+          </TableContainer>
+        </Box>
+      </CardContent>
+    </Card>
   )
 }

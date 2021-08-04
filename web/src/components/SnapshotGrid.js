@@ -5,11 +5,14 @@ import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import { BorderColor } from '@material-ui/icons';
 import { Card, CardContent } from '@material-ui/core';
+import { useMediaQuery } from '@material-ui/core';
 
 import { SpringGrid, measureItems, makeResponsive, enterExitStyle } from 'react-stonecutter';
 import Shimmer from "react-shimmer-effect";
 
-import { BrowserRouter, Route } from "react-router-dom"
+import { useRouteMatch, useHistory, Link } from "react-router-dom"
+
+import theme from '../theme'
 
 import SnapshotCard from './SnapshotCard';
 import snapshotsJSON from '../snapshots.json'
@@ -30,10 +33,11 @@ const useStyles = makeStyles((theme) => ({
   //   borderRadius: "50%"
   // },
   line: {
-    width: "340px",
-    height: "8px",
+    width: "100%",
+    height: "15px",
     alignSelf: "center",
-    marginLeft: "16px",
+    // marginLeft: "16px",
+    marginRight: "16px",
     borderRadius: "8px",
   }
 }));
@@ -41,11 +45,18 @@ const useStyles = makeStyles((theme) => ({
 export default function SnapshotGrid(props) {
   const classes = useStyles();
   const [snapshots, setSnapshots] = useState([]);
-  const [snapshotHighlighted, highlightSnapshot] = useState({});
-  const [isInDetail, didMoveToDetail] = useState(false);
   const [state, dispatch] = useContext(UserContext);
+  const history = useHistory();
+  const match = useRouteMatch();
+  const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const { enter, entered, exit } = enterExitStyle.foldUp;
+  useEffect(() => {
+    props.setFocusedSnapshot({});
+    // props.setInstrument(lastItem);
+    // didMoveToDetail(false)
+    // highlightSnapshot({})
+    // history.push(`${match.url}/${props.instrument}`)
+  }, [])
 
   const sendGetRequest = async (key) => {
     try {
@@ -78,15 +89,7 @@ export default function SnapshotGrid(props) {
   };
 
   useEffect(() => {
-    didMoveToDetail(Object.keys(snapshotHighlighted).length > 0)
-  }, [snapshotHighlighted])
-
-  useEffect(() => {
     const key = props.instrument + "/" + props.category
-
-    setSnapshots([]);
-    didMoveToDetail(false);
-    highlightSnapshot("");
 
     if (state.instruments[props.instrument].data != undefined && 
       state.instruments[props.instrument].data.length > 0) 
@@ -102,11 +105,6 @@ export default function SnapshotGrid(props) {
     }
   }, [props.instrument, props.category])
 
-  const CustomGrid = makeResponsive(SpringGrid, {
-    maxWidth: 1920,
-    minPadding: 100
-  });
-
   function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -115,59 +113,48 @@ export default function SnapshotGrid(props) {
 
 const locations = ["LF06", "Motor Pool", "LF-03", "Boathouse", "SLC-3", "HSF", "NASA", "Diosa Rd", "Taurus", "MM", "WR1"]
   return (    
-    <Grid container className={classes.root} justify='center'>
-      <CustomGrid
-        component="ul"
-        columns={isInDetail ? 1 : 3}
-        columnWidth={isInDetail ? 1000 : 375}
-        gutterWidth={40}
-        gutterHeight={40}
-        itemHeight={308}
-        springConfig={{ stiffness: 170, damping: 26 }}
-        style={{listStyle: "none"}}
-        enter={enter}
-        exit={exit}
-        entered={entered}
-      >
+    <Grid container className={classes.root} style={{minWidth: "100%", paddingTop: "1rem"}} spacing={3}>
       {snapshots.length == 0 ?
         (
           [...Array(getRandomInt(1, 10)).keys()].map((customKey) => (
-            <li key={locations[customKey]}>
-              <Card style={{backgroundColor: "#242026", width: "400px", height: "335px"}} variant="outlined">
+            <Grid item>
+              <Card style={{backgroundColor: "#242026", width: "100%", height: "100%"}} variant="outlined">
                 <CardContent style={{backgroundColor: "#242026"}}>
-                  <Shimmer>
-                    <div className={classes.line}/>
-                  </Shimmer>
+                  <Grid container direction="column">
+                    <Shimmer>
+                      <div className={classes.line}/>
+                    </Shimmer>
+                    <div/>
+                    <Shimmer>
+                      <div className={classes.line}/>
+                    </Shimmer>
+                  </Grid>
                 </CardContent>
               </Card>
-            </li>
+            </Grid>
           ))        
         ) : (
-          snapshots
-            .filter((snapshot) => (
-              isInDetail
-                ? snapshotHighlighted.instrument.location == snapshot.instrument.location
-                : true
-            ))
-            .map((snapshot) => (
-              <li key={snapshot.instrument.location} style={{width: isInDetail ? "100%" : "400px", height: isInDetail ? "Auto" : "335px"}} onClick={() => {
-                if (!isInDetail) {
-                  highlightSnapshot(snapshot)
-                }
-                }}>
+          snapshots.map((snapshot) => (
+            <Grid item 
+              sm={6}
+              md={6}
+              lg={4}
+              xl={3}
+              style={{minWidth: matchesSm ? "100%" : "Auto"}}
+              onClick={() => {
+                props.setFocusedSnapshot(snapshot);
+                history.push(`${match.path}${snapshot.instrument.location}/detail`)
+              }}>
                 <SnapshotCard 
                   snapshot={snapshot} 
-                  numRows={5} 
+                  category={props.category}
+                  numRows={5}
                   isMetric={state.settings.imperial} 
-                  isDetail={isInDetail && snapshotHighlighted.instrument.location == snapshot.instrument.location}
-                  highlightSnapshot={highlightSnapshot}
-                  didMoveToDetail={didMoveToDetail}
                 />
-              </li>
-            ))
+            </Grid>
+          ))
         )
       }
-      </CustomGrid>
     </Grid>
   );
 }
