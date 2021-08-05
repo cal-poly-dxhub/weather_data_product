@@ -200,12 +200,12 @@ function DetailHeader(props) {
       </Box>
     
       <Box>
-        <Typography variant="h3" style={{fontWeight: "bold", textAlign: "center"}}>
+        <Typography variant="h3" style={{fontWeight: "bold"}}>
           {props.snapshot.instrument.location}
         </Typography>
       </Box>
 
-      <Spacer grow='1'/>
+      <Spacer grow='1' width='3rem'/>
 
       <Box justifyContent="center">
         {("BalloonType" in props.snapshot.instrument)
@@ -238,10 +238,10 @@ function DetailHeader(props) {
 
       <Box>
         <Button variant="contained" color="primary" disableElevation onClick={() => {
-          // dispatch({
-          //   type: "exports/add",
-          //   payload: props.archiveMetadata
-          // })
+          dispatch({
+            type: "exports/add",
+            payload: props.archiveMetadata
+          })
 
           // console.log(state.exports)
         }}>
@@ -260,22 +260,22 @@ export default function DetailView(props) {
   const [numMeasurements, setNumMeasurements] = useState(1);
 
   useEffect(() => {
-    console.log("catts" + props.category);
+    console.log(props.snapshot.instrument);
     setNumMeasurements(props.snapshot.measurements.length);
   }, [])
 
   const archiveMetadata = {
     instrument: props.instrument,
-    category: '',
-    assetID: props.snapshot.instrument.asset_id,
+    category: props.category,
+    assetID: props.snapshot.instrument.asset_id == undefined ? props.snapshot.instrument.asset_ID : props.snapshot.instrument.asset_id,
     location: props.snapshot.instrument.location,
     from: '2017-05-24T10:30',
     to: '2017-05-25T11:30'
   }
 
   return (
-    <Grid container direction="column">
-      { DetailHeader(props) }
+    <Grid container direction="column" style={{paddingTop: "1rem"}}>
+      <DetailHeader {...props} archiveMetadata={archiveMetadata}/>
       <Grid item>
         <Card className={classes.root} variant="outlined">
           <CardContent>

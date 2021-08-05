@@ -80,15 +80,15 @@ export default function Navbar() {
           : (
             <Toolbar>
               <Button className={classes.menuButton} variant="text" size="small" color="primary">
-                <Link to="/docs">
+                <a style={{textDecoration: 'none'}} href="https://documenter.getpostman.com/view/13220876/Tzsijifs">
                   <Typography variant="body1" display="block" style={{ margin: "0.5rem", color: "#9C9C9C", marginLeft: '0.5rem', marginRight: '0.5rem' }}>
                     API Docs
                   </Typography>
-                </Link>
+                </a>
               </Button>
 
               <Button className={classes.feedbackButton} size="large" color="primary">
-                <a style={{textDecoration: 'none'}} href="mailto:jaschrei@calpoly.edu?subject=React Feedback (Spacesport Weather Archive)&body=Write your feedback here...">
+                <a style={{textDecoration: 'none'}} href="https://forms.gle/smfZiATVcvbEaRGN9">
                   <Typography variant="body1" style={{ margin: "0.5rem", marginLeft: '1rem', marginRight: '1rem', fontWeight: "bold" }}>
                     Give Feedback
                   </Typography>

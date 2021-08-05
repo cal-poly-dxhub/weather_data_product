@@ -139,7 +139,7 @@ function GateResponsePreview(props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.response.gateResponses.slice(props.numRows > 5 ? 0 : props.response.gateResponses.length - props.numRows, props.response.gateResponses.length).map((row) => (
+          {props.response.gateResponses.slice(-5).map((row) => (
             <TableRow key={row.name}>
               {headers.slice(1, 4).map((header) => (
                 <TableCell align="right">{

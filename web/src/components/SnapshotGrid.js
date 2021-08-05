@@ -143,7 +143,7 @@ const locations = ["LF06", "Motor Pool", "LF-03", "Boathouse", "SLC-3", "HSF", "
               style={{minWidth: matchesSm ? "100%" : "Auto"}}
               onClick={() => {
                 props.setFocusedSnapshot(snapshot);
-                history.push(`${match.path}${snapshot.instrument.location}/detail`)
+                history.push(`${match.path}/${snapshot.instrument.location}/detail`)
               }}>
                 <SnapshotCard 
                   snapshot={snapshot} 

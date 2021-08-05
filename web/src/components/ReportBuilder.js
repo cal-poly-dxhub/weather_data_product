@@ -17,9 +17,11 @@ import IconButton from '@material-ui/core/IconButton';
 import { UserContext } from '../contexts/UserProvider';
 
 import theme from '../theme'
+import axios from 'axios';
 
 export default function ReportBuilder(props) {
   const [ state, dispatch ] = React.useContext(UserContext);
+  const FileDownload = require('js-file-download');
   const Spacer = require('react-spacer');
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -31,6 +33,27 @@ export default function ReportBuilder(props) {
   });  
 
   const classes = useStyles();
+
+  const sendGetRequest = async (instrument, category, assetID) => {
+    try {
+      const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
+      + state.instruments[instrument].path 
+      + (category === "" ? "" : `${state.instruments[instrument][category].path}`) 
+      + `snapshot?assetId=${assetID}&csv=true`;
+
+      const resp = await axios.get(baseUrl, {
+        params: {},
+        headers: {
+          'Accept': '*/*',
+          'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
+        }
+      });
+      
+      FileDownload(resp.data, "TODO.csv")
+    } catch (err) {
+        console.error("async error: ", err);
+    }
+  };
 
   return (
     <div>
@@ -94,7 +117,9 @@ export default function ReportBuilder(props) {
                     <Spacer grow={1}/>
 
                     <Box flexDirection="column" display="flex" alignItems="center">
-                      <Button size="large" color="secondary">
+                      <Button size="large" color="secondary" onClick={() => {
+                        sendGetRequest(item.instrument, item.category, item.assetID)
+                      }}>
                         <Typography variant="body2" style={{fontWeight: "bold" }}>
                           Download
                         </Typography>

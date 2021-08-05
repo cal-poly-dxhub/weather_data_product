@@ -23,53 +23,45 @@ export default function SnapshotHub(props) {
   useEffect(() => {
     const instrumentKeyCache = localStorage.getItem('instrumentKey');
     setInstrument(instrumentKeyCache === "" ? Object.keys(state.instruments)[0] : instrumentKeyCache);
-    // const lastItem = window.location.href.substring(window.location.href.lastIndexOf('/') + 1)
-
-    // if (lastItem == "temp" || lastItem == "wind") {
-    //   setInstrument("profiler");
-    //   setCategory(lastItem);
-    // } else {
-    //   setInstrument(lastItem);
-    // }
   }, [])
 
   useEffect(() => {
     setFocusedSnapshot({});
 
-    // if (state.instruments[instrument].data == undefined) {  // Data is nested inside path, e.g. profiler
-    //   setCategory(Object.keys(state.instruments[instrument])[1])
-    // } else {
-    //   setCategory("")
-    // }
+    if (state.instruments[instrument].data == undefined) {  // Data is nested inside path, e.g. profiler
+      setCategory(Object.keys(state.instruments[instrument])[1])
+    } else {
+      setCategory("")
+    }
   }, [instrument]);
 
   function renderSwitch() {
     return (
     <Switch>
-      <Route path={`${props.match.path}/profiler`}>
+      <Route exact path={`${props.match.path}/${instrument}${category == "" ? "" : `/${category}`}`}>
         <div>
-          <CategoryChips instrument={state.instruments[instrument]} category={category} setCategory={setCategory}/>
-          <Switch>
-            <Route exact path={`${props.match.path}/profiler/temp`}>
-              <SnapshotGrid instrument="profiler" category="temp" setFocusedSnapshot={setFocusedSnapshot}/>
-            </Route>
-
-            <Route exact path={`${props.match.path}/profiler/wind`}>
-              <SnapshotGrid instrument="profiler" category="wind" setFocusedSnapshot={setFocusedSnapshot}/>
-            </Route>
-
-            <Route exact path={`${props.match.path}/profiler`}>
-              <Redirect to={`${props.match.path}/profiler/temp`}/>
-            </Route>
-          </Switch>
+          {state.instruments[instrument].data == undefined 
+            ? (
+              <CategoryChips instrument={state.instruments[instrument]} category={category} setCategory={setCategory}/>
+            ) : undefined}
+            
+          <SnapshotGrid instrument={instrument} category={category} setFocusedSnapshot={setFocusedSnapshot}/>
         </div>
+
+        <Route exact path={`${props.match.path}/profiler`}>
+          <Redirect to={`${props.match.path}/profiler/temp`}/>
+        </Route>
       </Route>
 
-      <Route exact path={`${props.match.path}/${instrument}/${category}`}>
-        <SnapshotGrid instrument={instrument} category={category} setFocusedSnapshot={setFocusedSnapshot}/>
+      <Route exact path={`${props.match.path}/profiler/temp/wind`}>
+        <Redirect to={`${props.match.path}/profiler/wind`}/>
       </Route>
 
-      <Route exact path={`${props.match.path}/${instrument}${Object.keys(focusedSnapshot).length == 0 ? "" : `/${focusedSnapshot.instrument.location}`}/detail`}>
+      <Route exact path={`${props.match.path}/profiler/wind/temp`}>
+        <Redirect to={`${props.match.path}/profiler/temp`}/>
+      </Route>
+
+      <Route exact path={`${props.match.path}/${instrument}${category == "" ? "" : `/${category}`}${focusedSnapshot.instrument == undefined ? "" : `/${focusedSnapshot.instrument.location}`}/detail`}>
         <DetailView
           snapshot={focusedSnapshot} 
           instrument={instrument}
