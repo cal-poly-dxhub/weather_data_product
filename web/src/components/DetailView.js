@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Slider from '@material-ui/core/Slider';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import IconButton from '@material-ui/core/IconButton';
-import { Grid } from '@material-ui/core';
+import { Grid, TableContainer } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Table from '@material-ui/core/Table';
@@ -146,6 +146,7 @@ function FullTable(props) {
   }, [props.response])
 
   return (
+    <TableContainer>
       <Table size="small" variant='outlined' aria-label="a dense table" className={classes.table} rows>
         <TableHead>
           <TableRow>
@@ -168,6 +169,7 @@ function FullTable(props) {
           ))}
         </TableBody>
       </Table>
+    </TableContainer>
   )
 }
 

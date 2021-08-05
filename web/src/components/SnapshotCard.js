@@ -39,6 +39,7 @@ const useStyles = makeStyles({
     color: '#9E9C98'
   },
   table: {
+    maxWidth: "100%",
     borderColor: '#464646',
     backgroundColor: '#242026',
   }
@@ -202,7 +203,7 @@ export default function SnapshotCard(props) {
 
           <Spacer width={20}/>
 
-          <TableContainer>
+          <TableContainer style={{maxWidth: "100%"}}>
             <GateResponsePreview 
             response={props.snapshot.measurements[0]} 
             numRows={props.numRows} 

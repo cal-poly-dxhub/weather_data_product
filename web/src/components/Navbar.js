@@ -105,16 +105,20 @@ export default function Navbar() {
           }}>
             <Box flexDirection="column" display="flex" alignItems="center">
               <LanguageIcon/>
-              <Typography variant="subtitle2">Imperial</Typography>
+              <Typography variant="subtitle2">{state.settings.imperial ? 'Metric' : 'Imperial'}</Typography>
             </Box>
           </IconButton>
 
-          <IconButton edge="start" className={classes.menuButton} onClick={() => setDrawerOpen(true)} aria-label="report">
-            <Box flexDirection="column" display="flex" alignItems="center">
-              <PostAddIcon/>
-              <Typography variant="subtitle2">Archive</Typography>
-            </Box>
-          </IconButton>
+          {state.exports.length <= 0
+          ? undefined
+          : (
+            <IconButton edge="start" className={classes.menuButton} onClick={() => setDrawerOpen(true)} aria-label="report">
+              <Box flexDirection="column" display="flex" alignItems="center">
+                <PostAddIcon/>
+                <Typography variant="subtitle2">{`Archive (${state.exports.length})`}</Typography>
+              </Box>
+            </IconButton>
+          )}
 
           <ReportBuilder open={drawerIsOpen} setDrawerOpen={setDrawerOpen}></ReportBuilder>
 
@@ -129,23 +133,3 @@ export default function Navbar() {
     </ThemeProvider>
   );
 }
-
-
-
-
-
-
-{/* <Grid container spacing={0} justify='space-evenly' direction='column'>
-<Link to="/home">
-  <Grid item xs={12}>
-    <Typography variant={matches ? "subtitle2" : "subtitle2"}  className={classes.title}>
-      VANDENBERG SPACE FORCE BASE
-    </Typography>
-  </Grid>
-  <Grid item xs={12}>
-    <Typography variant={matches ? "body1" : "h5"} className={classes.title}>
-      SPACEPORT WEATHER ARCHIVE
-    </Typography>
-  </Grid>
-</Link>
-</Grid> */}

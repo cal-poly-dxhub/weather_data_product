@@ -6,7 +6,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Box from '@material-ui/core/Box';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import ArrowForwardIosRounded from '@material-ui/icons/ArrowForwardIosRounded';
 import { Divider, Typography } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import { useMediaQuery } from '@material-ui/core';
@@ -49,6 +49,7 @@ export default function ReportBuilder(props) {
         }
       });
       
+      console.log(resp.data)
       FileDownload(resp.data, "TODO.csv")
     } catch (err) {
         console.error("async error: ", err);
@@ -58,12 +59,12 @@ export default function ReportBuilder(props) {
   return (
     <div>
       <Drawer anchor='right' variant="persistent" open={props.open} classes={{paper: classes.paper}}>
-        <AppBar position="static" color="secondary">
+        <AppBar position="static" color="transparent">
           <Toolbar>
-            <IconButton onClick={() => {
+            <IconButton style={{backgroundColor: "#302a33"}} onClick={() => {
               props.setDrawerOpen(false);
             }}>
-              <ArrowBackIosIcon style={{color: "white"}}/>
+              <ArrowForwardIosRounded style={{color: "white"}}/>
             </IconButton>
           </Toolbar>
         </AppBar>
@@ -135,11 +136,11 @@ export default function ReportBuilder(props) {
             )
           })}
 
-          <Button size="large" color="primary" style={{margin: "1rem"}}>
+          {/* <Button size="large" color="primary" style={{margin: "1rem"}}>
             <Typography variant="body1" style={{ margin: "0.5rem", marginLeft: '3rem', marginRight: '3rem', fontWeight: "bold" }}>
               Download All
             </Typography>
-          </Button>
+          </Button> */}
         </Box>
       </Drawer>
     </div>
