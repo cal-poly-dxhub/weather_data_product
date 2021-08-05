@@ -45,65 +45,65 @@ const useStyles = makeStyles((theme) => ({
 export default function SnapshotGrid(props) {
   const classes = useStyles();
   const [snapshots, setSnapshots] = useState([]);
+  const [loaded, setLoading] = useState(true);
   const [state, dispatch] = useContext(UserContext);
   const history = useHistory();
   const match = useRouteMatch();
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
 
-  useEffect(() => {
-    props.setFocusedSnapshot({});
-    // props.setInstrument(lastItem);
-    // didMoveToDetail(false)
-    // highlightSnapshot({})
-    // history.push(`${match.url}/${props.instrument}`)
-  }, [])
-
-  const sendGetRequest = async (key) => {
+  const sendGetRequest = (key) => {
     try {
       const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
       + state.instruments[props.instrument].path 
-      + (state.instruments[props.instrument][props.category] != undefined ? state.instruments[props.instrument][props.category].path : "") 
+      + (state.instruments[props.instrument][props.category] ? state.instruments[props.instrument][props.category].path : "") 
       + "snapshot/";
 
-      const resp = await axios.get(baseUrl, {
+      const resp = axios
+      .get(baseUrl, {
         params: {},
         headers: {
           'Accept': '*/*',
           'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
         }
-      });
-
-      console.log("wowieeeee: ", resp.data)
-
-      setSnapshots(resp.data)
-      dispatch({
-        type: "instruments/data",
-        payload: {
-          key: key,
-          data: resp.data
-        }
       })
+      .then((resp) => {
+        console.log("data: ", resp.data)
+
+        setSnapshots(resp.data)
+
+        dispatch({
+          type: "instruments/data",
+          payload: {
+            key: key,
+            data: resp.data
+          }
+        });
+      });
     } catch (err) {
         console.error("async error: ", err);
     }
   };
 
   useEffect(() => {
+    props.setFocusedSnapshot({});
+    setSnapshots([]);
+
     const key = props.instrument + "/" + props.category
 
-    if (state.instruments[props.instrument].data != undefined && 
+    if (state.instruments[props.instrument].data != null && 
       state.instruments[props.instrument].data.length > 0) 
     {
       setSnapshots(state.instruments[props.instrument].data)
     } else if (props.category != "" && 
-      state.instruments[props.instrument][props.category] != undefined && 
+      state.instruments[props.instrument][props.category] != null && 
+      state.instruments[props.instrument][props.category].data != null && 
       state.instruments[props.instrument][props.category].data.length > 0) 
     {
       setSnapshots(state.instruments[props.instrument][props.category].data)
     } else {
-      sendGetRequest(key)
+      sendGetRequest(key)  
     }
-  }, [props.instrument, props.category])
+  }, [props.instrument, props.category]);
 
   function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -117,7 +117,7 @@ const locations = ["LF06", "Motor Pool", "LF-03", "Boathouse", "SLC-3", "HSF", "
       {snapshots.length == 0 ?
         (
           [...Array(getRandomInt(1, 10)).keys()].map((customKey) => (
-            <Grid item>
+            <Grid item key={customKey}>
               <Card style={{backgroundColor: "#242026", width: "100%", height: "100%"}} variant="outlined">
                 <CardContent style={{backgroundColor: "#242026"}}>
                   <Grid container direction="column">
@@ -136,6 +136,7 @@ const locations = ["LF06", "Motor Pool", "LF-03", "Boathouse", "SLC-3", "HSF", "
         ) : (
           snapshots.map((snapshot) => (
             <Grid item 
+              key={snapshot.instrument.asset_id}
               sm={6}
               md={6}
               lg={4}

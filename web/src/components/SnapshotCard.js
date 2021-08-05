@@ -83,7 +83,7 @@ function QuickMetadataItem(props) {
 
 // PREVIEW: Asset ID, Asset Height
 
-function QuickMetadataRow(props) {
+function QuickMetadataColumn(props) {
   const [height, setHeight] = React.useState(props.instrument.asset_height);
 
   useEffect(() => {
@@ -192,7 +192,7 @@ export default function SnapshotCard(props) {
             <Spacer height={10}/>
 
             <Box>
-              <QuickMetadataRow 
+              <QuickMetadataColumn 
               instrument={props.snapshot.instrument} 
               index={state.instruments.index} 
               isMetric={props.isMetric}/>
