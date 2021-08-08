@@ -276,33 +276,25 @@ export default function DetailView(props) {
   }
 
   return (
-    <Grid container direction="column" style={{paddingTop: "1rem"}}>
+    <Box flexDirection="column" style={{paddingTop: "1rem"}}>
       <DetailHeader {...props} archiveMetadata={archiveMetadata}/>
-      <Grid item>
-        <Card className={classes.root} variant="outlined">
-          <CardContent>
-          <Grid container direction='column'>
-            <Grid container justify="space-evenly" alignItems="center" style={{marginBottom: 20}}>
-              <Grid item xs={12}>
-                <FullToolbar 
-                  archiveMetadata={archiveMetadata}
-                  numMeasurements={numMeasurements} 
-                  timestamps={props.snapshot.measurements.map((measurement) => {
-                    return measurement.metadata.measurement_date_time
-                  })}
-                  setMeasurementIndex={setMeasurementIndex} 
-                  isMetric={props.isMetric}/>
-              </Grid>
-            </Grid>
-            <Grid item>
-              <FullTable 
-                response={props.snapshot.measurements[measurementIndex]} 
-                numRows={props.numRows} isMetric={props.isMetric}/>
-            </Grid>
-          </Grid>
-          </CardContent>
-        </Card>
-      </Grid>
-    </Grid>
+      <Card className={classes.root} variant="outlined">
+        <CardContent>
+        <Box flexDirection='column'>
+          <FullToolbar 
+            archiveMetadata={archiveMetadata}
+            numMeasurements={numMeasurements} 
+            timestamps={props.snapshot.measurements.map((measurement) => {
+              return measurement.metadata.measurement_date_time
+            })}
+            setMeasurementIndex={setMeasurementIndex} 
+            isMetric={props.isMetric}/>
+          <FullTable 
+            response={props.snapshot.measurements[measurementIndex]} 
+            numRows={props.numRows} isMetric={props.isMetric}/>
+        </Box>
+        </CardContent>
+      </Card>
+    </Box>
   )
 }

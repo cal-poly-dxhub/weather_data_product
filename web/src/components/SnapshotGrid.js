@@ -42,7 +42,7 @@ export default function SnapshotGrid(props) {
   const classes = useStyles();
   const [snapshots, setSnapshots] = useState([]);
   const [metadata, setMetadata] = useState([]);
-  const [codes, setCodes] = useState([]);
+  const [towerColumns, setTowerColumns] = useState([]);
   const [state, dispatch] = useContext(UserContext);
   const history = useHistory();
   const match = useRouteMatch();
@@ -128,12 +128,20 @@ export default function SnapshotGrid(props) {
         }
       })
       .then((resp) => {
-        console.log("data: ", resp.data)
+        console.log("codes: ", resp.data);
 
-        // let codes = resp.data.map((code) => {
-        //   return ();
-        // })
+        const columns = []
 
+        resp.data.forEach(tower_code => {
+          let column = {
+            field: tower_code.code,
+            headerName: tower_code.description
+          }
+
+          columns.push(column);
+        });
+
+        setTowerColumns(columns);
       });
     } catch (err) {
         console.error("get error: ", err);
