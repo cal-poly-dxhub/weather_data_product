@@ -34,23 +34,24 @@ export default function ReportBuilder(props) {
 
   const classes = useStyles();
 
-  const sendGetRequest = async (instrument, category, assetID) => {
+  const sendDownloadRequest = async (instrument, category, assetID) => {
     try {
       const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
       + state.instruments[instrument].path 
       + (category === "" ? "" : `${state.instruments[instrument][category].path}`) 
       + `snapshot?assetId=${assetID}&csv=true`;
 
-      const resp = await axios.get(baseUrl, {
+      axios.get(baseUrl, {
         params: {},
         headers: {
           'Accept': '*/*',
           'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
         }
+      }).then((resp) => {
+        // console.log("url: ", resp.data);
+        var win = window.open(resp.data, '_blank');
+        win.focus();
       });
-      
-      console.log(resp.data)
-      FileDownload(resp.data, "TODO.csv")
     } catch (err) {
         console.error("async error: ", err);
     }
@@ -72,7 +73,7 @@ export default function ReportBuilder(props) {
 
           {state.exports.map((item) => {
             return (
-              <Card style={{backgroundColor: "#1C1A1E", margin: "1rem"}} variant="outlined">
+              <Card style={{backgroundColor: "#1C1A1E", margin: "1rem"}} variant="outlined" id={item.assetID}>
                 <Box display="flex" flexDirection="column" style={{margin: "1rem"}}>
                   <Box display="flex" alignItems="center">
 
@@ -119,7 +120,7 @@ export default function ReportBuilder(props) {
 
                     <Box flexDirection="column" display="flex" alignItems="center">
                       <Button size="large" color="secondary" onClick={() => {
-                        sendGetRequest(item.instrument, item.category, item.assetID)
+                        sendDownloadRequest(item.instrument, item.category, item.assetID)
                       }}>
                         <Typography variant="body2" style={{fontWeight: "bold" }}>
                           Download

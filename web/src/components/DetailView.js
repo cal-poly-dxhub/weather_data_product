@@ -230,7 +230,7 @@ function DetailHeader(props) {
               <Spacer width='3rem'/>
 
               <Box>
-                <QuickMetadataItem title="ID" value={"asset_id" in props.snapshot.instrument ? props.snapshot.instrument.asset_id : props.snapshot.instrument.asset_ID}/>
+                <QuickMetadataItem title="ID" value={props.snapshot.instrument.asset_id}/>
               </Box>
             </Box>  
         )}

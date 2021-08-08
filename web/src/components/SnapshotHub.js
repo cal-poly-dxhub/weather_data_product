@@ -22,7 +22,7 @@ export default function SnapshotHub(props) {
 
   useEffect(() => {
     const instrumentKeyCache = localStorage.getItem('instrumentKey');
-    setInstrument(instrumentKeyCache == null ? Object.keys(state.instruments)[0] : instrumentKeyCache);
+    // setInstrument(instrumentKeyCache == null ? Object.keys(state.instruments)[0] : instrumentKeyCache);
   }, [])
 
   useEffect(() => {
@@ -49,29 +49,29 @@ export default function SnapshotHub(props) {
       </Route>
 
       <Route path={`${match.path}/sodar`}>
-        <SnapshotGrid instrument="sodar" category="" setFocusedSnapshot={setFocusedSnapshot}/>
+        <SnapshotGrid instrument="sodar" category="" setFocusedSnapshot={setFocusedSnapshot} setInstrument={setInstrument}/>
       </Route>
 
       <Route path={`${match.path}/tower`}>
-        <SnapshotGrid instrument="tower" category="" setFocusedSnapshot={setFocusedSnapshot}/>
+        <SnapshotGrid instrument="tower" category="" setFocusedSnapshot={setFocusedSnapshot} setInstrument={setInstrument}/>
       </Route>
 
       <Route path={`${match.path}/asos`}>
-        <SnapshotGrid instrument="asos" category="" setFocusedSnapshot={setFocusedSnapshot}/>
+        <SnapshotGrid instrument="asos" category="" setFocusedSnapshot={setFocusedSnapshot} setInstrument={setInstrument}/>
       </Route>
 
       <Route path={`${match.path}/amps`}>
-        <SnapshotGrid instrument="amps" category="" setFocusedSnapshot={setFocusedSnapshot}/>
+        <SnapshotGrid instrument="amps" category="" setFocusedSnapshot={setFocusedSnapshot} setInstrument={setInstrument}/>
       </Route>
 
       <Route path={`${match.path}/profiler/temp`}>
         <CategoryChips instrument={state.instruments[instrument]} category={category} setCategory={setCategory}/>
-        <SnapshotGrid instrument="profiler" category="temp" setFocusedSnapshot={setFocusedSnapshot}/>
+        <SnapshotGrid instrument="profiler" category={category} setFocusedSnapshot={setFocusedSnapshot} setInstrument={setInstrument}/>
       </Route>
 
       <Route path={`${match.path}/profiler/wind`}>
         <CategoryChips instrument={state.instruments[instrument]} category={category} setCategory={setCategory}/>
-        <SnapshotGrid instrument="profiler" category="wind" setFocusedSnapshot={setFocusedSnapshot}/>
+        <SnapshotGrid instrument="profiler" category={category} setFocusedSnapshot={setFocusedSnapshot} setInstrument={setInstrument}/>
       </Route>
 
       <Route path={`${match.path}/profiler`}>

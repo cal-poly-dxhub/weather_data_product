@@ -3,19 +3,14 @@ import axios from 'axios';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import { BorderColor } from '@material-ui/icons';
-import { Card, CardContent } from '@material-ui/core';
 import { useMediaQuery } from '@material-ui/core';
-
-import { SpringGrid, measureItems, makeResponsive, enterExitStyle } from 'react-stonecutter';
-import Shimmer from "react-shimmer-effect";
 
 import { useRouteMatch, useHistory, Link } from "react-router-dom"
 
 import theme from '../theme'
 
 import SnapshotCard from './SnapshotCard';
-import snapshotsJSON from '../snapshots.json'
+import PlaceholderCard from './PlaceholderCard';
 import { UserContext } from '../contexts/UserProvider';
 
 const useStyles = makeStyles((theme) => ({
@@ -27,11 +22,12 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center',
     color: theme.palette.text.secondary,
   },
-  // circle: {
-  //   height: "56px",
-  //   width: "56px",
-  //   borderRadius: "50%"
-  // },
+  rect: {
+    minWidth: "100%",
+    minHeight: "100%",
+    borderRadius: "5%",
+    alignSelf: "center",
+  },
   line: {
     width: "100%",
     height: "15px",
@@ -45,20 +41,50 @@ const useStyles = makeStyles((theme) => ({
 export default function SnapshotGrid(props) {
   const classes = useStyles();
   const [snapshots, setSnapshots] = useState([]);
-  const [loaded, setLoading] = useState(true);
+  const [metadata, setMetadata] = useState([]);
+  const [codes, setCodes] = useState([]);
   const [state, dispatch] = useContext(UserContext);
   const history = useHistory();
   const match = useRouteMatch();
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const sendGetRequest = (key) => {
+  const sendMetadataRequest = (key) => {
+    try {
+      let baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
+      + state.instruments[props.instrument].path 
+      + (state.instruments[props.instrument][props.category] ? state.instruments[props.instrument][props.category].path : "")
+
+      baseUrl = baseUrl.slice(0, -1);
+      console.log(baseUrl)
+
+      axios
+      .get(baseUrl, {
+        params: {},
+        headers: {
+          'Accept': '*/*',
+          'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
+        }
+      })
+      .then((resp) => {
+        console.log("metadata: ", resp.data)
+        setMetadata(resp.data);
+        console.log("why count: ", metadata.length)
+
+        sendSnapshotRequest(key);
+      });
+    } catch (err) {
+        console.error("metadata error: ", err);
+    }
+  }
+
+  const sendSnapshotRequest = (key) => {
     try {
       const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
       + state.instruments[props.instrument].path 
       + (state.instruments[props.instrument][props.category] ? state.instruments[props.instrument][props.category].path : "") 
-      + "snapshot/";
+      + "snapshot?units=true";
 
-      const resp = axios
+      axios
       .get(baseUrl, {
         params: {},
         headers: {
@@ -69,24 +95,55 @@ export default function SnapshotGrid(props) {
       .then((resp) => {
         console.log("data: ", resp.data)
 
-        setSnapshots(resp.data)
+        if (props.instrument == "tower") {
+          handleTowerProductCodes(resp.data)
+        } else {
+          setSnapshots(resp.data);
+          console.log("why 2 count: ", metadata.length)
+          // setMetadata([]);
 
-        dispatch({
-          type: "instruments/data",
-          payload: {
-            key: key,
-            data: resp.data
-          }
-        });
+          dispatch({
+            type: "instruments/data",
+            payload: {
+              key: key,
+              data: resp.data
+            }
+          });
+        }
       });
     } catch (err) {
-        console.error("async error: ", err);
+        console.error("get error: ", err);
     }
   };
 
-  useEffect(() => {
+  const handleTowerProductCodes = (tower_data) => {
+    try {
+
+      axios
+      .get('https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/tower/codes' , {
+        params: {},
+        headers: {
+          'Accept': '*/*',
+          'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
+        }
+      })
+      .then((resp) => {
+        console.log("data: ", resp.data)
+
+        // let codes = resp.data.map((code) => {
+        //   return ();
+        // })
+
+      });
+    } catch (err) {
+        console.error("get error: ", err);
+    }
+  };
+
+  useEffect(() => { 
     props.setFocusedSnapshot({});
     setSnapshots([]);
+    setMetadata([]);
 
     const key = props.instrument + "/" + props.category
 
@@ -101,38 +158,29 @@ export default function SnapshotGrid(props) {
     {
       setSnapshots(state.instruments[props.instrument][props.category].data)
     } else {
-      sendGetRequest(key)  
+      sendMetadataRequest(key);
     }
   }, [props.instrument, props.category]);
 
-  function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+  useEffect(() => {
+    props.setInstrument(props.instrument);
+  }, [])
 
-const locations = ["LF06", "Motor Pool", "LF-03", "Boathouse", "SLC-3", "HSF", "NASA", "Diosa Rd", "Taurus", "MM", "WR1"]
   return (    
     <Grid container className={classes.root} style={{minWidth: "100%", paddingTop: "1rem"}} spacing={3}>
-      {snapshots.length == 0 ?
+      {snapshots.length <= 0 ?
         (
-          [...Array(getRandomInt(1, 10)).keys()].map((customKey) => (
-            <Grid item key={customKey}>
-              <Card style={{backgroundColor: "#242026", width: "100%", height: "100%"}} variant="outlined">
-                <CardContent style={{backgroundColor: "#242026"}}>
-                  <Grid container direction="column">
-                    <Shimmer>
-                      <div className={classes.line}/>
-                    </Shimmer>
-                    <div/>
-                    <Shimmer>
-                      <div className={classes.line}/>
-                    </Shimmer>
-                  </Grid>
-                </CardContent>
-              </Card>
+          metadata.map((meta) => (
+            <Grid item 
+              key={meta.asset_name} 
+              sm={6}
+              md={6}
+              lg={4}
+              xl={3}
+              style={{height: "17rem", minWidth: matchesSm ? "100%" : "Auto"}}>
+                <PlaceholderCard/>
             </Grid>
-          ))        
+          ))     
         ) : (
           snapshots.map((snapshot) => (
             <Grid item 

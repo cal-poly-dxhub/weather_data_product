@@ -6,7 +6,6 @@ export const reducer = (state, action) => {
 
         case "instruments/data":
             const keys = action.payload.key.split("/").filter(key => key)
-            console.log("keys: ", keys)
 
             if (keys.length == 2) {
                 return {
