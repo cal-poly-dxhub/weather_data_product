@@ -83,7 +83,7 @@ function QuickMetadataColumn(props) {
         : (
           <Grid container direction="column">
             <Grid>
-              <QuickMetadataItem title="HEIGHT" value={props.instrument.asset_height}/>
+              <QuickMetadataItem title="HEIGHT" value={`${props.instrument.asset_height} ${props.isMetric ? 'm' : 'ft'}`}/>
             </Grid>
             <Grid>
               <QuickMetadataItem title="ID" value={"asset_id" in props.instrument ? props.instrument.asset_id : props.instrument.asset_ID}/>
@@ -146,7 +146,6 @@ function GateResponsePreview(props) {
 // props: snapshot, slice_min, slice_max
 export default function SnapshotCard(props) {
   const classes = useStyles();
-  const [height, setHeight] = React.useState(props.snapshot.instrument.asset_height);
   const [ state, dispatch ] = React.useContext(UserContext);
   const [metricSnapshot, setMetricSnapshot] = React.useState({});
   const Spacer = require('react-spacer');

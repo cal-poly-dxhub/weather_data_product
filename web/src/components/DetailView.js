@@ -273,7 +273,7 @@ function DetailViewHeader(props) {
           : (
             <Box display="flex">
               <Box>
-                <QuickMetadataItem title="HEIGHT" value={props.snapshot.instrument.asset_height}/>
+                <QuickMetadataItem title="HEIGHT" value={`${props.snapshot.instrument.asset_height} ${props.isMetric ? 'm' : 'ft'}`}/>
               </Box>
 
               <Spacer width='3rem'/>
