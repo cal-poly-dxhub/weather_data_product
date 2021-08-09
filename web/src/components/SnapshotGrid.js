@@ -267,7 +267,7 @@ export default function SnapshotGrid(props) {
         ) : (
           props.instrument == "tower" ?
           (
-            <div style={{color: "white"}}>Sorry, we're working on it!</div>
+            <div style={{color: "white", textAlign: "center", minWidth: "100%", paddingTop: "10rem", fontWeight: "bold", color: "gray"}}>Sorry, we're working on it!</div>
           ) : (
             snapshots.map((snapshot, index) => (
               <Grid item 

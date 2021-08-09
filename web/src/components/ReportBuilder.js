@@ -28,6 +28,8 @@ export default function ReportBuilder(props) {
   const useStyles = makeStyles({
     paper: {
       width: matchesSm ? "100%" : 550,
+      borderWidth: "1px",
+      borderColor: "gray",
       backgroundColor: '#1C1A1E',
     }
   });  
@@ -50,10 +52,12 @@ export default function ReportBuilder(props) {
         }
       }).then((resp) => {
         // console.log("url: ", resp.data);
-        if (resp.data != null) {
+        // if (resp.data != undefined) {
           var win = window.open(resp.data, '_blank');
-          win.focus();
-        }
+          if (win != null) {
+            win.focus();
+          }
+        // }
       });
     } catch (err) {
         console.error("async error: ", err);
@@ -62,7 +66,7 @@ export default function ReportBuilder(props) {
 
   return (
     <div>
-      <Drawer anchor='right' variant="persistent" open={props.open} classes={{paper: classes.paper}}>
+      <Drawer elevation={12} anchor='right' variant="persistent" open={props.open} classes={{paper: classes.paper}}>
         <AppBar position="static" color="transparent">
           <Toolbar>
             <IconButton style={{backgroundColor: "#302a33"}} onClick={() => {
