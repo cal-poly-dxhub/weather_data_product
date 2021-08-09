@@ -65,7 +65,7 @@ function removeMissingData(num) {
 
 // DETAIL: Toolbar
 
-function FullToolbar(props) {
+function TimeSlider(props) {
   const [state, dispatch] = useContext(UserContext);
 
   const marks = Array(props.numMeasurements).fill(0).map((_, i) => {
@@ -141,6 +141,22 @@ function FullTable(props) {
 
   useEffect(() => {
     const keys = Object.keys(props.response.gateResponses[0]);
+    keys.forEach((key, index) => {
+      switch (props.units[key]) {
+        case "dist":
+          keys[index] = key + (props.isMetric ? " (m)" : " (ft)");
+          break;
+        case "rate":
+          keys[index] = key + (props.isMetric ? " (m/s)" : " (ft/s)");
+          break;
+        case "temp":
+          keys[index] = key + (props.isMetric ? " (C)" : " (F)");  
+          break
+        default:
+          break;
+      };
+    });
+    
     setHeaders(keys)
     // console.log("response", props)
   }, [props.response])
@@ -150,7 +166,7 @@ function FullTable(props) {
       <Table size="small" variant='outlined' aria-label="a dense table" className={classes.table} rows>
         <TableHead>
           <TableRow>
-            {headers.slice(1, 5).map((header) => (
+            {headers.slice(1, 20).map((header) => (
               <TableCell align="right">{header}</TableCell>
             ))}
           </TableRow>
@@ -158,11 +174,9 @@ function FullTable(props) {
         <TableBody>
           {props.response.gateResponses.slice(0, props.response.gateResponses.length).map((row) => (
             <TableRow key={row.name}>
-              {headers.slice(1, 5).map((header) => (
+              {Object.keys(props.response.gateResponses[0]).slice(1, 20).map((header) => (
                 <TableCell align="right">{
-                  props.isMetric
-                    ? (0.5 * removeMissingData(row[header]))
-                    : (2* removeMissingData(row[header]))
+                  row[header]
                 }</TableCell>
               ))}
             </TableRow>
@@ -175,21 +189,11 @@ function FullTable(props) {
 
 // DETAIL: Header
 
-function DetailHeader(props) {  
+function DetailViewHeader(props) {  
   const classes = useStyles();
-  const [headers, setHeaders] = useState([]);
-  const [height, setHeight] = React.useState(props.snapshot.instrument.asset_height);
   const Spacer = require('react-spacer')
   const history = useHistory();
   const [state, dispatch] = useContext(UserContext);
-
-  useEffect(() => {
-    setHeight(
-      props.isMetric 
-      ? (0.5 * props.snapshot.instrument.asset_height)
-      : (2 * props.snapshot.instrument.asset_height)
-    )
-  }, [props.isMetric])
 
   return (
     <Box display="flex" alignItems="center" style={{paddingBottom: "2rem"}}>
@@ -224,7 +228,7 @@ function DetailHeader(props) {
           : (
             <Box display="flex">
               <Box>
-                <QuickMetadataItem title="HEIGHT" value={height}/>
+                <QuickMetadataItem title="HEIGHT" value={props.snapshot.instrument.asset_height}/>
               </Box>
 
               <Spacer width='3rem'/>
@@ -277,21 +281,22 @@ export default function DetailView(props) {
 
   return (
     <Box flexDirection="column" style={{paddingTop: "1rem"}}>
-      <DetailHeader {...props} archiveMetadata={archiveMetadata}/>
+      <DetailViewHeader {...props} archiveMetadata={archiveMetadata}/>
       <Card className={classes.root} variant="outlined">
         <CardContent>
         <Box flexDirection='column'>
-          <FullToolbar 
+          <TimeSlider 
             archiveMetadata={archiveMetadata}
             numMeasurements={numMeasurements} 
             timestamps={props.snapshot.measurements.map((measurement) => {
               return measurement.metadata.measurement_date_time
             })}
-            setMeasurementIndex={setMeasurementIndex} 
-            isMetric={props.isMetric}/>
+            setMeasurementIndex={setMeasurementIndex}/>
           <FullTable 
             response={props.snapshot.measurements[measurementIndex]} 
-            numRows={props.numRows} isMetric={props.isMetric}/>
+            numRows={props.numRows}
+            units={props.units}
+            isMetric={props.isMetric}/>
         </Box>
         </CardContent>
       </Card>

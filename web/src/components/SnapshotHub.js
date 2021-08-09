@@ -17,6 +17,7 @@ export default function SnapshotHub(props) {
   const [instrument, setInstrument] = useState(Object.keys(state.instruments)[0]);
   const [category, setCategory] = useState("");
   const [focusedSnapshot, setFocusedSnapshot] = useState({});
+  const [focusedSnapshotMetric, setFocusedSnapshotMetric] = useState({});
   const history = useHistory();
   const match = useRouteMatch();
 
@@ -40,42 +41,26 @@ export default function SnapshotHub(props) {
     <Switch>
       <Route path={`${props.match.path}/${instrument}${category == "" ? "" : `/${category}`}${focusedSnapshot.instrument == null ? "" : `/${focusedSnapshot.instrument.location}`}/detail`}>
         <DetailView
-          snapshot={focusedSnapshot} 
+          snapshot={!state.settings.imperial && Object.keys(focusedSnapshotMetric).length != 0 ? focusedSnapshotMetric : focusedSnapshot} 
           instrument={instrument}
           category={category}
           numRows={5} 
-          isMetric={state.settings.imperial} 
+          units={focusedSnapshot.units}
+          isMetric={!state.settings.imperial} 
         />
       </Route>
 
-      <Route path={`${match.path}/sodar`}>
-        <SnapshotGrid instrument="sodar" category="" setFocusedSnapshot={setFocusedSnapshot} setInstrument={setInstrument}/>
-      </Route>
-
-      <Route path={`${match.path}/tower`}>
-        <SnapshotGrid instrument="tower" category="" setFocusedSnapshot={setFocusedSnapshot} setInstrument={setInstrument}/>
-      </Route>
-
-      <Route path={`${match.path}/asos`}>
-        <SnapshotGrid instrument="asos" category="" setFocusedSnapshot={setFocusedSnapshot} setInstrument={setInstrument}/>
-      </Route>
-
-      <Route path={`${match.path}/amps`}>
-        <SnapshotGrid instrument="amps" category="" setFocusedSnapshot={setFocusedSnapshot} setInstrument={setInstrument}/>
-      </Route>
-
-      <Route path={`${match.path}/profiler/temp`}>
-        <CategoryChips instrument={state.instruments[instrument]} category={category} setCategory={setCategory}/>
-        <SnapshotGrid instrument="profiler" category={category} setFocusedSnapshot={setFocusedSnapshot} setInstrument={setInstrument}/>
-      </Route>
-
-      <Route path={`${match.path}/profiler/wind`}>
-        <CategoryChips instrument={state.instruments[instrument]} category={category} setCategory={setCategory}/>
-        <SnapshotGrid instrument="profiler" category={category} setFocusedSnapshot={setFocusedSnapshot} setInstrument={setInstrument}/>
+      <Route path={`${match.path}/profiler/${category}`}>
+        <CategoryChips instrument={state.instruments[instrument]} category={category} setCategory={setCategory} baseURL={`${match.path}/profiler`}/>
+        <SnapshotGrid instrument="profiler" category={category} setFocusedSnapshot={setFocusedSnapshot} setFocusedSnapshotMetric={setFocusedSnapshotMetric} setInstrument={setInstrument}/>
       </Route>
 
       <Route path={`${match.path}/profiler`}>
         <Redirect to={`${match.path}/profiler/temp`}/>
+      </Route>
+
+      <Route path={`${match.path}/${instrument}`}>
+        <SnapshotGrid instrument={instrument} category="" setFocusedSnapshot={setFocusedSnapshot} setFocusedSnapshotMetric={setFocusedSnapshotMetric} setInstrument={setInstrument}/>
       </Route>
 
       <Route path={props.match.path}>

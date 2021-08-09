@@ -45,22 +45,6 @@ const useStyles = makeStyles({
   }
 });
 
-function removeMissingData(num) {
-  const regex = "[9.]+$";
-
-  if (num == null) {
-    return null
-  }
-  
-  var str = num.toString();
-
-  if (str.match(regex)) {
-    return 'NA'
-  }
-
-  return num
-}
-
 // PREVIEW: Asset ID, Asset Height
 
 function QuickMetadataItem(props) {
@@ -84,16 +68,6 @@ function QuickMetadataItem(props) {
 // PREVIEW: Asset ID, Asset Height
 
 function QuickMetadataColumn(props) {
-  const [height, setHeight] = React.useState(props.instrument.asset_height);
-
-  useEffect(() => {
-    setHeight(
-      props.isMetric 
-      ? (0.5 * props.instrument.asset_height)
-      : (2 * props.instrument.asset_height)
-    )
-  }, [props.isMetric])
-
   return (
     "BalloonType" in props.instrument)
         ? (
@@ -109,7 +83,7 @@ function QuickMetadataColumn(props) {
         : (
           <Grid container direction="column">
             <Grid>
-              <QuickMetadataItem title="HEIGHT" value={height}/>
+              <QuickMetadataItem title="HEIGHT" value={props.instrument.asset_height}/>
             </Grid>
             <Grid>
               <QuickMetadataItem title="ID" value={"asset_id" in props.instrument ? props.instrument.asset_id : props.instrument.asset_ID}/>
@@ -125,9 +99,24 @@ function GateResponsePreview(props) {
   const [headers, setHeaders] = useState([]);
 
   useEffect(() => {
-    const keys = Object.keys(props.response.gateResponses[0]);
+    console.log("response changed: ", props.response.gateResponses[0]);
+    let keys = Object.keys(props.response.gateResponses[0]);
+    keys.forEach((key, index) => {
+      switch (props.units[key]) {
+        case "dist":
+          keys[index] = key + (props.isMetric ? " (m)" : " (ft)");
+          break;
+        case "rate":
+          keys[index] = key + (props.isMetric ? " (m/s)" : " (ft/s)");
+          break;
+        case "temp":
+          keys[index] = key + (props.isMetric ? " (C)" : " (F)");
+          break;
+        default:
+          break;
+      };
+    });
     setHeaders(keys)
-    // console.log("response", props)
   }, [props.response])
 
   return (
@@ -142,12 +131,10 @@ function GateResponsePreview(props) {
         <TableBody>
           {props.response.gateResponses.slice(-5).map((row) => (
             <TableRow key={row.name}>
-              {headers.slice(1, 4).map((header) => (
-                <TableCell align="right">{
-                  props.isMetric
-                    ? (0.5 * removeMissingData(row[header]))
-                    : (2* removeMissingData(row[header]))
-                }</TableCell>
+              {Object.keys(props.response.gateResponses[0]).slice(1, 4).map((header) => (
+                <TableCell align="right">
+                  {row[header]}
+                </TableCell>
               ))}
             </TableRow>
           ))}
@@ -161,7 +148,7 @@ export default function SnapshotCard(props) {
   const classes = useStyles();
   const [height, setHeight] = React.useState(props.snapshot.instrument.asset_height);
   const [ state, dispatch ] = React.useContext(UserContext);
-  const match = useRouteMatch()
+  const [metricSnapshot, setMetricSnapshot] = React.useState({});
   const Spacer = require('react-spacer');
 
   // useEffect(() => {
@@ -169,12 +156,11 @@ export default function SnapshotCard(props) {
   // }, [])
 
   useEffect(() => {
-    setHeight(
-      props.isMetric 
-      ? (0.5 * props.snapshot.instrument.asset_height)
-      : (2 * props.snapshot.instrument.asset_height)
-    )
-  }, [props.isMetric])
+    if (props.metricSnapshot != undefined && props.metricSnapshot != null && Object.keys(props.metricSnapshot).length > 0) {
+      setMetricSnapshot(props.metricSnapshot);
+    }
+
+  }, [props.metricSnapshot])
 
   return (
     <Card className={classes.root} variant="outlined">
@@ -193,7 +179,7 @@ export default function SnapshotCard(props) {
 
             <Box>
               <QuickMetadataColumn 
-              instrument={props.snapshot.instrument} 
+              instrument={props.isMetric && Object.keys(metricSnapshot).length != 0  ? metricSnapshot.instrument : props.snapshot.instrument} 
               index={state.instruments.index} 
               isMetric={props.isMetric}/>
             </Box>
@@ -205,9 +191,10 @@ export default function SnapshotCard(props) {
 
           <TableContainer style={{maxWidth: "100%"}}>
             <GateResponsePreview 
-            response={props.snapshot.measurements[0]} 
+            response={props.isMetric && Object.keys(metricSnapshot).length != 0 ? metricSnapshot.measurements[0] : props.snapshot.measurements[0]} 
             numRows={props.numRows} 
-            isMetric={props.isMetric}/>
+            isMetric={props.isMetric}
+            units={props.snapshot.units}/>
           </TableContainer>
         </Box>
       </CardContent>

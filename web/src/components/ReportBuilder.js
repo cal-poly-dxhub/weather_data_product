@@ -39,7 +39,8 @@ export default function ReportBuilder(props) {
       const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
       + state.instruments[instrument].path 
       + (category === "" ? "" : `${state.instruments[instrument][category].path}`) 
-      + `snapshot?assetId=${assetID}&csv=true`;
+      // + `snapshot?assetId=${assetID}&csv=true`;
+      + `snapshot?csv=true`;
 
       axios.get(baseUrl, {
         params: {},
@@ -49,8 +50,10 @@ export default function ReportBuilder(props) {
         }
       }).then((resp) => {
         // console.log("url: ", resp.data);
-        var win = window.open(resp.data, '_blank');
-        win.focus();
+        if (resp.data != null) {
+          var win = window.open(resp.data, '_blank');
+          win.focus();
+        }
       });
     } catch (err) {
         console.error("async error: ", err);

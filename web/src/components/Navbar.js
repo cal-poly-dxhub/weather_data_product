@@ -105,7 +105,7 @@ export default function Navbar() {
           }}>
             <Box flexDirection="column" display="flex" alignItems="center">
               <LanguageIcon/>
-              <Typography variant="subtitle2">{state.settings.imperial ? 'Metric' : 'Imperial'}</Typography>
+              <Typography variant="subtitle2">{state.settings.imperial ? 'Imperial' : 'Metric'}</Typography>
             </Box>
           </IconButton>
 

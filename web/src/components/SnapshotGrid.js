@@ -13,6 +13,11 @@ import SnapshotCard from './SnapshotCard';
 import PlaceholderCard from './PlaceholderCard';
 import { UserContext } from '../contexts/UserProvider';
 
+const IMP_TO_MET_DIST = 0.3047851265;   // MARK: Feet to meters
+const IMP_TO_MET_RATE = 0.3047851265;   // MARK: Feet/s to meters/s
+
+const ROOT_PLACEHOLDER = {asset_name: "Root"}
+
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -38,10 +43,21 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+function isMissing(num) {
+  const regex = "[9.]+$";
+
+  if (num == null || num.toString().match(regex)) {
+    return true;
+  }
+
+  return false;
+}
+
 export default function SnapshotGrid(props) {
   const classes = useStyles();
   const [snapshots, setSnapshots] = useState([]);
-  const [metadata, setMetadata] = useState([]);
+  const [metricSnapshots, setMetricSnapshots] = React.useState([]);
+  const [metadata, setMetadata] = useState([ROOT_PLACEHOLDER]);
   const [towerColumns, setTowerColumns] = useState([]);
   const [state, dispatch] = useContext(UserContext);
   const history = useHistory();
@@ -96,11 +112,23 @@ export default function SnapshotGrid(props) {
         console.log("data: ", resp.data)
 
         if (props.instrument == "tower") {
-          handleTowerProductCodes(resp.data)
+          handleTowerProductCodes(resp.data);
         } else {
+          resp.data.forEach((snapshot) => {
+            snapshot.measurements.forEach((measurement) => {
+              measurement.gateResponses.forEach((gateResponse) => {
+                Object.keys(gateResponse).forEach((key, index) => {
+                  let unitType = snapshot.units[key];
+  
+                  if (isMissing(gateResponse[key])) {
+                    gateResponse[key] = "NaN";
+                  }
+                });
+              });
+            });  
+          });
+
           setSnapshots(resp.data);
-          console.log("why 2 count: ", metadata.length)
-          // setMetadata([]);
 
           dispatch({
             type: "instruments/data",
@@ -109,12 +137,55 @@ export default function SnapshotGrid(props) {
               data: resp.data
             }
           });
+
+          converToMetric(resp.data);
         }
+      })
+      .then((resp) => {
+
       });
     } catch (err) {
         console.error("get error: ", err);
     }
   };
+
+  const converToMetric = (data) => {
+    const clone = JSON.parse(JSON.stringify(data))
+
+    clone.forEach((snapshot) => {
+      if ("asset_height" in snapshot.instrument) {
+        snapshot.instrument.asset_height = (snapshot.instrument.asset_height * IMP_TO_MET_DIST).toFixed(4);
+      }
+      
+      snapshot.measurements.forEach((measurement) => {
+        measurement.gateResponses.forEach((gateResponse) => {
+          Object.keys(gateResponse).forEach((key, index) => {
+            let unitType = snapshot.units[key];
+
+            if (isMissing(gateResponse[key])) {
+              gateResponse[key] = "NaN";
+            } else {
+              switch (unitType) {
+                case "dist":
+                  gateResponse[key] = (IMP_TO_MET_DIST * gateResponse[key]).toFixed(2);
+                  break;
+                case "rate":
+                  gateResponse[key] = (IMP_TO_MET_RATE * gateResponse[key]).toFixed(2);
+                  break;
+                case "temp":
+                  gateResponse[key] = ((gateResponse[key] -32) * 5/9).toFixed(2);
+                  break;
+                default:
+                  break;
+              }
+            }
+          });
+        });
+      });
+    });
+
+    setMetricSnapshots(clone);
+  }
 
   const handleTowerProductCodes = (tower_data) => {
     try {
@@ -130,7 +201,7 @@ export default function SnapshotGrid(props) {
       .then((resp) => {
         console.log("codes: ", resp.data);
 
-        const columns = []
+        const columns = [];
 
         resp.data.forEach(tower_code => {
           let column = {
@@ -142,6 +213,7 @@ export default function SnapshotGrid(props) {
         });
 
         setTowerColumns(columns);
+        setSnapshots(tower_data);
       });
     } catch (err) {
         console.error("get error: ", err);
@@ -150,21 +222,24 @@ export default function SnapshotGrid(props) {
 
   useEffect(() => { 
     props.setFocusedSnapshot({});
+    setMetricSnapshots([]);
     setSnapshots([]);
-    setMetadata([]);
+    setMetadata([ROOT_PLACEHOLDER]);
 
     const key = props.instrument + "/" + props.category
 
     if (state.instruments[props.instrument].data != null && 
       state.instruments[props.instrument].data.length > 0) 
     {
-      setSnapshots(state.instruments[props.instrument].data)
+      setSnapshots(state.instruments[props.instrument].data);
+      converToMetric(state.instruments[props.instrument].data);
     } else if (props.category != "" && 
       state.instruments[props.instrument][props.category] != null && 
       state.instruments[props.instrument][props.category].data != null && 
       state.instruments[props.instrument][props.category].data.length > 0) 
     {
-      setSnapshots(state.instruments[props.instrument][props.category].data)
+      setSnapshots(state.instruments[props.instrument][props.category].data);
+      converToMetric(state.instruments[props.instrument][props.category].data);
     } else {
       sendMetadataRequest(key);
     }
@@ -180,7 +255,7 @@ export default function SnapshotGrid(props) {
         (
           metadata.map((meta) => (
             <Grid item 
-              key={meta.asset_name} 
+              key={(("BalloonName" in meta) ? meta.BalloonName : meta.asset_name) + "_" + props.instrument} 
               sm={6}
               md={6}
               lg={4}
@@ -190,26 +265,33 @@ export default function SnapshotGrid(props) {
             </Grid>
           ))     
         ) : (
-          snapshots.map((snapshot) => (
-            <Grid item 
-              key={snapshot.instrument.asset_id}
-              sm={6}
-              md={6}
-              lg={4}
-              xl={3}
-              style={{minWidth: matchesSm ? "100%" : "Auto"}}
-              onClick={() => {
-                props.setFocusedSnapshot(snapshot);
-                history.push(`${match.path}/${snapshot.instrument.location}/detail`)
-              }}>
-                <SnapshotCard 
-                  snapshot={snapshot} 
-                  category={props.category}
-                  numRows={5}
-                  isMetric={state.settings.imperial} 
-                />
-            </Grid>
-          ))
+          props.instrument == "tower" ?
+          (
+            <div style={{color: "white"}}>Sorry, we're working on it!</div>
+          ) : (
+            snapshots.map((snapshot, index) => (
+              <Grid item 
+                key={snapshot.instrument.asset_id + "_" + props.instrument}
+                sm={6}
+                md={6}
+                lg={4}
+                xl={3}
+                style={{minWidth: matchesSm ? "100%" : "Auto"}}
+                onClick={() => {
+                  props.setFocusedSnapshot(snapshot);
+                  props.setFocusedSnapshotMetric(metricSnapshots[index]);
+                  history.push(`${match.path}/${snapshot.instrument.location}/detail`)
+                }}>
+                  <SnapshotCard 
+                    snapshot={snapshot} 
+                    metricSnapshot={metricSnapshots[index]}
+                    category={props.category}
+                    numRows={5}
+                    isMetric={!state.settings.imperial} 
+                  />
+              </Grid>
+            ))
+          )
         )
       }
     </Grid>
