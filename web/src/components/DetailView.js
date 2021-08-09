@@ -10,12 +10,16 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
+import TableFooter from '@material-ui/core/TableFooter';
+import TablePagination from '@material-ui/core/TablePagination';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+
+import TablePaginationActions from './TablePaginationActions';
 
 import { UserContext } from '../contexts/UserProvider';
 
@@ -74,8 +78,7 @@ function TimeSlider(props) {
         value: i,
         label: (
           <Box display="flex" flexDirection="column" alignItems="center">
-            <Box style={{color: "#616161"}}>{props.timestamps[i]}</Box>
-            <Box>Recent</Box>
+            <Box style={{color: "#616161"}}>{`${props.timestamps[i]} (most recent)`}</Box>
           </Box>
         )
       })   
@@ -94,7 +97,7 @@ function TimeSlider(props) {
 
   return (
     <Grid container justify="space-between" alignItems="center">
-      <Grid item xs={8} style={{ paddingLeft: 60, paddingRight: 60 }}>
+      <Grid item xs={12} style={{ paddingLeft: "8rem", paddingRight: "8rem" }}>
         {
           props.numMeasurements == 1
           ? (
@@ -138,6 +141,8 @@ function QuickMetadataItem(props) {
 function FullTable(props) {  
   const classes = useStyles();
   const [headers, setHeaders] = useState([]);
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   useEffect(() => {
     const keys = Object.keys(props.response.gateResponses[0]);
@@ -159,20 +164,35 @@ function FullTable(props) {
     
     setHeaders(keys)
     // console.log("response", props)
-  }, [props.response])
+  }, [props.response]);
+
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, props.response.gateResponses.length - page * rowsPerPage);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    console.log("hmmm 2", rowsPerPage);
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
+    <div>
     <TableContainer>
       <Table size="small" variant='outlined' aria-label="a dense table" className={classes.table} rows>
         <TableHead>
           <TableRow>
             {headers.slice(1, 20).map((header) => (
-              <TableCell align="right">{header}</TableCell>
+              <TableCell align="right" style={{fontWeight: "bold"}}>{header}</TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.response.gateResponses.slice(0, props.response.gateResponses.length).map((row) => (
+          {(rowsPerPage > 0 ?
+            props.response.gateResponses.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) :
+            props.response.gateResponses).map((row) => (
             <TableRow key={row.name}>
               {Object.keys(props.response.gateResponses[0]).slice(1, 20).map((header) => (
                 <TableCell align="right">{
@@ -181,9 +201,34 @@ function FullTable(props) {
               ))}
             </TableRow>
           ))}
+
+          {emptyRows > 0 && (
+            <TableRow style={{ height: 53 * emptyRows }}>
+              <TableCell colSpan={6} />
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>
+    <TableFooter style={{minWidth: "600px"}}>
+      <TableRow style={{minWidth: "600px"}}>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+          colSpan={3}
+          count={props.response.gateResponses.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          SelectProps={{
+            inputProps: { 'aria-label': 'rows per page' },
+            native: true,
+          }}
+          onChangePage={handleChangePage}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
+          ActionsComponent={TablePaginationActions}
+        />
+      </TableRow>
+    </TableFooter>  
+    </div>
   )
 }
 
