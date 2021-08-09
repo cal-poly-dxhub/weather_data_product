@@ -51,16 +51,20 @@ function QuickMetadataItem(props) {
   const Spacer = require('react-spacer');
 
   return (
-    <Box display="flex" style={{width: "100%"}}>
-      <Box justifyContent="flex-end" display="flex" style={{color: 'gray', fontWeight: 'bold', minWidth: "47%"}}>
+    <Box display="flex" style={{width: "100%"}} justifyContent="center">
+      <Spacer grow={1}/>
+
+      <Box justifyContent="flex-end" style={{color: 'gray', fontWeight: 'bold', verticalAlign: "right", textAlign: "right", width: "50%"}}>
         {props.title}
       </Box>
 
-      <Spacer grow={1}/>
+      <Spacer width={5}/>
 
-      <Box style={{color: 'white', textAlign: 'leading', minWidth: "47%"}}>
+      <Box style={{color: 'white', textAlign: 'left', width: "50%"}}>
         {props.value}
       </Box>
+
+      <Spacer grow={1}/>
     </Box>
   )
 }
@@ -82,10 +86,10 @@ function QuickMetadataColumn(props) {
         )
         : (
           <Grid container direction="column">
-            <Grid>
+            <Grid item>
               <QuickMetadataItem title="HEIGHT" value={`${props.instrument.asset_height} ${props.isMetric ? 'm' : 'ft'}`}/>
             </Grid>
-            <Grid>
+            <Grid item>
               <QuickMetadataItem title="ID" value={"asset_id" in props.instrument ? props.instrument.asset_id : props.instrument.asset_ID}/>
             </Grid>  
           </Grid>

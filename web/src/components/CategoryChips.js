@@ -44,7 +44,7 @@ export default function CategoryChips(props) {
 
             return (
               <li key={key}>
-                <Link to={`${props.baseURL}/${key}`}>
+                <Link to={`${props.baseURL}/${key}`} style={{textDecoration: "none"}}>
                   <Chip
                   label={key.toUpperCase()}
                   color="primary"

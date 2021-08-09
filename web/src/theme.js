@@ -55,6 +55,11 @@ const theme = createMuiTheme({
         color: '#ffffff',
         borderColor: '#ffffff'
       }
+    },
+    MuiPaper: {
+      root: {
+        backgroundColor: "#242026",
+      }
     }
   }
 });

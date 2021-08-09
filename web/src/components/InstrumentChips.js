@@ -48,7 +48,7 @@ export default function InstrumentChips(props) {
         {
           Object.keys(state.instruments).map((key, index) => (
             <li key={key}>
-              <Link to={`${match.url}/${key}`}>
+              <Link to={`${match.url}/${key}`} style={{textDecoration: "none"}}>
                 <Chip
                 label={key.toUpperCase()}
                 color={"primary"}
@@ -57,6 +57,10 @@ export default function InstrumentChips(props) {
                 variant={key == props.instrument ? "default" : "outlined"}
                 onClick={() => {
                   props.setInstrument(key);
+                  if (state.instruments[key].data == null) {    // e.g. profiler
+                    props.setCategory(Object.keys(state.instruments[key])[1])
+                  }
+
                   localStorage.setItem("instrumentKey", key)
                   }}
                 />

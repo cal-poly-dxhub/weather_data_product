@@ -4,6 +4,8 @@ import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import { useMediaQuery } from '@material-ui/core';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { useRouteMatch, useHistory, Link } from "react-router-dom"
 
@@ -258,8 +260,8 @@ export default function SnapshotGrid(props) {
               key={(("BalloonName" in meta) ? meta.BalloonName : meta.asset_name) + "_" + props.instrument} 
               sm={6}
               md={6}
-              lg={4}
-              xl={3}
+              lg={6}
+              xl={4}
               style={{height: "17rem", minWidth: matchesSm ? "100%" : "Auto"}}>
                 <PlaceholderCard/>
             </Grid>
@@ -274,21 +276,25 @@ export default function SnapshotGrid(props) {
                 key={snapshot.instrument.asset_id + "_" + props.instrument}
                 sm={6}
                 md={6}
-                lg={4}
-                xl={3}
+                lg={6}
+                xl={4}
                 style={{minWidth: matchesSm ? "100%" : "Auto"}}
                 onClick={() => {
                   props.setFocusedSnapshot(snapshot);
                   props.setFocusedSnapshotMetric(metricSnapshots[index]);
-                  history.push(`${match.path}/${snapshot.instrument.location}/detail`)
                 }}>
-                  <SnapshotCard 
-                    snapshot={snapshot} 
-                    metricSnapshot={metricSnapshots[index]}
-                    category={props.category}
-                    numRows={5}
-                    isMetric={!state.settings.imperial} 
-                  />
+                  {/* <Backdrop style={{zIndex: theme.zIndex.drawer + 1, color: '#fff'}} open={true}>
+                    <CircularProgress color="inherit" />
+                  </Backdrop> */}
+                  <Link to={`${match.path}/${snapshot.instrument.location}/detail`} style={{textDecoration: "none"}}>
+                    <SnapshotCard 
+                      snapshot={snapshot} 
+                      metricSnapshot={metricSnapshots[index]}
+                      category={props.category}
+                      numRows={5}
+                      isMetric={!state.settings.imperial} 
+                    />
+                  </Link>
               </Grid>
             ))
           )

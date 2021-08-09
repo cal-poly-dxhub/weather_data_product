@@ -73,7 +73,7 @@ export default function SnapshotHub(props) {
   return (
     <Box>
       <section>
-        <InstrumentChips instrument={instrument} setInstrument={setInstrument}/>
+        <InstrumentChips instrument={instrument} setInstrument={setInstrument} setCategory={setCategory}/>
       </section>
       <section>
         {renderSwitch()}

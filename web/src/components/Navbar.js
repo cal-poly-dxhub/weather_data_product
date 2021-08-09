@@ -6,12 +6,14 @@ import Toolbar from '@material-ui/core/Toolbar';
 import { useMediaQuery } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import Backdrop from '@material-ui/core/Backdrop';
 import IconButton from '@material-ui/core/IconButton';
-import { colors } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/styles';
 import LanguageIcon from '@material-ui/icons/Language';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import Grid from '@material-ui/core/Grid';
 import { Box } from '@material-ui/core';
 
@@ -48,6 +50,16 @@ export default function Navbar() {
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
   const Spacer = require('react-spacer');
 
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <AppBar position={matchesMd ? "fixed" : "static"} color={matchesMd ? "secondary" : "transparent"} elevation={matchesMd ? 2 : 0} style={{paddingLeft: matchesMd ? 0 : "4rem", paddingRight: matchesMd ? 0 : "4rem", paddingTop: matchesSm ? 0: matchesMd ? "1rem" :"2rem", paddingBottom: matchesSm ? 0: matchesMd ? "1rem" :"2rem"}}>
@@ -58,7 +70,7 @@ export default function Navbar() {
           ? undefined
           : (
             <Grid container spacing={0} justify='space-evenly' direction='column'>
-              <Link to="/">
+              <Link to="/" style={{textDecoration: "none"}}>
                 <Grid item xs={12}>
                   <Typography variant="subtitle2"  className={classes.title}>
                     VANDENBERG SPACE FORCE BASE
@@ -120,13 +132,28 @@ export default function Navbar() {
             </IconButton>
           )}
 
-          <ReportBuilder open={drawerIsOpen} setDrawerOpen={setDrawerOpen}></ReportBuilder>
+          <Backdrop style={{zIndex: theme.zIndex.drawer + 1, color: '#fff'}} open={drawerIsOpen} onClick={handleClose}>
+            <ReportBuilder open={drawerIsOpen} setDrawerOpen={setDrawerOpen}></ReportBuilder>
+          </Backdrop>
 
-          {matchesMd
-          ? <IconButton edge="end" className={classes.menuButton}>
-              <MoreVertIcon/>
-            </IconButton>
-          : undefined}
+          {matchesMd ? (
+            <div>
+              <IconButton edge="end" className={classes.menuButton} onClick={handleClick}>
+                <MoreVertIcon/>
+              </IconButton>
+              <Menu
+                id="simple-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+                style={{backgroundColor: 'rgba(0,0,0,0.4)'}}
+              >
+                <MenuItem onClick={handleClose}>API Docs</MenuItem>
+                <MenuItem onClick={handleClose}>Give Feedback</MenuItem>
+              </Menu>
+            </div>
+          ) : undefined}
 
         </Toolbar>
       </AppBar>

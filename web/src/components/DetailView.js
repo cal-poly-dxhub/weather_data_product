@@ -30,9 +30,6 @@ const useStyles = makeStyles({
     // minWidth: 275, 
     height: "100%",
     backgroundColor: '#242026',
-    '&:hover': {
-      borderColor: '#ffffff',
-    }
   },
   bullet: {
     display: 'inline-block',
@@ -156,6 +153,9 @@ function FullTable(props) {
           break;
         case "temp":
           keys[index] = key + (props.isMetric ? " (C)" : " (F)");  
+          break
+        case "deg":
+          keys[index] = key + " (deg)";  
           break
         default:
           break;
