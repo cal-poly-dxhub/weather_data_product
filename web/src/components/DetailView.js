@@ -181,53 +181,55 @@ function FullTable(props) {
   return (
     <div>
     <TableContainer>
-      <Table size="small" variant='outlined' aria-label="a dense table" className={classes.table} rows>
+      <Table size="small" variant='outlined' aria-label="a dense table" className={classes.table}>
         <TableHead>
           <TableRow>
             {headers.slice(1, 20).map((header) => (
-              <TableCell align="right" style={{fontWeight: "bold"}}>{header}</TableCell>
+              <TableCell align="right" style={{fontWeight: "bold"}} key={header}>{header}</TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
           {(rowsPerPage > 0 ?
             props.response.gateResponses.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) :
-            props.response.gateResponses).map((row) => (
-            <TableRow key={row.name}>
+            props.response.gateResponses).map((row, index) => (
+            <TableRow key={index}>
               {Object.keys(props.response.gateResponses[0]).slice(1, 20).map((header) => (
-                <TableCell align="right">{
-                  row[header]
-                }</TableCell>
+                <TableCell align="right" key={`${index}_${header}`}>
+                  {row[header]}
+                </TableCell>
               ))}
             </TableRow>
           ))}
 
-          {emptyRows > 0 && (
+          {/* {emptyRows > 0 && (
             <TableRow style={{ height: 53 * emptyRows }}>
               <TableCell colSpan={6} />
             </TableRow>
-          )}
+          )} */}
         </TableBody>
       </Table>
     </TableContainer>
-    <TableFooter style={{minWidth: "600px"}}>
-      <TableRow style={{minWidth: "600px"}}>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-          colSpan={3}
-          count={props.response.gateResponses.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          SelectProps={{
-            inputProps: { 'aria-label': 'rows per page' },
-            native: true,
-          }}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          ActionsComponent={TablePaginationActions}
-        />
-      </TableRow>
-    </TableFooter>  
+    <Table>
+      <TableFooter style={{minWidth: "600px"}}>
+        <TableRow style={{minWidth: "600px"}}>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+            colSpan={3}
+            count={props.response.gateResponses.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            SelectProps={{
+              inputProps: { 'aria-label': 'rows per page' },
+              native: true,
+            }}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+            ActionsComponent={TablePaginationActions}
+          />
+        </TableRow>
+      </TableFooter>  
+    </Table>
     </div>
   )
 }

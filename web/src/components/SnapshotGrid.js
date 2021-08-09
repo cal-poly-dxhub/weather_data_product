@@ -4,8 +4,6 @@ import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import { useMediaQuery } from '@material-ui/core';
-import Backdrop from '@material-ui/core/Backdrop';
-import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { useRouteMatch, useHistory, Link } from "react-router-dom"
 
@@ -45,16 +43,6 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function isMissing(num) {
-  const regex = "[9.]+$";
-
-  if (num == null || num.toString().match(regex)) {
-    return true;
-  }
-
-  return false;
-}
-
 export default function SnapshotGrid(props) {
   const classes = useStyles();
   const [snapshots, setSnapshots] = useState([]);
@@ -84,72 +72,29 @@ export default function SnapshotGrid(props) {
         }
       })
       .then((resp) => {
-        console.log("metadata: ", resp.data)
         setMetadata(resp.data);
-        console.log("why count: ", metadata.length)
 
-        sendSnapshotRequest(key);
-      });
-    } catch (err) {
-        console.error("metadata error: ", err);
-    }
-  }
-
-  const sendSnapshotRequest = (key) => {
-    try {
-      const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
-      + state.instruments[props.instrument].path 
-      + (state.instruments[props.instrument][props.category] ? state.instruments[props.instrument][props.category].path : "") 
-      + "snapshot?units=true";
-
-      axios
-      .get(baseUrl, {
-        params: {},
-        headers: {
-          'Accept': '*/*',
-          'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
-        }
-      })
-      .then((resp) => {
-        console.log("data: ", resp.data)
-
-        if (props.instrument == "tower") {
-          handleTowerProductCodes(resp.data);
-        } else {
-          resp.data.forEach((snapshot) => {
-            snapshot.measurements.forEach((measurement) => {
-              measurement.gateResponses.forEach((gateResponse) => {
-                Object.keys(gateResponse).forEach((key, index) => {
-                  let unitType = snapshot.units[key];
-  
-                  if (isMissing(gateResponse[key])) {
-                    gateResponse[key] = "NaN";
-                  }
-                });
-              });
-            });  
-          });
-
-          setSnapshots(resp.data);
+        props.apiManager.sendSnapshotRequest(
+          state.instruments[props.instrument].path,
+          state.instruments[props.instrument][props.category] ? state.instruments[props.instrument][props.category].path : null
+        ).then((snapshotsData) => {
+          setSnapshots(snapshotsData);
 
           dispatch({
             type: "instruments/data",
             payload: {
               key: key,
-              data: resp.data
+              data: snapshotsData
             }
           });
-
-          converToMetric(resp.data);
-        }
-      })
-      .then((resp) => {
-
+  
+          converToMetric(snapshotsData);
+        });
       });
     } catch (err) {
-        console.error("get error: ", err);
+        console.error("metadata error: ", err);
     }
-  };
+  }
 
   const converToMetric = (data) => {
     const clone = JSON.parse(JSON.stringify(data))
@@ -164,7 +109,7 @@ export default function SnapshotGrid(props) {
           Object.keys(gateResponse).forEach((key, index) => {
             let unitType = snapshot.units[key];
 
-            if (isMissing(gateResponse[key])) {
+            if (props.apiManager.isMissing(gateResponse[key])) {
               gateResponse[key] = "NaN";
             } else {
               switch (unitType) {

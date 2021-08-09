@@ -10,7 +10,8 @@ import SnapshotGrid from './SnapshotGrid';
 
 import { UserContext } from '../contexts/UserProvider';
 import DetailView from './DetailView';
-import { Category } from '@material-ui/icons';
+
+import APIManager from '../api/APIManager';
 
 export default function SnapshotHub(props) {
   const [state, dispatch] = useContext(UserContext);
@@ -18,7 +19,8 @@ export default function SnapshotHub(props) {
   const [category, setCategory] = useState("");
   const [focusedSnapshot, setFocusedSnapshot] = useState({});
   const [focusedSnapshotMetric, setFocusedSnapshotMetric] = useState({});
-  const history = useHistory();
+  const apiManager = new APIManager();
+  // const history = useHistory();
   const match = useRouteMatch();
 
   useEffect(() => {
@@ -47,12 +49,24 @@ export default function SnapshotHub(props) {
           numRows={5} 
           units={focusedSnapshot.units}
           isMetric={!state.settings.imperial} 
+          apiManager={apiManager}
         />
       </Route>
 
       <Route path={`${match.path}/profiler/${category}`}>
-        <CategoryChips instrument={state.instruments[instrument]} category={category} setCategory={setCategory} baseURL={`${match.path}/profiler`}/>
-        <SnapshotGrid instrument="profiler" category={category} setFocusedSnapshot={setFocusedSnapshot} setFocusedSnapshotMetric={setFocusedSnapshotMetric} setInstrument={setInstrument}/>
+        <CategoryChips 
+          instrument={state.instruments[instrument]} 
+          category={category} 
+          setCategory={setCategory} 
+          baseURL={`${match.path}/profiler`}/>
+        <SnapshotGrid 
+          instrument="profiler" 
+          category={category} 
+          setFocusedSnapshot={setFocusedSnapshot} 
+          setFocusedSnapshotMetric={setFocusedSnapshotMetric} 
+          setInstrument={setInstrument}
+          apiManager={apiManager}
+        />
       </Route>
 
       <Route path={`${match.path}/profiler`}>
@@ -60,7 +74,14 @@ export default function SnapshotHub(props) {
       </Route>
 
       <Route path={`${match.path}/${instrument}`}>
-        <SnapshotGrid instrument={instrument} category="" setFocusedSnapshot={setFocusedSnapshot} setFocusedSnapshotMetric={setFocusedSnapshotMetric} setInstrument={setInstrument}/>
+        <SnapshotGrid 
+          instrument={instrument} 
+          category="" 
+          setFocusedSnapshot={setFocusedSnapshot} 
+          setFocusedSnapshotMetric={setFocusedSnapshotMetric} 
+          setInstrument={setInstrument}
+          apiManager={apiManager}
+        />
       </Route>
 
       <Route path={props.match.path}>
@@ -73,7 +94,10 @@ export default function SnapshotHub(props) {
   return (
     <Box>
       <section>
-        <InstrumentChips instrument={instrument} setInstrument={setInstrument} setCategory={setCategory}/>
+        <InstrumentChips 
+          instrument={instrument} 
+          setInstrument={setInstrument} 
+          setCategory={setCategory}/>
       </section>
       <section>
         {renderSwitch()}

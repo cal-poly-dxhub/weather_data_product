@@ -103,7 +103,6 @@ function GateResponsePreview(props) {
   const [headers, setHeaders] = useState([]);
 
   useEffect(() => {
-    console.log("response changed: ", props.response.gateResponses[0]);
     let keys = Object.keys(props.response.gateResponses[0]);
     keys.forEach((key, index) => {
       switch (props.units[key]) {
@@ -116,6 +115,9 @@ function GateResponsePreview(props) {
         case "temp":
           keys[index] = key + (props.isMetric ? " (C)" : " (F)");
           break;
+        case "dir":
+          keys[index] = key + " (deg)";
+          break;  
         default:
           break;
       };
@@ -128,15 +130,15 @@ function GateResponsePreview(props) {
         <TableHead>
           <TableRow>
             {headers.slice(1, 4).map((header) => (
-              <TableCell align="right">{header}</TableCell>
+              <TableCell align="right" key={header}>{header}</TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.response.gateResponses.slice(-5).map((row) => (
-            <TableRow key={row.name}>
+          {props.response.gateResponses.slice(-5).map((row, index) => (
+            <TableRow key={index}>
               {Object.keys(props.response.gateResponses[0]).slice(1, 4).map((header) => (
-                <TableCell align="right">
+                <TableCell align="right" key={`${index}_${header}`}>
                   {row[header]}
                 </TableCell>
               ))}

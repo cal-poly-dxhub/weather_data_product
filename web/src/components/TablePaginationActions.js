@@ -31,7 +31,7 @@ function TablePaginationActions(props) {
   };
 
   const handleNextButtonClick = (event) => {
-    console.log("hmm: ", page)
+    console.log("hmm: ", page);
     onChangePage(event, page + 1);
   };
 
@@ -79,7 +79,7 @@ function TablePaginationActions(props) {
 
 TablePaginationActions.propTypes = {
   count: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired,
+  onChangePage: PropTypes.func.isRequired,
   page: PropTypes.number.isRequired,
   rowsPerPage: PropTypes.number.isRequired,
 };

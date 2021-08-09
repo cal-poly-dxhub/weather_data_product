@@ -33,7 +33,7 @@ export default function CategoryChips(props) {
 
   return (
     <Grid container direction='column' alignItems='flex-start'>
-      <Typography variant="p" style={{color: 'gray', fontWeight: 'bold'}}>
+      <Typography variant="body1" style={{color: 'gray', fontWeight: 'bold'}}>
         Category
       </Typography>
 

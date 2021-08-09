@@ -21,16 +21,17 @@ import axios from 'axios';
 
 export default function ReportBuilder(props) {
   const [ state, dispatch ] = React.useContext(UserContext);
-  const FileDownload = require('js-file-download');
   const Spacer = require('react-spacer');
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
 
   const useStyles = makeStyles({
     paper: {
-      width: matchesSm ? "100%" : 550,
-      borderWidth: "1px",
-      borderColor: "gray",
+      minWidth: matchesSm ? "100%" : "Auto",
+      height: "100%",
       backgroundColor: '#1C1A1E',
+      margin: matchesSm ? "0px" : "20px",
+      borderRadius: "10px",
+      overflowY: 'scroll',
     }
   });  
 
@@ -41,7 +42,7 @@ export default function ReportBuilder(props) {
       const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
       + state.instruments[instrument].path 
       + (category === "" ? "" : `${state.instruments[instrument][category].path}`) 
-      // + `snapshot?assetId=${assetID}&csv=true`;
+      + `snapshot?assetId=${assetID}&csv=true`
       + `snapshot?csv=true`;
 
       axios.get(baseUrl, {
@@ -65,7 +66,7 @@ export default function ReportBuilder(props) {
   };
 
   return (
-    <div>
+    <div style={{width: matchesSm ? "100%" : 550 }}>
       <Drawer elevation={12} anchor='right' variant="persistent" open={props.open} classes={{paper: classes.paper}}>
         <AppBar position="static" color="transparent">
           <Toolbar>
