@@ -241,38 +241,40 @@ function DetailNavigationBar(props) {
         </IconButton>
       </Box>
     
-      <Box flexGrow={1} style={{minWidth: matchesSm ? "100%" : "Auto"}}>
-        <Typography variant="h3" style={{fontWeight: "bold"}}>
+      <Box flexGrow={1} style={{minWidth: matchesSm ? "100%" : "Auto", backgroundColor: matchesSm ? "#2a272e" : "#1C1A1E", borderRadius: "10px", paddingTop: "10px", paddingBottom: "10px"}}>
+        <Typography variant="h3" style={{fontWeight: "bold", textAlign: matchesSm ? "center" : "left"}}>
           {props.snapshot.instrument.location}
         </Typography>
       </Box>
 
-      <Spacer width='50px' height='10px'/>
+      <Spacer width='50px' height='30px'/>
 
-      <Grid container>
+      <Box display="flex" flexWrap="nowrap" alignItems="center" style={{width: matchesSm ? "100%" : "Inherit"}}>
         {("BalloonType" in props.snapshot.instrument)
           ? (
-            <Grid container xs={matchesSm ? 6 : 10}>
-              <Grid item xs={6}>
+            <Box display="flex" flexWrap="nowrap">
+              <Box style={{paddingRight: "40px"}}>
                 <QuickMetadataItem title="BALLOON TYPE" value={props.snapshot.instrument.BalloonType}/>
-              </Grid>
-              <Grid item xs={6}>
+              </Box>
+              <Box style={{paddingRight: "40px"}}>
                 <QuickMetadataItem title="LAUNCH" value={props.snapshot.instrument.location}/>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
           )
           : (
-            <Grid container xs={matchesSm ? 6 : 10}>
-              <Grid item xs={6}>
+            <Box display="flex" flexWrap="nowrap">
+              <Box style={{paddingRight: "40px"}}>
                 <QuickMetadataItem title="HEIGHT" value={`${props.snapshot.instrument.asset_height} ${props.isMetric ? 'm' : 'ft'}`}/>
-              </Grid>
-              <Grid item xs={6}>
+              </Box>
+              <Box style={{paddingRight: "40px"}}>
                 <QuickMetadataItem title="ID" value={props.snapshot.instrument.asset_id}/>
-              </Grid>
-            </Grid>  
+              </Box>
+            </Box>  
         )}
 
-        <Grid item xs={matchesSm ? 6 : 2}>
+        <Spacer grow={1}/>
+
+        <Box>
           <Button variant="contained" color="primary" disableElevation onClick={() => {
             dispatch({
               type: "exports/add",
@@ -281,8 +283,8 @@ function DetailNavigationBar(props) {
           }}>
             Add to Archive
           </Button>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   )
 }
