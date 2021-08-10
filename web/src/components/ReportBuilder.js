@@ -38,12 +38,13 @@ export default function ReportBuilder(props) {
   const classes = useStyles();
 
   const sendDownloadRequest = async (instrument, category, assetID) => {
+
     try {
       const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
       + state.instruments[instrument].path 
       + (category === "" ? "" : `${state.instruments[instrument][category].path}`) 
-      + `snapshot?assetId=${assetID}&csv=true`
-      + `snapshot?csv=true`;
+      + `snapshot?assetId=${assetID}`
+      + `&csv=true`;
 
       axios.get(baseUrl, {
         params: {},

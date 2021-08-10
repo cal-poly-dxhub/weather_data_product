@@ -4,12 +4,14 @@ import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import { useMediaQuery } from '@material-ui/core';
+import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Backdrop from '@material-ui/core/Backdrop';
 import IconButton from '@material-ui/core/IconButton';
 import { ThemeProvider } from '@material-ui/styles';
 import LanguageIcon from '@material-ui/icons/Language';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
@@ -136,25 +138,37 @@ export default function Navbar() {
             <ReportBuilder open={drawerIsOpen} setDrawerOpen={setDrawerOpen}></ReportBuilder>
           </Backdrop>
 
-          {matchesMd ? (
-            <div>
-              <IconButton edge="end" className={classes.menuButton} onClick={handleClick}>
-                <MoreVertIcon/>
-              </IconButton>
-              <Menu
-                id="simple-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-                style={{backgroundColor: 'rgba(0,0,0,0.4)'}}
-              >
-                <MenuItem onClick={handleClose}>API Docs</MenuItem>
-                <MenuItem onClick={handleClose}>Give Feedback</MenuItem>
-              </Menu>
+          <IconButton edge="end" className={classes.menuButton} onClick={handleClick}>
+            {matchesMd ? <MoreVertIcon/> : <InfoOutlinedIcon/> }
+          </IconButton>
+            <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+            style={{backgroundColor: 'rgba(0,0,0,0.4)'}}
+          >
+            {matchesMd ? (
+              <div>
+              <MenuItem onClick={handleClose}>
+                <a style={{textDecoration: 'none', color: 'white'}} href="https://documenter.getpostman.com/view/13220876/Tzsijifs">
+                  API Docs
+                </a>
+                </MenuItem>
+              <MenuItem onClick={handleClose}>
+                <a style={{textDecoration: 'none', color: 'white'}} href="https://forms.gle/smfZiATVcvbEaRGN9">
+                  Give Feedback
+                </a>
+              </MenuItem>
+              <Divider style={{backgroundColor: "#3c3540", marginTop: "5px"}}/>
+              </div>
+            ) : undefined}
+            <div style={{padding: "1rem"}}>
+              <Typography variant="subtitle2" style={{color: "#635b69"}}>VAFB XUI Demo</Typography>
+              <Typography variant="body2" style={{color: "#635b69"}}>Version 3.1</Typography>
             </div>
-          ) : undefined}
-
+          </Menu>
         </Toolbar>
       </AppBar>
     </ThemeProvider>

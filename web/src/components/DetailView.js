@@ -17,7 +17,11 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import Divider from '@material-ui/core/Divider';
 import Box from '@material-ui/core/Box';
+import { useMediaQuery } from '@material-ui/core';
+
+import theme from '../theme'
 
 import TablePaginationActions from './TablePaginationActions';
 
@@ -64,60 +68,6 @@ function removeMissingData(num) {
   return num
 }
 
-// DETAIL: Toolbar
-
-function TimeSlider(props) {
-  const [state, dispatch] = useContext(UserContext);
-
-  const marks = Array(props.numMeasurements).fill(0).map((_, i) => {
-    if (i == 0) {
-      return({
-        value: i,
-        label: (
-          <Box display="flex" flexDirection="column" alignItems="center">
-            <Box style={{color: "#616161"}}>{`${props.timestamps[i]} (most recent)`}</Box>
-          </Box>
-        )
-      })   
-    } else {
-      return({
-        value: i,
-        label: <Box style={{color: "#616161"}}>{props.timestamps[i]}</Box>
-      })
-    }
-  });
-
-  const handleInputChange = (event, newValue) => {
-    console.log(newValue)
-    props.setMeasurementIndex(newValue);
-  };
-
-  return (
-    <Grid container justify="space-between" alignItems="center">
-      <Grid item xs={12} style={{ paddingLeft: "8rem", paddingRight: "8rem" }}>
-        {
-          props.numMeasurements == 1
-          ? (
-            undefined
-          ) : (
-            <Slider
-              defaultValue={0}
-              onChange={handleInputChange}
-              track={false}
-              valueLabelDisplay="off"
-              aria-labelledby="discrete-slider-restrict"
-              step={1}
-              marks={marks}
-              min={0}
-              max={props.numMeasurements > 0 ? props.numMeasurements-1 : 0}
-            />
-          )
-        }
-      </Grid>
-    </Grid>
-  )
-}
-
 // PREVIEW: Asset ID, Asset Height
 
 function QuickMetadataItem(props) {
@@ -133,13 +83,91 @@ function QuickMetadataItem(props) {
   )
 }
 
+// DETAIL: Toolbar
+
+function ControlsToolbar(props) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
+
+  const marks = Array(props.numMeasurements).fill(0).map((_, i) => {
+    if (i == currentIndex) {
+      return({
+        value: i,
+        label: (
+          <Box display="flex" flexDirection="column" alignItems="center">
+            <Box style={{color: "#616161"}}>{`${props.timestamps[i]}`}</Box>
+          </Box>
+        )
+      })   
+    } else {
+      return({
+        value: i,
+      })
+    }
+  });
+
+  const handleTimeIndexChange = (event, newValue) => {
+    setCurrentIndex(newValue);
+    props.setMeasurementIndex(newValue);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    props.setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    props.setRowsPerPage(parseInt(event.target.value, 10));
+    props.setPage(0);
+  };
+
+  return (
+    <Grid direction={matchesMd ? 'column' : 'row'} container justify="space-between" alignItems="center" style={{padding: "0.5rem"}}>
+      <Grid item>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+          colSpan={3}
+          count={props.numGateResponses}
+          rowsPerPage={props.rowsPerPage}
+          page={props.page}
+          SelectProps={{
+            inputProps: { 'aria-label': 'rows per page' },
+            native: true,
+          }}
+          onChangePage={handleChangePage}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
+          ActionsComponent={TablePaginationActions}
+          style={{borderWidth: 0}}
+        />
+      </Grid>
+      <Grid item style={{minWidth: matchesMd ? "80%" : '50%', paddingRight: matchesMd ? '0px' : '60px'}}>
+        {
+          props.numMeasurements == 1
+          ? (
+            undefined
+          ) : (
+            <Slider
+              defaultValue={0}
+              onChange={handleTimeIndexChange}
+              track={false}
+              valueLabelDisplay="off"
+              aria-labelledby="discrete-slider-restrict"
+              step={1}
+              marks={marks}
+              min={0}
+              max={props.numMeasurements > 0 ? props.numMeasurements-1 : 0}
+            />
+          )
+        }
+      </Grid>
+    </Grid>
+  )
+}
+
 // DETAIL: Data Table
 
 function FullTable(props) {  
   const classes = useStyles();
   const [headers, setHeaders] = useState([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   useEffect(() => {
     const keys = Object.keys(props.response.gateResponses[0]);
@@ -166,21 +194,8 @@ function FullTable(props) {
     // console.log("response", props)
   }, [props.response]);
 
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, props.response.gateResponses.length - page * rowsPerPage);
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    console.log("hmmm 2", rowsPerPage);
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
   return (
-    <div>
-    <TableContainer>
+    <TableContainer style={{padding: "1rem"}}>
       <Table size="small" variant='outlined' aria-label="a dense table" className={classes.table}>
         <TableHead>
           <TableRow>
@@ -190,8 +205,8 @@ function FullTable(props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {(rowsPerPage > 0 ?
-            props.response.gateResponses.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) :
+          {(props.rowsPerPage > 0 ?
+            props.response.gateResponses.slice(props.page * props.rowsPerPage, props.page * props.rowsPerPage + props.rowsPerPage) :
             props.response.gateResponses).map((row, index) => (
             <TableRow key={index}>
               {Object.keys(props.response.gateResponses[0]).slice(1, 20).map((header) => (
@@ -201,50 +216,24 @@ function FullTable(props) {
               ))}
             </TableRow>
           ))}
-
-          {/* {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={6} />
-            </TableRow>
-          )} */}
         </TableBody>
       </Table>
     </TableContainer>
-    <Table>
-      <TableFooter style={{minWidth: "600px"}}>
-        <TableRow style={{minWidth: "600px"}}>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-            colSpan={3}
-            count={props.response.gateResponses.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            SelectProps={{
-              inputProps: { 'aria-label': 'rows per page' },
-              native: true,
-            }}
-            onChangePage={handleChangePage}
-            onChangeRowsPerPage={handleChangeRowsPerPage}
-            ActionsComponent={TablePaginationActions}
-          />
-        </TableRow>
-      </TableFooter>  
-    </Table>
-    </div>
   )
 }
 
 // DETAIL: Header
 
-function DetailViewHeader(props) {  
+function DetailNavigationBar(props) {  
   const classes = useStyles();
   const Spacer = require('react-spacer')
   const history = useHistory();
   const [state, dispatch] = useContext(UserContext);
+  const matchesSm = useMediaQuery(theme.breakpoints.down('xs'));
 
   return (
-    <Box display="flex" alignItems="center" style={{paddingBottom: "2rem"}}>
-      <Box>
+    <Box display="flex" flexDirection={matchesSm ? 'column' : 'row'} alignItems="center" style={{paddingBottom: "2rem", minWidth: "100%"}}>
+      <Box style={{minWidth: matchesSm ? "100%" : "Auto"}}>
         <IconButton edge="start" className={classes.menuButton} aria-label="units" onClick={() => {
           history.goBack()
         }}>
@@ -252,18 +241,18 @@ function DetailViewHeader(props) {
         </IconButton>
       </Box>
     
-      <Box>
+      <Box flexGrow={1} style={{minWidth: matchesSm ? "100%" : "Auto"}}>
         <Typography variant="h3" style={{fontWeight: "bold"}}>
           {props.snapshot.instrument.location}
         </Typography>
       </Box>
 
-      <Spacer grow='1' width='3rem'/>
+      <Spacer width='50px' height='10px'/>
 
-      <Box justifyContent="center">
+      <Grid container>
         {("BalloonType" in props.snapshot.instrument)
           ? (
-            <Grid container>
+            <Grid container xs={matchesSm ? 6 : 10}>
               <Grid item xs={6}>
                 <QuickMetadataItem title="BALLOON TYPE" value={props.snapshot.instrument.BalloonType}/>
               </Grid>
@@ -273,35 +262,27 @@ function DetailViewHeader(props) {
             </Grid>
           )
           : (
-            <Box display="flex">
-              <Box>
+            <Grid container xs={matchesSm ? 6 : 10}>
+              <Grid item xs={6}>
                 <QuickMetadataItem title="HEIGHT" value={`${props.snapshot.instrument.asset_height} ${props.isMetric ? 'm' : 'ft'}`}/>
-              </Box>
-
-              <Spacer width='3rem'/>
-
-              <Box>
+              </Grid>
+              <Grid item xs={6}>
                 <QuickMetadataItem title="ID" value={props.snapshot.instrument.asset_id}/>
-              </Box>
-            </Box>  
+              </Grid>
+            </Grid>  
         )}
-      </Box>
 
-      <Spacer width='3rem'/>
-
-      <Box>
-        <Button variant="contained" color="primary" disableElevation onClick={() => {
-          dispatch({
-            type: "exports/add",
-            payload: props.archiveMetadata
-          })
-
-          // console.log(state.exports)
-        }}>
-          Add to Archive
-        </Button>
-
-      </Box>
+        <Grid item xs={matchesSm ? 6 : 2}>
+          <Button variant="contained" color="primary" disableElevation onClick={() => {
+            dispatch({
+              type: "exports/add",
+              payload: props.archiveMetadata
+            })
+          }}>
+            Add to Archive
+          </Button>
+        </Grid>
+      </Grid>
     </Box>
   )
 }
@@ -311,9 +292,10 @@ export default function DetailView(props) {
   const [ state, dispatch ] = React.useContext(UserContext);
   const [measurementIndex, setMeasurementIndex] = useState(0);
   const [numMeasurements, setNumMeasurements] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [page, setPage] = React.useState(0);
 
   useEffect(() => {
-    console.log(props.snapshot.instrument);
     setNumMeasurements(props.snapshot.measurements.length);
   }, [])
 
@@ -328,22 +310,31 @@ export default function DetailView(props) {
 
   return (
     <Box flexDirection="column" style={{paddingTop: "1rem"}}>
-      <DetailViewHeader {...props} archiveMetadata={archiveMetadata}/>
+      <DetailNavigationBar {...props} archiveMetadata={archiveMetadata}/>
       <Card className={classes.root} variant="outlined">
-        <CardContent>
+        <CardContent style={{padding: 0}}>
         <Box flexDirection='column'>
-          <TimeSlider 
+          <ControlsToolbar 
             archiveMetadata={archiveMetadata}
             numMeasurements={numMeasurements} 
+            numGateResponses={props.snapshot.measurements[measurementIndex].gateResponses.length}
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+            setPage={setPage}
+            page={page}
             timestamps={props.snapshot.measurements.map((measurement) => {
               return measurement.metadata.measurement_date_time
             })}
-            setMeasurementIndex={setMeasurementIndex}/>
+            setMeasurementIndex={setMeasurementIndex}
+          />
+          <Divider style={{backgroundColor: "#464646"}}/>
           <FullTable 
             response={props.snapshot.measurements[measurementIndex]} 
-            numRows={props.numRows}
+            rowsPerPage={rowsPerPage}
+            page={page}
             units={props.units}
-            isMetric={props.isMetric}/>
+            isMetric={props.isMetric}
+          />
         </Box>
         </CardContent>
       </Card>

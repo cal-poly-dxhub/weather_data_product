@@ -198,7 +198,7 @@ export default function SnapshotGrid(props) {
 
   return (    
     <Grid container className={classes.root} style={{minWidth: "100%", paddingTop: "1rem"}} spacing={3}>
-      {snapshots.length <= 0 ?
+      {snapshots.length <= 0 || metricSnapshots.length <= 0 ?
         (
           metadata.map((meta) => (
             <Grid item 
