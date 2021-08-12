@@ -41,7 +41,7 @@ export default function SnapshotHub(props) {
   function renderSwitch() {
     return (
     <Switch>
-      <Route path={`${props.match.path}/${instrument}${category == "" ? "" : `/${category}`}${focusedSnapshot.instrument == null ? "" : `/${focusedSnapshot.instrument.location}`}/detail`}>
+      <Route exact path={`${props.match.path}/${instrument}${category == "" ? "" : `/${category}`}${focusedSnapshot.instrument == null ? "" : `/${focusedSnapshot.instrument.location}`}/detail`}>
         <DetailView
           snapshot={!state.settings.imperial && Object.keys(focusedSnapshotMetric).length != 0 ? focusedSnapshotMetric : focusedSnapshot} 
           instrument={instrument}
@@ -53,7 +53,7 @@ export default function SnapshotHub(props) {
         />
       </Route>
 
-      <Route path={`${match.path}/profiler/${category}`}>
+      <Route exact path={`${match.path}/profiler/${category}`}>
         <CategoryChips 
           instrument={state.instruments[instrument]} 
           category={category} 
@@ -69,11 +69,11 @@ export default function SnapshotHub(props) {
         />
       </Route>
 
-      <Route path={`${match.path}/profiler`}>
+      <Route exact path={`${match.path}/profiler`}>
         <Redirect to={`${match.path}/profiler/temp`}/>
       </Route>
 
-      <Route path={`${match.path}/${instrument}`}>
+      <Route exact path={`${match.path}/${instrument}`}>
         <SnapshotGrid 
           instrument={instrument} 
           category="" 

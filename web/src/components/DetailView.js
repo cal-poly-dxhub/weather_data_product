@@ -83,6 +83,19 @@ function QuickMetadataItem(props) {
   )
 }
 
+function AddToArchiveButton(props) {
+  return (
+    <Button variant="contained" color="primary" disableElevation style={{maxHeight: "50px"}} onClick={() => {
+      props.dispatch({
+        type: "exports/add",
+        payload: props.archiveMetadata
+      })
+    }}>
+      Add to Archive
+    </Button>
+  )
+}
+
 // DETAIL: Toolbar
 
 function ControlsToolbar(props) {
@@ -233,13 +246,21 @@ function DetailNavigationBar(props) {
 
   return (
     <Box display="flex" flexDirection={matchesSm ? 'column' : 'row'} alignItems="center" style={{paddingBottom: "2rem", minWidth: "100%"}}>
-      <Box style={{minWidth: matchesSm ? "100%" : "Auto"}}>
-        <IconButton edge="start" className={classes.menuButton} aria-label="units" onClick={() => {
+      <Box display="flex" alignItems="center" style={{minWidth: matchesSm ? "100%" : "Auto"}}>
+        <IconButton edge="start" className={classes.menuButton} aria-label="Go Back" onClick={() => {
           history.goBack()
         }}>
-          <ArrowBackIcon/>
+          <ArrowBackIcon fontSize="large"/>
         </IconButton>
+
+        <Spacer grow={1}/>
+
+        {matchesSm ? (
+          <AddToArchiveButton dispatch={dispatch} archiveMetadata={props.archiveMetadata}/>
+        ) : undefined}
       </Box>
+
+      <Spacer height='20px'/>
     
       <Box flexGrow={1} style={{minWidth: matchesSm ? "100%" : "Auto", backgroundColor: matchesSm ? "#2a272e" : "#1C1A1E", borderRadius: "10px", paddingTop: "10px", paddingBottom: "10px"}}>
         <Typography variant="h3" style={{fontWeight: "bold", textAlign: matchesSm ? "center" : "left"}}>
@@ -249,7 +270,7 @@ function DetailNavigationBar(props) {
 
       <Spacer width='50px' height='30px'/>
 
-      <Box display="flex" flexWrap="nowrap" alignItems="center" style={{width: matchesSm ? "100%" : "Inherit"}}>
+      <Box display="flex" flexWrap="nowrap" alignItems="center" justifyItems="center">
         {("BalloonType" in props.snapshot.instrument)
           ? (
             <Box display="flex" flexWrap="nowrap">
@@ -263,27 +284,21 @@ function DetailNavigationBar(props) {
           )
           : (
             <Box display="flex" flexWrap="nowrap">
-              <Box style={{paddingRight: "40px"}}>
+              <Box>
                 <QuickMetadataItem title="HEIGHT" value={`${props.snapshot.instrument.asset_height} ${props.isMetric ? 'm' : 'ft'}`}/>
               </Box>
-              <Box style={{paddingRight: "40px"}}>
+              <Spacer width='40px'/>
+              <Box>
                 <QuickMetadataItem title="ID" value={props.snapshot.instrument.asset_id}/>
               </Box>
             </Box>  
         )}
 
-        <Spacer grow={1}/>
+        <Spacer width={matchesSm ? '0px' : '50px'}/>
 
-        <Box>
-          <Button variant="contained" color="primary" disableElevation onClick={() => {
-            dispatch({
-              type: "exports/add",
-              payload: props.archiveMetadata
-            })
-          }}>
-            Add to Archive
-          </Button>
-        </Box>
+        {matchesSm ? undefined : (
+          <AddToArchiveButton dispatch={dispatch} archiveMetadata={props.archiveMetadata}/>
+        )}
       </Box>
     </Box>
   )
