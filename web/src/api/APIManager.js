@@ -1,9 +1,13 @@
 import axios from 'axios';
 
+const hostUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
+const api_key = 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0'
+
 const IMP_TO_MET_DIST = 0.3047851265;   // MARK: Feet to meters
 const IMP_TO_MET_RATE = 0.3047851265;   // MARK: Feet/s to meters/s
 
 export default class APIManager {
+
   isMissing(num) {
     const regex = "[9.]+$";
   
@@ -14,9 +18,34 @@ export default class APIManager {
     return false;
   }
 
+  sendDownloadLinkRequest(instrumentPath, categoryPath, assetID) {
+    try {
+      const baseUrl = hostUrl
+      + instrumentPath 
+      + (categoryPath == null ? "" : categoryPath) 
+      + `snapshot?assetId=${assetID}`
+      + `&csv=true`;
+
+      axios.get(baseUrl, {
+        params: {},
+        headers: {
+          'Accept': '*/*',
+          'x-api-key': api_key
+        }
+      }).then((resp) => {
+        var win = window.open(resp.data, '_blank');
+        if (win != null) {
+          win.focus();
+        }
+      });
+    } catch (err) {
+        console.error("async error: ", err);
+    }
+  }
+
   async sendMetadataRequest(instrumentPath, categoryPath, key) {
     try {
-      let baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
+      let baseUrl = hostUrl
       + instrumentPath 
       + (categoryPath == null ? "" : categoryPath);
 
@@ -27,7 +56,7 @@ export default class APIManager {
         params: {},
         headers: {
           'Accept': '*/*',
-          'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
+          'x-api-key': api_key
         }
       })
       .then((resp) => {
@@ -41,11 +70,11 @@ export default class APIManager {
   async handleTowerProductCodes(tower_data) {
     try {
       return await axios
-      .get('https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/tower/codes' , {
+      .get(hostUrl + 'tower/codes', {
         params: {},
         headers: {
           'Accept': '*/*',
-          'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
+          'x-api-key': api_key
         }
       })
       .then((resp) => {
@@ -74,7 +103,7 @@ export default class APIManager {
 
     clone.forEach((snapshot) => {
       if ("asset_height" in snapshot.instrument) {
-        snapshot.instrument.asset_height = (snapshot.instrument.asset_height * IMP_TO_MET_DIST).toFixed(4);
+        snapshot.instrument.asset_height = (snapshot.instrument.asset_height * IMP_TO_MET_DIST).toFixed(2);
       }
       
       snapshot.measurements.forEach((measurement) => {
@@ -109,7 +138,7 @@ export default class APIManager {
 
   async sendSnapshotRequest(instrumentPath, categoryPath=null, assetId=null, includeUnits=true) {
     try {
-      const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
+      const baseUrl = hostUrl
       + instrumentPath 
       + (categoryPath == null ? "" : categoryPath)  
       + `snapshot?units=${includeUnits}`;
@@ -119,7 +148,7 @@ export default class APIManager {
         params: {},
         headers: {
           'Accept': '*/*',
-          'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
+          'x-api-key': api_key
         }
       })
       .then((resp) => {
@@ -137,6 +166,12 @@ export default class APIManager {
               });
             });
           });  
+
+          snapshot.measurements.sort((first, second) => {
+            let firstDate = Date.parse(first.metadata.measurement_date_time);
+            let secondDate = Date.parse(second.metadata.measurement_date_time);
+            return secondDate - firstDate;
+          })
         });
 
         return resp.data;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import AppBar from '@material-ui/core/AppBar';
 import Drawer from '@material-ui/core/Drawer';
@@ -13,16 +13,32 @@ import { useMediaQuery } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { UserContext } from '../contexts/UserProvider';
+import APIManager from '../api/APIManager';
 
 import theme from '../theme'
-import axios from 'axios';
 
 export default function ReportBuilder(props) {
   const [ state, dispatch ] = React.useContext(UserContext);
   const Spacer = require('react-spacer');
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
+  const apiManager = new APIManager();
+  const [isDownloading, didBeginDownloading] = React.useState(null);
+
+  const onFocus = () => {
+    didBeginDownloading(false);
+  };
+
+  useEffect(() => {
+    window.addEventListener('focus', onFocus);
+
+    return () => {
+      window.removeEventListener('focus', onFocus);
+    };
+  });
 
   const useStyles = makeStyles({
     paper: {
@@ -37,37 +53,15 @@ export default function ReportBuilder(props) {
 
   const classes = useStyles();
 
-  const sendDownloadRequest = async (instrument, category, assetID) => {
-
-    try {
-      const baseUrl = 'https://qqviypx48b.execute-api.us-gov-west-1.amazonaws.com/dev/' 
-      + state.instruments[instrument].path 
-      + (category === "" ? "" : `${state.instruments[instrument][category].path}`) 
-      + `snapshot?assetId=${assetID}`
-      + `&csv=true`;
-
-      axios.get(baseUrl, {
-        params: {},
-        headers: {
-          'Accept': '*/*',
-          'x-api-key': 'sbnnxUa0Y94y0rn9YKSah8MyOmRVbmZYtUq9ZbK0',
-        }
-      }).then((resp) => {
-        // console.log("url: ", resp.data);
-        // if (resp.data != undefined) {
-          var win = window.open(resp.data, '_blank');
-          if (win != null) {
-            win.focus();
-          }
-        // }
-      });
-    } catch (err) {
-        console.error("async error: ", err);
-    }
-  };
-
   return (
     <div style={{width: matchesSm ? "100%" : 550 }}>
+      <Backdrop style={{zIndex: theme.zIndex.drawer + 1, color: '#fff'}} open={isDownloading}>
+        <Box flexDirection="column" display="flex" alignItems="center">
+          <CircularProgress color="inherit" />
+          <Spacer height={20}/>
+          <caption>Downloading...</caption>
+        </Box>
+      </Backdrop>
       <Drawer elevation={12} anchor='right' variant="persistent" open={props.open} classes={{paper: classes.paper}}>
         <AppBar position="static" color="transparent">
           <Toolbar>
@@ -129,7 +123,8 @@ export default function ReportBuilder(props) {
 
                     <Box flexDirection="column" display="flex" alignItems="center">
                       <Button size="large" color="secondary" onClick={() => {
-                        sendDownloadRequest(item.instrument, item.category, item.assetID)
+                        apiManager.sendDownloadLinkRequest(state.instruments[item.instrument].path, item.category, item.assetID);
+                        didBeginDownloading(true);
                       }}>
                         <Typography variant="body2" style={{fontWeight: "bold" }}>
                           Download

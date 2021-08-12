@@ -7,7 +7,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 
-export default function FullTable(props) {  
+export default function GenericTable(props) {  
   const [headers, setHeaders] = useState([]);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function FullTable(props) {
   }, [props.response]);
 
   return (
-    <TableContainer style={{padding: "1rem"}}>
+    <TableContainer>
       <Table size="small" variant='outlined' aria-label="a dense table">
         <TableHead>
           <TableRow>

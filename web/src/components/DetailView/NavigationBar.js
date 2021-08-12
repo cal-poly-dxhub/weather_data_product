@@ -52,7 +52,15 @@ export default function DetailNavigationBar(props) {
 
       <Spacer height='20px'/>
     
-      <Box flexGrow={1} style={{minWidth: matchesSm ? "100%" : "Auto", backgroundColor: matchesSm ? "#2a272e" : "#1C1A1E", borderRadius: "10px", paddingTop: "10px", paddingBottom: "10px"}}>
+      <Box 
+        flexGrow={1} 
+        style={{
+          minWidth: matchesSm ? "100%" : "Auto", 
+          backgroundColor: matchesSm ? "#2a272e" : "#1C1A1E", 
+          borderRadius: "10px", paddingTop: "10px", 
+          paddingBottom: "10px"
+        }}
+      >
         <Typography variant="h3" style={{fontWeight: "bold", textAlign: matchesSm ? "center" : "left"}}>
           {props.snapshot.instrument.location}
         </Typography>
@@ -60,10 +68,26 @@ export default function DetailNavigationBar(props) {
 
       <Spacer width='50px' height='30px'/>
 
-      <Box display="flex" flexWrap="nowrap" alignItems="center" justifyItems="center">
+      <Box 
+        display="flex" 
+        flexWrap="nowrap" 
+        justifyContent="center" 
+        alignContent="center" 
+        style={{
+          borderRadius: "10px", 
+          borderColor: "#2a272e", 
+          borderWidth: "2px", 
+          borderStyle: "solid", 
+          minWidth: matchesSm ? "100%" : "Auto", 
+          paddingTop: "10px", 
+          paddingBottom: "10px"
+        }}
+      >
+        <Spacer width={matchesSm ? '0px' : '10px'}/>
+
         {("BalloonType" in props.snapshot.instrument)
           ? (
-            <Box display="flex" flexWrap="nowrap">
+            <Box display="flex" flexWrap="nowrap" style={{paddingLeft: matchesSm ? 0 : "10px"}}>
               <Box style={{paddingRight: "40px"}}>
                 <MetadataItem direction="column" title="BALLOON TYPE" value={props.snapshot.instrument.BalloonType}/>
               </Box>
@@ -89,6 +113,8 @@ export default function DetailNavigationBar(props) {
         {matchesSm ? undefined : (
           <AddToArchiveButton dispatch={dispatch} archiveMetadata={props.archiveMetadata}/>
         )}
+
+        <Spacer width={matchesSm ? '0px' : '10px'}/>
       </Box>
     </Box>
   )

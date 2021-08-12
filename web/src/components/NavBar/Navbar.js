@@ -4,7 +4,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import { useMediaQuery } from '@material-ui/core';
-import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Backdrop from '@material-ui/core/Backdrop';
@@ -14,16 +13,16 @@ import LanguageIcon from '@material-ui/icons/Language';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import Grid from '@material-ui/core/Grid';
 import { Box } from '@material-ui/core';
 
-import { Link } from 'react-router-dom';
+import theme from '../../theme'
+import ReportBuilder from '../ReportBuilder';
+import { UserContext } from '../../contexts/UserProvider';
+import NavTitle from './NavTitle';
+import MoreMenu from './MoreMenu';
 
-import theme from '../theme'
-import ReportBuilder from './ReportBuilder';
-import { UserContext } from '../contexts/UserProvider';
+const feedback_form_url = 'https://forms.gle/smfZiATVcvbEaRGN9'
+const api_docs_url = 'https://documenter.getpostman.com/view/13220876/Tzsijifs'
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -51,7 +50,6 @@ export default function Navbar() {
   const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
   const Spacer = require('react-spacer');
-
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleClick = (event) => {
@@ -70,22 +68,7 @@ export default function Navbar() {
           
           {matchesSm
           ? undefined
-          : (
-            <Grid container spacing={0} justify='space-evenly' direction='column'>
-              <Link to="/" style={{textDecoration: "none"}}>
-                <Grid item xs={12}>
-                  <Typography variant="subtitle2"  className={classes.title}>
-                    VANDENBERG SPACE FORCE BASE
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="h5" className={classes.title}>
-                    SPACEPORT WEATHER ARCHIVE
-                  </Typography>
-                </Grid>
-              </Link>
-            </Grid>    
-          )}
+          : <NavTitle/>}
 
           <Spacer grow='1' />
 
@@ -94,7 +77,7 @@ export default function Navbar() {
           : (
             <Toolbar>
               <Button className={classes.menuButton} variant="text" size="small" color="primary">
-                <a style={{textDecoration: 'none'}} href="https://documenter.getpostman.com/view/13220876/Tzsijifs">
+                <a style={{textDecoration: 'none'}} href={api_docs_url}>
                   <Typography variant="body1" display="block" style={{ margin: "0.5rem", color: "#9C9C9C", marginLeft: '0.5rem', marginRight: '0.5rem' }}>
                     API Docs
                   </Typography>
@@ -102,7 +85,7 @@ export default function Navbar() {
               </Button>
 
               <Button className={classes.feedbackButton} size="large" color="primary">
-                <a style={{textDecoration: 'none'}} href="https://forms.gle/smfZiATVcvbEaRGN9">
+                <a style={{textDecoration: 'none'}} href={feedback_form_url}>
                   <Typography variant="body1" style={{ margin: "0.5rem", marginLeft: '1rem', marginRight: '1rem', fontWeight: "bold" }}>
                     Give Feedback
                   </Typography>
@@ -141,34 +124,13 @@ export default function Navbar() {
           <IconButton edge="end" className={classes.menuButton} onClick={handleClick}>
             {matchesMd ? <MoreVertIcon/> : <InfoOutlinedIcon/> }
           </IconButton>
-            <Menu
-            id="simple-menu"
+
+          <MoreMenu 
+            feedback_form_url={feedback_form_url} 
+            api_docs_url={api_docs_url}
             anchorEl={anchorEl}
-            keepMounted
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-            style={{backgroundColor: 'rgba(0,0,0,0.4)'}}
-          >
-            {matchesMd ? (
-              <div>
-              <MenuItem onClick={handleClose}>
-                <a style={{textDecoration: 'none', color: 'white'}} href="https://documenter.getpostman.com/view/13220876/Tzsijifs">
-                  API Docs
-                </a>
-                </MenuItem>
-              <MenuItem onClick={handleClose}>
-                <a style={{textDecoration: 'none', color: 'white'}} href="https://forms.gle/smfZiATVcvbEaRGN9">
-                  Give Feedback
-                </a>
-              </MenuItem>
-              <Divider style={{backgroundColor: "#3c3540", marginTop: "5px"}}/>
-              </div>
-            ) : undefined}
-            <div style={{padding: "1rem"}}>
-              <Typography variant="subtitle2" style={{color: "#635b69"}}>VAFB XUI Demo</Typography>
-              <Typography variant="body2" style={{color: "#635b69"}}>Version 3.1</Typography>
-            </div>
-          </Menu>
+            handleClose={handleClose}/>
+
         </Toolbar>
       </AppBar>
     </ThemeProvider>
