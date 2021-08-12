@@ -4,14 +4,14 @@ import { Box, Grid } from '@material-ui/core';
 
 import { Route, Switch, useHistory, useRouteMatch, Redirect } from 'react-router-dom';
 
-import InstrumentChips from './InstrumentChips';
-import CategoryChips from './CategoryChips';
+import InstrumentChips from '../Chips/InstrumentChips';
+import CategoryChips from '../Chips/CategoryChips';
 import SnapshotGrid from './SnapshotGrid';
 
-import { UserContext } from '../contexts/UserProvider';
-import DetailView from './DetailView';
+import { UserContext } from '../../contexts/UserProvider';
+import DetailView from '../DetailView/DetailView';
 
-import APIManager from '../api/APIManager';
+import APIManager from '../../api/APIManager';
 
 export default function SnapshotHub(props) {
   const [state, dispatch] = useContext(UserContext);

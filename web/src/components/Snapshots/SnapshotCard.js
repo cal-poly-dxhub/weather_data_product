@@ -13,10 +13,8 @@ import TableRow from '@material-ui/core/TableRow';
 import { Typography } from '@material-ui/core';
 import { Box } from '@material-ui/core';
 
-import { useRouteMatch, Switch, Route, useHistory } from "react-router-dom"
-
-import { UserContext } from '../contexts/UserProvider';
-import DetailView from './DetailView';
+import MetadataItem from '../Misc/MetadataItem'
+import { UserContext } from '../../contexts/UserProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -47,50 +45,26 @@ const useStyles = makeStyles({
 
 // PREVIEW: Asset ID, Asset Height
 
-function QuickMetadataItem(props) {
-  const Spacer = require('react-spacer');
-
-  return (
-    <Box display="flex" style={{width: "100%"}} justifyContent="center">
-      <Spacer grow={1}/>
-
-      <Box justifyContent="flex-end" style={{color: 'gray', fontWeight: 'bold', verticalAlign: "right", textAlign: "right", width: "50%"}}>
-        {props.title}
-      </Box>
-
-      <Spacer width={5}/>
-
-      <Box style={{color: 'white', textAlign: 'left', width: "50%"}}>
-        {props.value}
-      </Box>
-
-      <Spacer grow={1}/>
-    </Box>
-  )
-}
-
-// PREVIEW: Asset ID, Asset Height
-
 function QuickMetadataColumn(props) {
   return (
     "BalloonType" in props.instrument)
         ? (
           <Grid container direction="column">
             <Grid item>
-              <QuickMetadataItem title="BALLOON TYPE" value={props.instrument.BalloonType}/>
+              <MetadataItem title="BALLOON TYPE" value={props.instrument.BalloonType}/>
             </Grid>
             <Grid item>
-              <QuickMetadataItem title="LAUNCH" value={props.instrument.location}/>
+              <MetadataItem title="LAUNCH" value={props.instrument.location}/>
             </Grid>
           </Grid>
         )
         : (
           <Grid container direction="column">
             <Grid item>
-              <QuickMetadataItem title="HEIGHT" value={`${props.instrument.asset_height} ${props.isMetric ? 'm' : 'ft'}`}/>
+              <MetadataItem title="HEIGHT" value={`${props.instrument.asset_height} ${props.isMetric ? 'm' : 'ft'}`}/>
             </Grid>
             <Grid item>
-              <QuickMetadataItem title="ID" value={"asset_id" in props.instrument ? props.instrument.asset_id : props.instrument.asset_ID}/>
+              <MetadataItem title="ID" value={"asset_id" in props.instrument ? props.instrument.asset_id : props.instrument.asset_ID}/>
             </Grid>  
           </Grid>
         )

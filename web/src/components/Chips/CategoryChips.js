@@ -8,7 +8,7 @@ import { Typography } from '@material-ui/core';
 
 import { Link, useRouteMatch } from 'react-router-dom';
 
-import { UserContext } from "../contexts/UserProvider"
+import { UserContext } from "../../contexts/UserProvider"
 
 const useStyles = makeStyles((theme) => ({
   root: {

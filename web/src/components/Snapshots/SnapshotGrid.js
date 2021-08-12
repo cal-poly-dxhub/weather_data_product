@@ -6,11 +6,11 @@ import { useMediaQuery } from '@material-ui/core';
 
 import { useRouteMatch, useHistory, Link } from "react-router-dom"
 
-import theme from '../theme'
+import theme from '../../theme'
 
 import SnapshotCard from './SnapshotCard';
-import PlaceholderCard from './PlaceholderCard';
-import { UserContext } from '../contexts/UserProvider';
+import PlaceholderCard from '../Misc/PlaceholderCard';
+import { UserContext } from '../../contexts/UserProvider';
 
 const ROOT_PLACEHOLDER = {asset_name: "Root"}
 

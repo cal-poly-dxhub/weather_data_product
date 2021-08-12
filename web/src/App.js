@@ -9,8 +9,8 @@ import { ThemeProvider } from '@material-ui/styles';
 import theme from './theme';
 
 import { UserContext, UserProvider } from './contexts/UserProvider';
-import SnapshotHub from './components/SnapshotHub';
-import SnapshotGrid from './components/SnapshotGrid';
+import SnapshotHub from './components/Snapshots/SnapshotHub';
+import SnapshotGrid from './components/Snapshots/SnapshotGrid';
 
 import { Route, BrowserRouter as Router, Switch, Redirect, useHistory } from 'react-router-dom';
 import ReportBuilder from './components/ReportBuilder';
