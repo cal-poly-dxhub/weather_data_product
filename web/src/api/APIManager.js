@@ -103,6 +103,54 @@ export default class APIManager {
     }
   }
 
+  mapCodesToSnapshotData(snapshotsData, columns) {
+    let mappedSnapshotsData = [];
+
+    snapshotsData.forEach(snapshot => {
+      let copiedSnapshot = {
+        instrument: snapshot.instrument,
+        measurements: [],
+        units: snapshot.units
+      };
+
+      snapshot.measurements.forEach(measurement => {
+        let copiedMeasurement = {
+          metadata: measurement.metadata,
+          gateResponses: []
+        };
+
+        let groupedGateResponsesByHeight = measurement.gateResponses.reduce((r, a) => {
+          r[a.height.toString()] = [...r[a.height.toString()] || [], a];
+          return r;
+        }, {});
+
+        for (const [heightKey, gateResponsesArray] of Object.entries(groupedGateResponsesByHeight)) {
+          let gateResponseToAppend = {
+            id: parseInt(heightKey),
+          };
+
+          gateResponsesArray.forEach(groupedGateResponse => {  
+            let gateResponseColumn = columns.find(column => {
+              return column.field == groupedGateResponse.product_code;
+            });
+
+            if (gateResponseColumn && gateResponseColumn.field) {
+              gateResponseToAppend[gateResponseColumn.field] = groupedGateResponse.value;
+            }
+          });
+
+          copiedMeasurement.gateResponses.push(gateResponseToAppend);
+        }
+
+        copiedSnapshot.measurements.push(copiedMeasurement);
+      });
+
+      mappedSnapshotsData.push(copiedSnapshot);
+    });
+
+    return mappedSnapshotsData;
+  }
+
   convertToMetric(data) {
     const clone = JSON.parse(JSON.stringify(data))
 

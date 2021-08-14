@@ -77,6 +77,7 @@ export default function DetailView(props) {
                 disableColumnMenu={true}
                 className={classes.datatable}
                 autoHeight
+                hideFooter
               />
             </div>
           ) : (

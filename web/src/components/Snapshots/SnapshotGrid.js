@@ -74,6 +74,13 @@ export default function SnapshotGrid(props) {
       state.instruments[props.instrument].data.length > 0) 
     {
       setSnapshots(state.instruments[props.instrument].data);
+
+      if (props.instrument == "tower") {
+        props.apiManager.sendTowerCodesRequest()
+        .then(columnsToSave => {
+          setColumns(columnsToSave);
+        });
+      }
     } else if (props.category != "" && 
       state.instruments[props.instrument][props.category] != null && 
       state.instruments[props.instrument][props.category].data != null && 
@@ -100,50 +107,7 @@ export default function SnapshotGrid(props) {
               .then(columnsToSave => {
                 setColumns(columnsToSave);
 
-                let towerSnapshotsData = [];
-
-                snapshotsData.forEach(snapshot => {
-                  let towerSnapshot = {
-                    instrument: snapshot.instrument,
-                    measurements: [],
-                    units: snapshot.units
-                  };
-  
-                  snapshot.measurements.forEach(measurement => {
-                    let towerMeasurement = {
-                      metadata: measurement.metadata,
-                      gateResponses: []
-                    };
-  
-                    let groupedGateResponsesByHeight = measurement.gateResponses.reduce((r, a) => {
-                      r[a.height.toString()] = [...r[a.height.toString()] || [], a];
-                      return r;
-                    }, {});
-  
-                    for (const [heightKey, gateResponsesArray] of Object.entries(groupedGateResponsesByHeight)) {
-                      let gateResponseToAppend = {
-                        id: parseInt(heightKey),
-                      };
-  
-                      gateResponsesArray.forEach(groupedGateResponse => {  
-                        let gateResponseColumn = columnsToSave.find(column => {
-                          return column.field == groupedGateResponse.product_code;
-                        });
-
-                        if (gateResponseColumn && gateResponseColumn.field) {
-                          gateResponseToAppend[gateResponseColumn.field] = groupedGateResponse.value;
-                        }
-                      });
-  
-                      towerMeasurement.gateResponses.push(gateResponseToAppend);
-                    }
-  
-                    towerSnapshot.measurements.push(towerMeasurement);
-                  });
-  
-                  towerSnapshotsData.push(towerSnapshot);
-                });
-  
+                let towerSnapshotsData = props.apiManager.mapCodesToSnapshotData(snapshotsData, columnsToSave);
                 setSnapshots(towerSnapshotsData);
   
                 dispatch({
