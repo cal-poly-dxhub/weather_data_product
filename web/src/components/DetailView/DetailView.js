@@ -5,30 +5,22 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Divider from '@material-ui/core/Divider';
 import Box from '@material-ui/core/Box';
+import { DataGrid } from '@material-ui/data-grid';
 
 import DetailNavigationBar from './NavigationBar';
 import TableControls from './TableControls';
 import GenericTable from './GenericTable';
+import CustomTable from './CustomTable'
 
 const useStyles = makeStyles({
   root: {
     height: "100%",
     backgroundColor: '#242026',
   },
-  bullet: {
-    display: 'inline-block',
-    margin: '0 2px',
-    transform: 'scale(0.8)',
-  },
-  title: {
-    fontSize: 14,
-  },
-  menuButton: {
-    color: '#9E9C98'
-  },
-  table: {
-    borderColor: '#464646',
-    backgroundColor: '#242026',
+  datatable: {
+    '& .super-app-theme--cell': {
+      borderColor: "#464646"
+    },
   }
 });
 
@@ -41,6 +33,7 @@ export default function DetailView(props) {
 
   useEffect(() => {
     setNumMeasurements(props.snapshot.measurements.length);
+    console.log("rows; ", props.snapshot.measurements[measurementIndex].gateResponses, "columns: ", props.columns);
   }, [])
 
   const archiveMetadata = {
@@ -72,13 +65,30 @@ export default function DetailView(props) {
             setMeasurementIndex={setMeasurementIndex}
           />
           <Divider style={{backgroundColor: "#464646"}}/>
-          <GenericTable 
-            response={props.snapshot.measurements[measurementIndex]} 
-            rowsPerPage={rowsPerPage}
-            page={page}
-            units={props.units}
-            isMetric={props.isMetric}
-          />
+
+          {props.instrument == "tower" ?
+          (
+            <div style={{ width: '100%' }}>
+              <DataGrid
+                rows={props.snapshot.measurements[measurementIndex].gateResponses}
+                columns={props.columns}
+                pageSize={rowsPerPage}
+                disableSelectionOnClick
+                disableColumnMenu={true}
+                className={classes.datatable}
+                autoHeight
+              />
+            </div>
+          ) : (
+            <GenericTable 
+              response={props.snapshot.measurements[measurementIndex]} 
+              rowsPerPage={rowsPerPage}
+              page={page}
+              units={props.units}
+              isMetric={props.isMetric}
+            />
+          )
+          }
         </Box>
         </CardContent>
       </Card>

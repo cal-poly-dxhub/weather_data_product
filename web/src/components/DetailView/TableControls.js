@@ -59,10 +59,8 @@ export default function TableControls(props) {
         style={{borderWidth: 0, padding: 0}}
       />
 
-      <Spacer grow={1} width={10}/>
-
-      <Box style={{minWidth: matchesMd ? "90%" : '50%', paddingRight: "60px", paddingLeft: "60px", paddingBottom: "10px"}}>
-        <Box>
+      <Box display="flex" flexGrow={1} flexDirection={matchesMd ? "column" : "row"} alignItems="center" justifyContent="center" style={{paddingBottom: matchesMd ? "10px" : 0, paddingLeft: "20px", paddingRight: "10px", maxWidth: matchesMd ? "90%" : "Inherit"}}>
+        <Box style={{width: props.numMeasurements * 50, maxWidth: matchesMd ? "100%" : "35rem", paddingRight: matchesMd ? 0 : "10px"}}>
           {
             props.numMeasurements == 1
             ? (
@@ -82,6 +80,8 @@ export default function TableControls(props) {
             )
           }
         </Box>
+
+        <Spacer grow={1}/>
 
         <Box display="flex" justifyContent="center">
           <Typography variant="subtitle2" style={{backgroundColor: "#2a272e", padding: "5px", borderRadius: "5px"}}>{`${props.timestamps[currentIndex]} ${currentIndex == 0 ? '(Most Recent)' : ''}`}</Typography>

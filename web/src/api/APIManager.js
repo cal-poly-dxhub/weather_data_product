@@ -67,7 +67,7 @@ export default class APIManager {
     }
   }
 
-  async handleTowerProductCodes(tower_data) {
+  async sendTowerCodesRequest() {
     try {
       return await axios
       .get(hostUrl + 'tower/codes', {
@@ -78,20 +78,25 @@ export default class APIManager {
         }
       })
       .then((resp) => {
-        console.log("codes: ", resp.data);
-
-        const headers = [];
+        const columns = [
+          { field: 'id', headerName: 'Height', width: 150, cellClassName: 'super-app-theme--cell' }
+        ];
 
         resp.data.forEach(tower_code => {
-          let header = {
-            field: tower_code.code,
-            headerName: tower_code.description
+          let column = {
+            field: tower_code.code.toString(),
+            headerName: tower_code.description,
+            width: 300,
+            type: 'number',
+            cellClassName: 'super-app-theme--cell'
           }
 
-          headers.push(header);
+          columns.push(column);
         });
 
-        return headers;
+        console.log('columns: ', columns)
+
+        return columns;
       });
     } catch (err) {
         console.error("get error: ", err);

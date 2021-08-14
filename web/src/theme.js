@@ -1,4 +1,5 @@
 import { createMuiTheme } from '@material-ui/core/styles';
+import { Rowing } from '@material-ui/icons';
 
 const theme = createMuiTheme({
   typography: {
@@ -59,6 +60,16 @@ const theme = createMuiTheme({
     MuiPaper: {
       root: {
         backgroundColor: "#242026",
+      }
+    },
+    MuiDataGrid: {
+      root: {
+        backgroundColor: "#242026",
+        borderWidth: 0
+      },
+      cellWithRenderer: {
+        backgroundColor: "#000000",
+        borderWidth: 0
       }
     }
   }

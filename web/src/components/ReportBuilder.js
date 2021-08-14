@@ -7,7 +7,7 @@ import Box from '@material-ui/core/Box';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import ArrowForwardIosRounded from '@material-ui/icons/ArrowForwardIosRounded';
-import { Divider, Typography } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import { useMediaQuery } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
@@ -26,7 +26,7 @@ export default function ReportBuilder(props) {
   const Spacer = require('react-spacer');
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
   const apiManager = new APIManager();
-  const [isDownloading, didBeginDownloading] = React.useState(null);
+  const [isDownloading, didBeginDownloading] = React.useState(false);
 
   const onFocus = () => {
     didBeginDownloading(false);
@@ -59,7 +59,7 @@ export default function ReportBuilder(props) {
         <Box flexDirection="column" display="flex" alignItems="center">
           <CircularProgress color="inherit" />
           <Spacer height={20}/>
-          <caption>Downloading...</caption>
+          <Typography>Downloading...</Typography>
         </Box>
       </Backdrop>
       <Drawer elevation={12} anchor='right' variant="persistent" open={props.open} classes={{paper: classes.paper}}>

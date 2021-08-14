@@ -19,6 +19,7 @@ export default function SnapshotHub(props) {
   const [category, setCategory] = useState("");
   const [focusedSnapshot, setFocusedSnapshot] = useState({});
   const [focusedSnapshotMetric, setFocusedSnapshotMetric] = useState({});
+  const [focusedColumns, setFocusedColumns] = useState([]);
   const apiManager = new APIManager();
   // const history = useHistory();
   const match = useRouteMatch();
@@ -44,6 +45,7 @@ export default function SnapshotHub(props) {
       <Route exact path={`${props.match.path}/${instrument}${category == "" ? "" : `/${category}`}${focusedSnapshot.instrument == null ? "" : `/${focusedSnapshot.instrument.location}`}/detail`}>
         <DetailView
           snapshot={!state.settings.imperial && Object.keys(focusedSnapshotMetric).length != 0 ? focusedSnapshotMetric : focusedSnapshot} 
+          columns={focusedColumns}
           instrument={instrument}
           category={category}
           numRows={5} 
@@ -64,6 +66,7 @@ export default function SnapshotHub(props) {
           category={category} 
           setFocusedSnapshot={setFocusedSnapshot} 
           setFocusedSnapshotMetric={setFocusedSnapshotMetric} 
+          setFocusedColumns={setFocusedColumns}
           setInstrument={setInstrument}
           apiManager={apiManager}
         />
@@ -79,6 +82,7 @@ export default function SnapshotHub(props) {
           category="" 
           setFocusedSnapshot={setFocusedSnapshot} 
           setFocusedSnapshotMetric={setFocusedSnapshotMetric} 
+          setFocusedColumns={setFocusedColumns}
           setInstrument={setInstrument}
           apiManager={apiManager}
         />

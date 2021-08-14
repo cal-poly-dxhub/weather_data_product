@@ -87,11 +87,12 @@ export default function DetailNavigationBar(props) {
 
         {("BalloonType" in props.snapshot.instrument)
           ? (
-            <Box display="flex" flexWrap="nowrap" style={{paddingLeft: matchesSm ? 0 : "10px"}}>
-              <Box style={{paddingRight: "40px"}}>
+            <Box display="flex" flexWrap="nowrap">
+              <Box>
                 <MetadataItem direction="column" title="BALLOON TYPE" value={props.snapshot.instrument.BalloonType}/>
               </Box>
-              <Box style={{paddingRight: "40px"}}>
+              <Spacer width='40px'/>
+              <Box>
                 <MetadataItem direction="column" title="LAUNCH" value={props.snapshot.instrument.location}/>
               </Box>
             </Box>

@@ -1,5 +1,27 @@
 export const reducer = (state, action) => {
     switch (action.type) {
+        // PAYLOAD instruments/codes
+        //      key:     'tower',
+        //      codes:    [...]
+
+        case "instruments/codes":
+            if (state.instruments[action.payload.key] != null && state.instruments[action.payload.key].codes != null) {
+                return {
+                    ...state,
+                    instruments: {
+                        ...state.instruments,
+                        [action.payload.key]: {
+                            ...state.instruments[action.payload.key],
+                            codes: action.payload.codes
+                        }
+                    }
+                }
+            } else {
+                console.log("Tried to store codes to reducer, but instrument either does not need them or does not exist.")
+            }
+
+            break;
+
         // PAYLOAD instruments/data
         //      key:     'profiler_temp',
         //      data:    [...]
@@ -54,22 +76,6 @@ export const reducer = (state, action) => {
                 ]    
             }
 
-        // PAYLOAD exports/delete
-        //     instrument:  'mini-sodar',
-        //     category:    '',
-        //     assetID:     '522',
-        //     from:        '2017-05-24T10:30',
-        //     to:          '2017-05-25T11:30'
-
-        // case "exports/delete":
-        //     return {
-        //         ...state,
-        //         exports: [
-        //             ...state.exports,
-        //             action.payload
-        //         ]
-        //     }
-    
         case "settings/imperial":
             return {
                 ...state,
@@ -103,6 +109,7 @@ export const initialState = {
         },
         tower: {
             path: "tower/",
+            codes: [],
             data: []
         },
         asos: {
