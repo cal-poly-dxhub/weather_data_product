@@ -29,7 +29,7 @@ export default class APIManager {
     return hash;
   }
 
-  sendDownloadLinkRequest(instrumentPath, categoryPath, assetID) {
+  async sendDownloadLinkRequest(instrumentPath, categoryPath, assetID) {
     try {
       const baseUrl = hostUrl
       + instrumentPath 
@@ -37,17 +37,15 @@ export default class APIManager {
       + `snapshot?assetId=${assetID}`
       + `&csv=true`;
 
-      axios.get(baseUrl, {
+      return await axios.get(baseUrl, {
         params: {},
         headers: {
           'Accept': '*/*',
           'x-api-key': api_key
         }
       }).then((resp) => {
-        var win = window.open(resp.data, '_blank');
-        if (win != null) {
-          win.focus();
-        }
+        console.log("but here: ", resp.data);
+        return resp.data;
       });
     } catch (err) {
         console.error("async error: ", err);

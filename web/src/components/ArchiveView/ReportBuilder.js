@@ -16,10 +16,11 @@ import IconButton from '@material-ui/core/IconButton';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import { UserContext } from '../contexts/UserProvider';
-import APIManager from '../api/APIManager';
+import { UserContext } from '../../contexts/UserProvider';
+import APIManager from '../../api/APIManager';
 
-import theme from '../theme'
+import theme from '../../theme'
+import DownloadAlert from './DownloadAlert';
 
 export default function ReportBuilder(props) {
   const [ state, dispatch ] = React.useContext(UserContext);
@@ -27,6 +28,7 @@ export default function ReportBuilder(props) {
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
   const apiManager = new APIManager();
   const [isDownloading, didBeginDownloading] = React.useState(false);
+  const [downloadUrl, setDownloadUrl] = React.useState(null);
 
   const onFocus = () => {
     didBeginDownloading(false);
@@ -123,18 +125,29 @@ export default function ReportBuilder(props) {
 
                     <Box flexDirection="column" display="flex" alignItems="center">
                       <Button size="large" color="secondary" onClick={() => {
-                        apiManager.sendDownloadLinkRequest(state.instruments[item.instrument].path, item.category, item.assetID);
                         didBeginDownloading(true);
+                        apiManager.sendDownloadLinkRequest(state.instruments[item.instrument].path, item.category, item.assetID)
+                          .then((url) => {
+                            setDownloadUrl(url);
+                            console.log(url)
+                            didBeginDownloading(false);
+                          });
                       }}>
                         <Typography variant="body2" style={{fontWeight: "bold" }}>
                           Download
                         </Typography>
                       </Button>
-                      <Typography variant="body2" style={{fontWeight: "bold", color: "gray" }}>
+                      {/* <Typography variant="body2" style={{fontWeight: "bold", color: "gray" }}>
                           32.5 MB
-                      </Typography>
+                      </Typography> */}
                     </Box>
 
+                    <DownloadAlert
+                      setDownloadUrl={setDownloadUrl}
+                      downloadUrl={downloadUrl}
+                      isOpen={!isDownloading && downloadUrl}
+                      setOpen={didBeginDownloading}
+                    />
                   </Box>
                 </Box>
               </Card>

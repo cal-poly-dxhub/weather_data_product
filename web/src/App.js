@@ -13,7 +13,7 @@ import SnapshotHub from './components/Snapshots/SnapshotHub';
 import SnapshotGrid from './components/Snapshots/SnapshotGrid';
 
 import { Route, BrowserRouter as Router, Switch, Redirect, useHistory } from 'react-router-dom';
-import ReportBuilder from './components/ReportBuilder';
+import ReportBuilder from './components/ArchiveView/ReportBuilder';
 
 export default function App() {
   const matchesMd = useMediaQuery(theme.breakpoints.down('md'));

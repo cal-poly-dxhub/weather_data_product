@@ -16,14 +16,39 @@ import { UserContext } from '../../contexts/UserProvider';
 import { useHistory } from "react-router-dom"
 
 function AddToArchiveButton(props) {
+  const [isInArchive, addToArchive] = useState(false);
+
+  useEffect(() => {
+    if (props.state == null) { return }
+    
+    for (var i = 0; i < props.state.exports.length; i++) {
+      if (
+        props.state.exports[i].instrument == props.archiveMetadata.instrument &&
+        props.state.exports[i].category == props.archiveMetadata.category &&
+        props.state.exports[i].assetID == props.archiveMetadata.assetID &&
+        props.state.exports[i].location == props.archiveMetadata.location
+      ) {
+          addToArchive(true);
+          break;
+      }
+    }
+  }, [props.state])
+
   return (
-    <Button variant="contained" color="primary" disableElevation style={{maxHeight: "50px"}} onClick={() => {
-      props.dispatch({
-        type: "exports/add",
-        payload: props.archiveMetadata
-      })
+    <Button 
+      disableRipple={isInArchive}
+      variant={isInArchive ? "outlined" : "contained"} 
+      color="primary" disableElevation 
+      style={{maxHeight: "50px"}} 
+      onClick={() => {
+        if (!isInArchive) {
+          props.dispatch({
+            type: "exports/add",
+            payload: props.archiveMetadata
+          });  
+        }
     }}>
-      Add to Archive
+      {isInArchive ? 'Added to Archive' : 'Add to Archive'}
     </Button>
   )
 }
@@ -46,7 +71,7 @@ export default function DetailNavigationBar(props) {
         <Spacer grow={1}/>
 
         {matchesSm ? (
-          <AddToArchiveButton dispatch={dispatch} archiveMetadata={props.archiveMetadata}/>
+          <AddToArchiveButton dispatch={dispatch} state={state} archiveMetadata={props.archiveMetadata}/>
         ) : undefined}
       </Box>
 
@@ -61,7 +86,7 @@ export default function DetailNavigationBar(props) {
           paddingBottom: "10px"
         }}
       >
-        <Typography variant="h3" style={{fontWeight: "bold", textAlign: matchesSm ? "center" : "left"}}>
+        <Typography variant="h3" style={{fontWeight: "bold", textAlign: matchesSm ? "center" : "left", padding: matchesSm ? 10 : 0}}>
           {props.snapshot.instrument.location}
         </Typography>
       </Box>
@@ -73,6 +98,7 @@ export default function DetailNavigationBar(props) {
         flexWrap="nowrap" 
         justifyContent="center" 
         alignContent="center" 
+        alignItems="center"
         style={{
           borderRadius: "10px", 
           borderColor: "#2a272e", 

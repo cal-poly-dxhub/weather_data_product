@@ -16,7 +16,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { Box } from '@material-ui/core';
 
 import theme from '../../theme'
-import ReportBuilder from '../ReportBuilder';
+import ReportBuilder from '../ArchiveView/ReportBuilder';
 import { UserContext } from '../../contexts/UserProvider';
 import NavTitle from './NavTitle';
 import MoreMenu from './MoreMenu';
