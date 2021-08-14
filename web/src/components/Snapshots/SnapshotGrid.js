@@ -141,7 +141,7 @@ export default function SnapshotGrid(props) {
     props.setInstrument(props.instrument);
   }, [])
 
-  if (snapshots.length <= 0 || metricSnapshots.length <= 0) {
+  if (snapshots.length <= 0 || metricSnapshots.length <= 0 || (props.instrument == "tower" && columns.length <= 0)) {
     return (
       <Grid container className={classes.root} style={{minWidth: "100%", paddingTop: "1rem"}} spacing={3}>
           {metadata.map((meta) => (
@@ -162,7 +162,7 @@ export default function SnapshotGrid(props) {
       <Grid container className={classes.root} style={{minWidth: "100%", paddingTop: "1rem"}} spacing={3}>
           {snapshots.map((snapshot, index) => (
             <Grid item 
-              key={snapshot.instrument.asset_id + "_" + props.instrument}
+              key={("BalloonName" in snapshot.instrument ? snapshot.instrument.BalloonName : snapshot.instrument.asset_id) + "_" + props.instrument}
               sm={6}
               md={6}
               lg={6}
@@ -173,9 +173,11 @@ export default function SnapshotGrid(props) {
                 props.setFocusedSnapshotMetric(metricSnapshots[index]);
                 props.setFocusedColumns(props.instrument == "tower" ? columns : []);
               }}>
-                <Link to={`${match.path}/${snapshot.instrument.location}/detail`} style={{textDecoration: "none"}}>
+                {/* {console.log(`${match.path}/${snapshot.instrument.location.replace(/(?=[() ])/g, '\\')}/detail`)} */}
+                <Link to={`${match.path}/${props.apiManager.hashCode(snapshot.instrument.location)}/detail`} style={{textDecoration: "none"}}>
                   <SnapshotCard 
                     snapshot={snapshot} 
+                    instrumentType={props.instrument}
                     columns={columns}
                     metricSnapshot={metricSnapshots[index]}
                     category={props.category}

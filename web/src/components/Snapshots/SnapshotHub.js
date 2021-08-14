@@ -42,7 +42,7 @@ export default function SnapshotHub(props) {
   function renderSwitch() {
     return (
     <Switch>
-      <Route exact path={`${props.match.path}/${instrument}${category == "" ? "" : `/${category}`}${focusedSnapshot.instrument == null ? "" : `/${focusedSnapshot.instrument.location}`}/detail`}>
+      <Route path={`${props.match.path}/${instrument}${category == "" ? "" : `/${category}`}${focusedSnapshot.instrument == null ? "" : `/${apiManager.hashCode(focusedSnapshot.instrument.location)}`}/detail`}>
         <DetailView
           snapshot={!state.settings.imperial && Object.keys(focusedSnapshotMetric).length != 0 ? focusedSnapshotMetric : focusedSnapshot} 
           columns={focusedColumns}

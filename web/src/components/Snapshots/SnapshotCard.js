@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+import GoogleMapReact from 'google-map-react';
+
 import { makeStyles } from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
@@ -12,6 +14,10 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import { Typography } from '@material-ui/core';
 import { Box } from '@material-ui/core';
+import { useMediaQuery } from '@material-ui/core';
+
+import theme from '../../theme'
+
 
 import MetadataItem from '../Misc/MetadataItem'
 import { UserContext } from '../../contexts/UserProvider';
@@ -129,7 +135,7 @@ export default function SnapshotCard(props) {
   const [ state, dispatch ] = React.useContext(UserContext);
   const [metricSnapshot, setMetricSnapshot] = React.useState({});
   const Spacer = require('react-spacer');
-
+  const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
   // useEffect(() => {
   //   console.log(`${match.path}/${props.snapshot.instrument.location}/detail`)
   // }, [])
@@ -145,7 +151,7 @@ export default function SnapshotCard(props) {
     <Card className={classes.root} variant="outlined">
       <CardContent>
         <Box flexDirection='row' display="flex">
-          <Box flexDirection='column' display="flex" style={{minWidth: "35%"}}>
+          <Box flexGrow={1} flexDirection='column' display="flex" style={{minWidth: "150px"}}>
             <Spacer grow={1}/>
 
             <Box display="flex" alignItems="center" justifyContent="center">
@@ -168,13 +174,25 @@ export default function SnapshotCard(props) {
 
           <Spacer width={20}/>
 
-          <TableContainer style={{maxWidth: "100%"}}>
-            <GateResponsePreview 
-            response={props.isMetric && Object.keys(metricSnapshot).length != 0 ? metricSnapshot.measurements[0] : props.snapshot.measurements[0]} 
-            numRows={props.numRows} 
-            isMetric={props.isMetric}
-            units={props.snapshot.units}/>
-          </TableContainer>
+          {props.instrumentType == "tower" ? (
+            <Box style={{ height: '175px', minWidth: matchesMd ? '50%' : '300px', borderRadius: 5, overflow: "hidden" }}>
+              <GoogleMapReact
+                bootstrapURLKeys={{ key: 'AIzaSyCpDdUirt6fRgnMFCuORsAQXOC3hBsBVg0'}}
+                defaultCenter={{lat: 34.75051, lng: -120.52122}}
+                defaultZoom={11}
+              >
+                <div></div>
+              </GoogleMapReact>
+            </Box>
+          ) : (
+            <TableContainer style={{maxWidth: "100%"}}>
+              <GateResponsePreview 
+              response={props.isMetric && Object.keys(metricSnapshot).length != 0 ? metricSnapshot.measurements[0] : props.snapshot.measurements[0]} 
+              numRows={props.numRows} 
+              isMetric={props.isMetric}
+              units={props.snapshot.units}/>
+            </TableContainer>
+          )}
         </Box>
       </CardContent>
     </Card>
