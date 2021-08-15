@@ -145,7 +145,7 @@ export default function ReportBuilder(props) {
                     <DownloadAlert
                       setDownloadUrl={setDownloadUrl}
                       downloadUrl={downloadUrl}
-                      isOpen={!isDownloading && downloadUrl}
+                      isOpen={!isDownloading && downloadUrl != null}
                       setOpen={didBeginDownloading}
                     />
                   </Box>

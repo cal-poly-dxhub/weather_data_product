@@ -19,20 +19,20 @@ function AddToArchiveButton(props) {
   const [isInArchive, addToArchive] = useState(false);
 
   useEffect(() => {
-    if (props.state == null) { return }
-    
-    for (var i = 0; i < props.state.exports.length; i++) {
+    if (props.exports == null) { return }
+
+    for (var i = 0; i < props.exports.length; i++) {
       if (
-        props.state.exports[i].instrument == props.archiveMetadata.instrument &&
-        props.state.exports[i].category == props.archiveMetadata.category &&
-        props.state.exports[i].assetID == props.archiveMetadata.assetID &&
-        props.state.exports[i].location == props.archiveMetadata.location
+        props.exports[i].instrument == props.archiveMetadata.instrument &&
+        props.exports[i].category == props.archiveMetadata.category &&
+        props.exports[i].assetID == props.archiveMetadata.assetID &&
+        props.exports[i].location == props.archiveMetadata.location
       ) {
           addToArchive(true);
           break;
       }
     }
-  }, [props.state])
+  }, [props.exports])
 
   return (
     <Button 
@@ -71,7 +71,7 @@ export default function DetailNavigationBar(props) {
         <Spacer grow={1}/>
 
         {matchesSm ? (
-          <AddToArchiveButton dispatch={dispatch} state={state} archiveMetadata={props.archiveMetadata}/>
+          <AddToArchiveButton dispatch={dispatch} exports={state.exports} archiveMetadata={props.archiveMetadata}/>
         ) : undefined}
       </Box>
 
@@ -138,7 +138,7 @@ export default function DetailNavigationBar(props) {
         <Spacer width={matchesSm ? '0px' : '50px'}/>
 
         {matchesSm ? undefined : (
-          <AddToArchiveButton dispatch={dispatch} archiveMetadata={props.archiveMetadata}/>
+          <AddToArchiveButton dispatch={dispatch} exports={state.exports} archiveMetadata={props.archiveMetadata}/>
         )}
 
         <Spacer width={matchesSm ? '0px' : '10px'}/>
