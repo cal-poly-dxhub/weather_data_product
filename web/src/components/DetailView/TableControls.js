@@ -13,6 +13,7 @@ import TablePaginationActions from './TablePaginationActions';
 export default function TableControls(props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
+  const matchesXs = useMediaQuery(theme.breakpoints.down('xs'));
   const Spacer = require('react-spacer')
 
   const marks = Array(props.numMeasurements).fill(0).map((_, i) => {
@@ -59,7 +60,7 @@ export default function TableControls(props) {
         style={{borderWidth: 0, padding: 0}}
       />
 
-      <Box display="flex" flexGrow={1} flexDirection={matchesMd ? "column" : "row"} alignItems="center" justifyContent="center" style={{paddingBottom: matchesMd ? "10px" : 0, paddingLeft: "20px", paddingRight: "10px", maxWidth: matchesMd ? "90%" : "Inherit"}}>
+      <Box display="flex" flexGrow={1} flexDirection={matchesXs ? "column" : "row"} alignItems="center" justifyContent="center" style={{paddingBottom: matchesMd ? "10px" : 0, paddingLeft: "20px", paddingRight: "10px", maxWidth: matchesMd ? "90%" : "Inherit"}}>
         <Box style={{width: props.numMeasurements * 50, maxWidth: matchesMd ? "100%" : "35rem", paddingRight: matchesMd ? 0 : "10px"}}>
           {
             props.numMeasurements == 1
@@ -81,10 +82,10 @@ export default function TableControls(props) {
           }
         </Box>
 
-        <Spacer grow={1}/>
+        <Spacer grow={1} width={20}/>
 
         <Box display="flex" justifyContent="center">
-          <Typography variant="subtitle2" style={{backgroundColor: "#2a272e", padding: "5px", borderRadius: "5px"}}>{`${props.timestamps[currentIndex]} ${currentIndex == 0 ? '(Most Recent)' : ''}`}</Typography>
+          <Typography variant="subtitle2" style={{color: currentIndex == 0 ? "black" : "gray", backgroundColor: currentIndex == 0 ? "yellow" : "#2a272e", padding: "5px", borderRadius: "5px", textAlign: "center"}}>{`${props.timestamps[currentIndex]} ${currentIndex == 0 ? '(Most Recent)' : ''}`}</Typography>
         </Box>
       </Box>
     </Box>

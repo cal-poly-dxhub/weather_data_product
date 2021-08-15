@@ -12,6 +12,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import LocationOnIcon from '@material-ui/icons/LocationOn';
 import { Typography } from '@material-ui/core';
 import { Box } from '@material-ui/core';
 import { useMediaQuery } from '@material-ui/core';
@@ -178,11 +179,21 @@ export default function SnapshotCard(props) {
             <Box style={{ height: '175px', minWidth: '50%', borderRadius: 5, overflow: "hidden" }}>
               <GoogleMapReact
                 bootstrapURLKeys={{ key: 'AIzaSyCpDdUirt6fRgnMFCuORsAQXOC3hBsBVg0'}}
-                defaultCenter={{lat: 34.75051, lng: -120.52122}}
-                defaultZoom={11}
+                defaultCenter={{lat: props.center.lat, lng: props.center.lng}}
+                defaultZoom={15}
                 yesIWantToUseGoogleMapApiInternals
-                options={{fullscreenControl: false}}
-              />
+                options={map => ({
+                  fullscreenControl: false,
+                  mapTypeId: map.MapTypeId.SATELLITE,
+                  clickableIcons: false,
+                  zoomControl: false,
+                  disableDoubleClickZoom: true,
+                  streetViewControl: false,
+                  gestureHandling: "greedy",
+                })}
+              >
+                <LocationOnIcon lat={props.center.lat} lng={props.center.lng} style={{color: "black"}}/>
+              </GoogleMapReact>
             </Box>
           ) : (
             <TableContainer style={{maxWidth: "100%"}}>

@@ -26,6 +26,7 @@ export default function ReportBuilder(props) {
   const [ state, dispatch ] = React.useContext(UserContext);
   const Spacer = require('react-spacer');
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
+  const matchesXs = useMediaQuery(theme.breakpoints.down('xs'));
   const apiManager = new APIManager();
   const [isDownloading, didBeginDownloading] = React.useState(false);
   const [downloadUrl, setDownloadUrl] = React.useState(null);
@@ -45,6 +46,7 @@ export default function ReportBuilder(props) {
   const useStyles = makeStyles({
     paper: {
       minWidth: matchesSm ? "100%" : "Auto",
+      maxWidth: matchesSm ? "100%" : "Auto",
       height: "100%",
       backgroundColor: '#1C1A1E',
       margin: matchesSm ? "0px" : "20px",
@@ -78,11 +80,11 @@ export default function ReportBuilder(props) {
 
           {state.exports.map((item) => {
             return (
-              <Card style={{backgroundColor: "#1C1A1E", margin: "1rem"}} variant="outlined" id={item.assetID}>
+              <Card style={{backgroundColor: "#1C1A1E", marginLeft: "1rem", marginRight: "1rem", marginTop: "1rem", borderWidth: 2}} variant="outlined" id={item.assetID}>
                 <Box display="flex" flexDirection="column" style={{margin: "1rem"}}>
-                  <Box display="flex" alignItems="center">
+                  <Box display="flex" flexDirection={matchesXs ? "column" : "row"} alignItems="center">
 
-                    <Box display="flex" flexDirection="column">
+                    <Box style={{maxWidth: "250px"}} display="flex" flexDirection="column">
                       <Box>
                         <Typography variant="subtitle2" style={{color: "gray"}}>
                           {item.instrument}
@@ -95,7 +97,7 @@ export default function ReportBuilder(props) {
                       </Box>
                     </Box>
 
-                    <Spacer grow={1}/>
+                    <Spacer grow={1} width={10} height={10}/>
 
                     <Box display="flex" flexDirection="column">
                       <TextField
@@ -121,7 +123,7 @@ export default function ReportBuilder(props) {
                       />
                     </Box>
 
-                    <Spacer grow={1}/>
+                    <Spacer width={10} height={10}/>
 
                     <Box flexDirection="column" display="flex" alignItems="center">
                       <Button size="large" color="secondary" onClick={() => {

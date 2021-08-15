@@ -185,7 +185,6 @@ export default function SnapshotGrid(props) {
                 props.setFocusedSnapshotMetric(metricSnapshots[index]);
                 props.setFocusedColumns(props.instrument == "tower" ? columns : []);
               }}>
-                {/* {console.log(`${match.path}/${snapshot.instrument.location.replace(/(?=[() ])/g, '\\')}/detail`)} */}
                 <Link to={`${match.path}/${props.apiManager.hashCode(snapshot.instrument.location)}/detail`} style={{textDecoration: "none"}}>
                   <SnapshotCard 
                     snapshot={snapshot} 
@@ -194,6 +193,10 @@ export default function SnapshotGrid(props) {
                     metricSnapshot={metricSnapshots[index]}
                     category={props.category}
                     numRows={5}
+                    center={{
+                      lat: (metadata[index] && metadata[index].latitude) ? metadata[index].latitude : null,
+                      lng: (metadata[index] && metadata[index].longitude) ? metadata[index].longitude : null
+                    }}
                     isMetric={!state.settings.imperial} 
                   />
                 </Link>
