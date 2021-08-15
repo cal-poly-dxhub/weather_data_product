@@ -47,7 +47,7 @@ export default function DetailView(props) {
 
   return (
     <Box flexDirection="column" style={{paddingTop: "1rem"}}>
-      <DetailNavigationBar {...props} archiveMetadata={archiveMetadata}/>
+      <DetailNavigationBar {...props} setGoBack={props.setGoBack} archiveMetadata={archiveMetadata}/>
       <Card className={classes.root} variant="outlined">
         <CardContent style={{padding: 0}}>
         <Box flexDirection='column'>

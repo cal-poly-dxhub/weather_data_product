@@ -59,7 +59,19 @@ export default function SnapshotGrid(props) {
       let columnsToSave = props.apiManager.sendTowerCodesRequest();
       setColumns(columnsToSave);
     }
-  }, [snapshots])
+  }, [snapshots]);
+
+  useEffect(() => {
+    if (metricSnapshots.length > 0 && props.instrument != "tower") {
+      props.setGoBack(false);
+    }
+  }, [metricSnapshots]);
+
+  useEffect(() => {
+    if (columns.length > 0) {
+      props.setGoBack(false);
+    }
+  }, [columns]);
 
   useEffect(() => { 
     props.setFocusedSnapshot({});

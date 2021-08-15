@@ -151,7 +151,7 @@ export default function SnapshotCard(props) {
     <Card className={classes.root} variant="outlined">
       <CardContent>
         <Box flexDirection='row' display="flex">
-          <Box flexGrow={1} flexDirection='column' display="flex" style={{minWidth: "150px"}}>
+          <Box alignContent="center" flexGrow={1} flexDirection='column' display="flex" style={{minWidth: "150px"}}>
             <Spacer grow={1}/>
 
             <Box display="flex" alignItems="center" justifyContent="center">
@@ -175,14 +175,14 @@ export default function SnapshotCard(props) {
           <Spacer width={20}/>
 
           {props.instrumentType == "tower" ? (
-            <Box style={{ height: '175px', minWidth: matchesMd ? '50%' : '300px', borderRadius: 5, overflow: "hidden" }}>
+            <Box style={{ height: '175px', minWidth: '50%', borderRadius: 5, overflow: "hidden" }}>
               <GoogleMapReact
                 bootstrapURLKeys={{ key: 'AIzaSyCpDdUirt6fRgnMFCuORsAQXOC3hBsBVg0'}}
                 defaultCenter={{lat: 34.75051, lng: -120.52122}}
                 defaultZoom={11}
-              >
-                <div></div>
-              </GoogleMapReact>
+                yesIWantToUseGoogleMapApiInternals
+                options={{fullscreenControl: false}}
+              />
             </Box>
           ) : (
             <TableContainer style={{maxWidth: "100%"}}>

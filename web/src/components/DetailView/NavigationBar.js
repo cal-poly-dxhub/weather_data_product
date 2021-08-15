@@ -64,6 +64,7 @@ export default function DetailNavigationBar(props) {
       <Box display="flex" alignItems="center" style={{minWidth: matchesSm ? "100%" : "Auto"}}>
         <IconButton edge="start" aria-label="Go Back" style={{color: "gray"}} onClick={() => {
           history.goBack()
+          props.setGoBack(true);
         }}>
           <ArrowBackIcon fontSize="large"/>
         </IconButton>

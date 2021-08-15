@@ -62,7 +62,7 @@ export default function Navbar() {
 
   return (
     <ThemeProvider theme={theme}>
-      <AppBar position={matchesMd ? "fixed" : "static"} color={matchesMd ? "secondary" : "transparent"} elevation={matchesMd ? 2 : 0} style={{paddingLeft: matchesMd ? 0 : "4rem", paddingRight: matchesMd ? 0 : "4rem", paddingTop: matchesSm ? 0: matchesMd ? "1rem" :"2rem", paddingBottom: matchesSm ? 0: matchesMd ? "1rem" :"2rem"}}>
+      <AppBar position={matchesMd ? "fixed" : "static"} color={matchesMd ? "secondary" : "transparent"} elevation={matchesMd ? 2 : 0} style={{margin: "0 auto", maxWidth: matchesMd ? null : "1500px", paddingTop: matchesSm ? 0: matchesMd ? "1rem" :"2rem", paddingBottom: matchesSm ? 0: matchesMd ? "1rem" :"2rem"}}>
         <Toolbar className={classes.root} style={{marginLeft: matchesSm ? 10 : 50, marginRight: matchesSm ? 10 : 50}}>
           <img style={{width: matchesMd ? 30 : 40, paddingRight: matchesSm ? 0 : 10}} src='https://user-images.githubusercontent.com/22374768/121132655-19ccb000-c7cd-11eb-8e26-89c10ca8a8c6.png'/>
           
@@ -86,7 +86,7 @@ export default function Navbar() {
 
               <Button className={classes.feedbackButton} size="large" color="primary">
                 <a style={{textDecoration: 'none'}} href={feedback_form_url}>
-                  <Typography variant="body1" style={{ margin: "0.5rem", marginLeft: '1rem', marginRight: '1rem', fontWeight: "bold" }}>
+                  <Typography variant="body1" style={{ margin: "0.5rem", marginLeft: '0.5rem', marginRight: '0.5rem', fontWeight: "bold" }}>
                     Give Feedback
                   </Typography>
                 </a>
