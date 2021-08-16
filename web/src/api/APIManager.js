@@ -37,6 +37,8 @@ export default class APIManager {
       + `snapshot?assetId=${assetID}`
       + `&csv=true`;
 
+      console.log(baseUrl)
+
       return await axios.get(baseUrl, {
         params: {},
         headers: {

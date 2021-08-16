@@ -128,7 +128,11 @@ export default function ReportBuilder(props) {
                     <Box flexDirection="column" display="flex" alignItems="center">
                       <Button size="large" color="secondary" onClick={() => {
                         didBeginDownloading(true);
-                        apiManager.sendDownloadLinkRequest(state.instruments[item.instrument].path, item.category, item.assetID)
+                        apiManager.sendDownloadLinkRequest(
+                          state.instruments[item.instrument].path, 
+                          state.instruments[item.instrument][item.category] ? state.instruments[item.instrument][item.category].path : "", 
+                          item.assetID
+                        )
                           .then((url) => {
                             setDownloadUrl(url);
                             console.log(url)
