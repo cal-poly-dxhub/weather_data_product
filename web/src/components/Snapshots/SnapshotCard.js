@@ -136,6 +136,7 @@ export default function SnapshotCard(props) {
   const [ state, dispatch ] = React.useContext(UserContext);
   const [metricSnapshot, setMetricSnapshot] = React.useState({});
   const Spacer = require('react-spacer');
+  const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
   const [ center, setCenter ] = React.useState({
     lat: 0,
     lng: 0
@@ -167,7 +168,7 @@ export default function SnapshotCard(props) {
             <Spacer grow={1}/>
 
             <Box display="flex" alignItems="center" justifyContent="center">
-              <Typography variant="h4" style={{fontWeight: 'bold', textAlign: "center"}}>
+              <Typography variant={matchesSm ? "h5" : "h4"} style={{fontWeight: 'bold', textAlign: "center"}}>
                 {props.snapshot.instrument.location}
               </Typography>
             </Box>
@@ -202,10 +203,10 @@ export default function SnapshotCard(props) {
                       zoomControl: false,
                       disableDoubleClickZoom: true,
                       streetViewControl: false,
-                      gestureHandling: "greedy",
+                      gestureHandling: "cooperative",
                     })}
                   >
-                    <LocationOnIcon lat={center.lat} lng={center.lng} style={{color: "white"}}/>
+                    <LocationOnIcon lat={center.lat} lng={center.lng} style={{color: "white", filter: "drop-shadow(0px 0px 6px yellow)"}}/>
                   </GoogleMapReact>  
                 )}
             </Box>

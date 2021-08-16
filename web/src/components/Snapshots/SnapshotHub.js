@@ -19,8 +19,8 @@ import APIManager from '../../api/APIManager';
 
 export default function SnapshotHub(props) {
   const [state, dispatch] = useContext(UserContext);
-  const [instrument, setInstrument] = useState(Object.keys(state.instruments)[0]);
-  const [category, setCategory] = useState("");
+  const [instrument, setInstrument] = useState(localStorage.getItem('instrumentKey') == null ? "sodar" : localStorage.getItem('instrumentKey'));
+  const [category, setCategory] = useState(localStorage.getItem('instrumentKey') == "profiler" ? "temp" : "");
   const [focusedSnapshot, setFocusedSnapshot] = useState({});
   const [focusedSnapshotMetric, setFocusedSnapshotMetric] = useState({});
   const [focusedColumns, setFocusedColumns] = useState([]);
@@ -30,12 +30,7 @@ export default function SnapshotHub(props) {
   const match = useRouteMatch();
 
   useEffect(() => {
-    const instrumentKeyCache = localStorage.getItem('instrumentKey');
-    // setInstrument(instrumentKeyCache == null ? Object.keys(state.instruments)[0] : instrumentKeyCache);
-  }, [])
-
-  useEffect(() => {
-    setFocusedSnapshot({});
+    localStorage.setItem('instrumentKey', instrument);
 
     if (state.instruments[instrument] && state.instruments[instrument].data == null) {  // Data is nested inside path, e.g. profiler
       setCategory(Object.keys(state.instruments[instrument])[1])
@@ -61,7 +56,7 @@ export default function SnapshotHub(props) {
         />
       </Route>
 
-      <Route exact path={`${match.path}/profiler/${category}`}>
+      <Route path={`${match.path}/profiler/${category}`}>
         <CategoryChips 
           instrument={state.instruments[instrument]} 
           category={category} 
@@ -79,11 +74,11 @@ export default function SnapshotHub(props) {
         />
       </Route>
 
-      <Route exact path={`${match.path}/profiler`}>
+      <Route path={`${match.path}/profiler`}>
         <Redirect to={`${match.path}/profiler/temp`}/>
       </Route>
 
-      <Route exact path={`${match.path}/${instrument}`}>
+      <Route path={`${match.path}/${instrument}`}>
         <SnapshotGrid 
           instrument={instrument} 
           category="" 

@@ -156,9 +156,9 @@ export default function SnapshotGrid(props) {
     }
   }, [props.instrument, props.category]);
 
-  useEffect(() => {
-    props.setInstrument(props.instrument);
-  }, [])
+  // useEffect(() => {
+  //   props.setInstrument(props.instrument);
+  // }, []);
 
   if (snapshots.length <= 0 || metricSnapshots.length <= 0 || (props.instrument == "tower" && columns.length <= 0)) {
     return (

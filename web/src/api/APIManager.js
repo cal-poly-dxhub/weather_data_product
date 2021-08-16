@@ -171,7 +171,7 @@ export default class APIManager {
 
     clone.forEach((snapshot) => {
       if ("asset_height" in snapshot.instrument) {
-        snapshot.instrument.asset_height = (snapshot.instrument.asset_height * IMP_TO_MET_DIST).toFixed(2);
+        snapshot.instrument.asset_height = (snapshot.instrument.asset_height * IMP_TO_MET_DIST).toFixed(0);
       }
       
       snapshot.measurements.forEach((measurement) => {

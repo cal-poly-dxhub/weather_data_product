@@ -48,7 +48,8 @@ export default function TableControls(props) {
       style={{
         color: currentIndex == 0 ? "black" : "gray", 
         backgroundColor: currentIndex == 0 ? "yellow" : "#2a272e", 
-        maxWidth: "150px",
+        minWidth: "150px",
+        maxWidth: "200px",
         padding: "5px", 
         borderRadius: "5px", 
         textAlign: "center",
