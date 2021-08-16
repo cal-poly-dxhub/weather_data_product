@@ -39,7 +39,7 @@ function AddToArchiveButton(props) {
       disableRipple={isInArchive}
       variant={isInArchive ? "outlined" : "contained"} 
       color="primary" disableElevation 
-      style={{maxHeight: "50px"}} 
+      style={{maxHeight: "50px", whiteSpace: "nowrap"}} 
       onClick={() => {
         if (!isInArchive) {
           props.dispatch({

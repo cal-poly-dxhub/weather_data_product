@@ -44,7 +44,6 @@ export default class APIManager {
           'x-api-key': api_key
         }
       }).then((resp) => {
-        console.log("but here: ", resp.data);
         return resp.data;
       });
     } catch (err) {
@@ -88,22 +87,20 @@ export default class APIManager {
       })
       .then((resp) => {
         const columns = [
-          { field: 'id', headerName: 'Height', width: 150, cellClassName: 'super-app-theme--cell' }
+          { field: 'id', headerName: 'Height', width: 100, cellClassName: 'super-app-theme--cell' }
         ];
 
         resp.data.forEach(tower_code => {
           let column = {
             field: tower_code.code.toString(),
-            headerName: tower_code.description,
-            width: 300,
+            headerName: `${tower_code.description}`,
+            width: tower_code.description.length * 10 + 10,
             type: 'number',
             cellClassName: 'super-app-theme--cell'
           }
 
           columns.push(column);
         });
-
-        console.log('columns: ', columns)
 
         return columns;
       });
@@ -145,6 +142,15 @@ export default class APIManager {
 
             if (gateResponseColumn && gateResponseColumn.field) {
               gateResponseToAppend[gateResponseColumn.field] = groupedGateResponse.value;
+            }
+          });
+
+          console.log("hello1: ", columns);
+          console.log("hello2", Object.keys(gateResponseToAppend));
+
+          columns.forEach((column) => {
+            if (Object.keys(gateResponseToAppend).indexOf(column.field) <= -1) {
+              gateResponseToAppend[column.field] = "NaN"
             }
           });
 

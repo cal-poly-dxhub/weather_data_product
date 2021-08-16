@@ -14,6 +14,7 @@ import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { Box } from '@material-ui/core';
+import Modal from '@material-ui/core/Modal';
 
 import theme from '../../theme'
 import ReportBuilder from '../ArchiveView/ReportBuilder';
@@ -43,6 +44,21 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+function rand() {
+  return Math.round(Math.random() * 20) - 10;
+}
+
+function getModalStyle() {
+  const top = 50 + rand();
+  const left = 50 + rand();
+
+  return {
+    top: `${top}%`,
+    left: `${left}%`,
+    transform: `translate(-${top}%, -${left}%)`,
+  };
+}
+
 export default function Navbar() {
   const classes = useStyles();
   const [drawerIsOpen, setDrawerOpen] = useState(false);
@@ -51,6 +67,7 @@ export default function Navbar() {
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
   const Spacer = require('react-spacer');
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [modalStyle] = React.useState(getModalStyle);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -130,6 +147,14 @@ export default function Navbar() {
             api_docs_url={api_docs_url}
             anchorEl={anchorEl}
             handleClose={handleClose}/>
+
+          {/* <Modal
+            open={true}
+            onClose={handleClose}
+            aria-labelledby="simple-modal-title"
+            aria-describedby="simple-modal-description"
+          >
+          </Modal> */}
 
         </Toolbar>
       </AppBar>

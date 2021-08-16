@@ -67,11 +67,11 @@ const theme = createMuiTheme({
         backgroundColor: "#242026",
         borderWidth: 0
       },
-      cellWithRenderer: {
-        backgroundColor: "#000000",
+      columnHeader: {
+        backgroundColor: "#242026",
         borderWidth: 0
-      }
-    }
+      },
+    },
   }
 });
 

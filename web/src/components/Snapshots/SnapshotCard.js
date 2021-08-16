@@ -136,10 +136,21 @@ export default function SnapshotCard(props) {
   const [ state, dispatch ] = React.useContext(UserContext);
   const [metricSnapshot, setMetricSnapshot] = React.useState({});
   const Spacer = require('react-spacer');
-  const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
-  // useEffect(() => {
-  //   console.log(`${match.path}/${props.snapshot.instrument.location}/detail`)
-  // }, [])
+  const [ center, setCenter ] = React.useState({
+    lat: 0,
+    lng: 0
+  });
+
+  useEffect(() => {
+    console.log("meta: ", props.metadata);
+
+    if (props.metadata && props.metadata.latitude && props.metadata.longitude) {
+      setCenter({
+        lat: props.metadata.latitude,
+        lng: props.metadata.longitude
+      });  
+    }
+  }, [props.metadata, props.metricSnapshot])
 
   useEffect(() => {
     if (props.metricSnapshot != undefined && props.metricSnapshot != null && Object.keys(props.metricSnapshot).length > 0) {
@@ -177,23 +188,26 @@ export default function SnapshotCard(props) {
 
           {props.instrumentType == "tower" ? (
             <Box style={{ height: '175px', minWidth: '50%', borderRadius: 5, overflow: "hidden" }}>
-              <GoogleMapReact
-                bootstrapURLKeys={{ key: 'AIzaSyCpDdUirt6fRgnMFCuORsAQXOC3hBsBVg0'}}
-                defaultCenter={{lat: props.center.lat, lng: props.center.lng}}
-                defaultZoom={15}
-                yesIWantToUseGoogleMapApiInternals
-                options={map => ({
-                  fullscreenControl: false,
-                  mapTypeId: map.MapTypeId.SATELLITE,
-                  clickableIcons: false,
-                  zoomControl: false,
-                  disableDoubleClickZoom: true,
-                  streetViewControl: false,
-                  gestureHandling: "greedy",
-                })}
-              >
-                <LocationOnIcon lat={props.center.lat} lng={props.center.lng} style={{color: "black"}}/>
-              </GoogleMapReact>
+              {center.lat == 0 ?
+                undefined : (
+                  <GoogleMapReact
+                    bootstrapURLKeys={{ key: 'AIzaSyCpDdUirt6fRgnMFCuORsAQXOC3hBsBVg0'}}
+                    defaultCenter={center}
+                    defaultZoom={15}
+                    yesIWantToUseGoogleMapApiInternals
+                    options={map => ({
+                      fullscreenControl: false,
+                      mapTypeId: map.MapTypeId.SATELLITE,
+                      clickableIcons: false,
+                      zoomControl: false,
+                      disableDoubleClickZoom: true,
+                      streetViewControl: false,
+                      gestureHandling: "greedy",
+                    })}
+                  >
+                    <LocationOnIcon lat={center.lat} lng={center.lng} style={{color: "white"}}/>
+                  </GoogleMapReact>  
+                )}
             </Box>
           ) : (
             <TableContainer style={{maxWidth: "100%"}}>

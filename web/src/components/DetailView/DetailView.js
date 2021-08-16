@@ -50,8 +50,9 @@ export default function DetailView(props) {
       <DetailNavigationBar {...props} setGoBack={props.setGoBack} archiveMetadata={archiveMetadata}/>
       <Card className={classes.root} variant="outlined">
         <CardContent style={{padding: 0}}>
-        <Box flexDirection='column'>
+        <Box display="flex" flexDirection='column'>
           <TableControls 
+            instrument={props.instrument}
             archiveMetadata={archiveMetadata}
             numMeasurements={numMeasurements} 
             numGateResponses={props.snapshot.measurements[measurementIndex].gateResponses.length}
@@ -64,6 +65,7 @@ export default function DetailView(props) {
             })}
             setMeasurementIndex={setMeasurementIndex}
           />
+
           <Divider style={{backgroundColor: "#464646"}}/>
 
           {props.instrument == "tower" ?

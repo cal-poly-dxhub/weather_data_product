@@ -76,9 +76,9 @@ export default function SnapshotGrid(props) {
   useEffect(() => { 
     props.setFocusedSnapshot({});
     setMetricSnapshots([]);
-    setSnapshots([]);
-    setColumns([]);
-    setMetadata([ROOT_PLACEHOLDER]);
+    // setSnapshots([]);
+    // setColumns([]);
+    // setMetadata([ROOT_PLACEHOLDER]);
 
     const key = props.instrument + "/" + props.category
 
@@ -91,6 +91,13 @@ export default function SnapshotGrid(props) {
         props.apiManager.sendTowerCodesRequest()
         .then(columnsToSave => {
           setColumns(columnsToSave);
+
+          props.apiManager.sendMetadataRequest(
+            state.instruments[props.instrument].path,
+            state.instruments[props.instrument][props.category] ? state.instruments[props.instrument][props.category].path : null
+          ).then((metadata) => {
+            setMetadata(metadata);
+          });    
         });
       }
     } else if (props.category != "" && 
@@ -193,10 +200,7 @@ export default function SnapshotGrid(props) {
                     metricSnapshot={metricSnapshots[index]}
                     category={props.category}
                     numRows={5}
-                    center={{
-                      lat: (metadata[index] && metadata[index].latitude) ? metadata[index].latitude : null,
-                      lng: (metadata[index] && metadata[index].longitude) ? metadata[index].longitude : null
-                    }}
+                    metadata={metadata[index]}
                     isMetric={!state.settings.imperial} 
                   />
                 </Link>
