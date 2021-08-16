@@ -27,7 +27,7 @@ export default function App() {
             <nav style={{paddingBottom: matchesSm ? "5rem" : matchesMd ? "8rem": 0}}>
               <Navbar/>
             </nav>
-            <Container style={{paddingBottom: "3rem"}}>
+            <Container style={{paddingBottom: "3rem", paddingLeft: 0, paddingRight: 0}}>
               <Switch>
                 <Route path="/home" component={SnapshotHub}></Route>
                 <Route path="/docs" render={(props) => (

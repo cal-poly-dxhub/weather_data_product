@@ -16,6 +16,7 @@ import { UserContext } from '../../contexts/UserProvider';
 import DetailView from '../DetailView/DetailView';
 
 import APIManager from '../../api/APIManager';
+import TowerMap from './TowerMap';
 
 export default function SnapshotHub(props) {
   const [state, dispatch] = useContext(UserContext);
@@ -54,6 +55,10 @@ export default function SnapshotHub(props) {
           apiManager={apiManager}
           setGoBack={setGoBack}
         />
+      </Route>
+
+      <Route path={`${match.path}/tower`}>
+        <TowerMap/>
       </Route>
 
       <Route path={`${match.path}/profiler/${category}`}>
@@ -100,13 +105,14 @@ export default function SnapshotHub(props) {
 
   return (
     <Box>
-      <section>
+      <section style={{paddingLeft: 20, paddingRight: 20}}>
         <InstrumentChips 
           instrument={instrument} 
           setInstrument={setInstrument} 
-          setCategory={setCategory}/>
+          setCategory={setCategory}
+        />
       </section>
-      <section>
+      <section style={{paddingLeft: instrument == "tower" ? 0 : 20, paddingRight: instrument == "tower" ? 0 : 20}}>
         <Backdrop style={{zIndex: theme.zIndex.drawer + 1, color: '#fff'}} open={didGoBack}>
           <Box flexDirection="column" display="flex" alignItems="center">
             <CircularProgress color="inherit" />
