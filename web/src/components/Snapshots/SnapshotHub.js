@@ -19,36 +19,61 @@ import APIManager from '../../api/APIManager';
 
 export default function SnapshotHub(props) {
   const [state, dispatch] = useContext(UserContext);
-  const [instrument, setInstrument] = useState(localStorage.getItem('instrumentKey') == null ? "sodar" : localStorage.getItem('instrumentKey'));
-  const [category, setCategory] = useState(localStorage.getItem('instrumentKey') == "profiler" ? "temp" : "");
+  const [instrument, setInstrument] = useState(Object.keys(state.instruments)[0]);
+  const [category, setCategory] = useState("");
   const [focusedSnapshot, setFocusedSnapshot] = useState({});
   const [focusedSnapshotMetric, setFocusedSnapshotMetric] = useState({});
   const [focusedColumns, setFocusedColumns] = useState([]);
   const [didGoBack, setGoBack] = React.useState(false);
   const apiManager = new APIManager();
-  // const history = useHistory();
+  const history = useHistory();
   const match = useRouteMatch();
 
-  useEffect(() => {
-    localStorage.setItem('instrumentKey', instrument);
+  const pageAccessedByReload = (
+    (window.performance.navigation && window.performance.navigation.type === 1) ||
+      window.performance
+        .getEntriesByType('navigation')
+        .map((nav) => nav.type)
+        .includes('reload')
+  );
 
-    if (state.instruments[instrument] && state.instruments[instrument].data == null) {  // Data is nested inside path, e.g. profiler
-      setCategory(Object.keys(state.instruments[instrument])[1])
-    } else {
-      setCategory("")
+  useEffect(() => {
+    if (pageAccessedByReload) {
+      console.log("refreshed!")
     }
-  }, [instrument]);
+  }, []);
+
+  const snapshotGrid = (instrumentName, categoryName="") => (
+    <SnapshotGrid 
+      instrument={instrumentName} 
+      category={categoryName} 
+      setFocusedSnapshot={setFocusedSnapshot} 
+      setFocusedSnapshotMetric={setFocusedSnapshotMetric} 
+      setFocusedColumns={setFocusedColumns}
+      setInstrument={setInstrument}
+      setCategory={setCategory}
+      apiManager={apiManager}
+      setGoBack={setGoBack}
+    />
+  );
+
+  const categoryChips = (instrumentName, categoryName) => (
+    <CategoryChips 
+    instrument={state.instruments[instrumentName]} 
+    category={categoryName} 
+    setCategory={setCategory} 
+    baseURL={`${match.path}/${instrumentName}`}/>
+  );
 
   function renderSwitch() {
     return (
     <Switch>
       <Route path={`${props.match.path}/${instrument}${category == "" ? "" : `/${category}`}${focusedSnapshot.instrument == null ? "" : `/${apiManager.hashCode(focusedSnapshot.instrument.location)}`}/detail`}>
         <DetailView
-          snapshot={!state.settings.imperial && Object.keys(focusedSnapshotMetric).length != 0 ? focusedSnapshotMetric : focusedSnapshot} 
+          snapshot={!state.settings.imperial ? focusedSnapshotMetric : focusedSnapshot} 
           columns={focusedColumns}
           instrument={instrument}
           category={category}
-          numRows={5} 
           units={focusedSnapshot.units}
           isMetric={!state.settings.imperial} 
           apiManager={apiManager}
@@ -56,39 +81,34 @@ export default function SnapshotHub(props) {
         />
       </Route>
 
-      <Route path={`${match.path}/profiler/${category}`}>
-        <CategoryChips 
-          instrument={state.instruments[instrument]} 
-          category={category} 
-          setCategory={setCategory} 
-          baseURL={`${match.path}/profiler`}/>
-        <SnapshotGrid 
-          instrument="profiler" 
-          category={category} 
-          setFocusedSnapshot={setFocusedSnapshot} 
-          setFocusedSnapshotMetric={setFocusedSnapshotMetric} 
-          setFocusedColumns={setFocusedColumns}
-          setInstrument={setInstrument}
-          apiManager={apiManager}
-          setGoBack={setGoBack}
-        />
+      <Route path={`${match.path}/profiler/temp`}>
+        {categoryChips("profiler", "temp")}
+        {snapshotGrid("profiler", "temp")}
+      </Route>
+
+      <Route path={`${match.path}/profiler/wind`}>
+        {categoryChips("profiler", "wind")}
+        {snapshotGrid("profiler", "wind")}
       </Route>
 
       <Route path={`${match.path}/profiler`}>
         <Redirect to={`${match.path}/profiler/temp`}/>
       </Route>
 
-      <Route path={`${match.path}/${instrument}`}>
-        <SnapshotGrid 
-          instrument={instrument} 
-          category="" 
-          setFocusedSnapshot={setFocusedSnapshot} 
-          setFocusedSnapshotMetric={setFocusedSnapshotMetric} 
-          setFocusedColumns={setFocusedColumns}
-          setInstrument={setInstrument}
-          apiManager={apiManager}
-          setGoBack={setGoBack}
-        />
+      <Route path={`${match.path}/asos`}>
+        {snapshotGrid("asos")}
+      </Route>
+
+      <Route path={`${match.path}/amps`}>
+        {snapshotGrid("amps")}
+      </Route>
+
+      <Route path={`${match.path}/tower`}>
+        {snapshotGrid("tower")}
+      </Route>
+
+      <Route path={`${match.path}/sodar`}>
+        {snapshotGrid("sodar")}
       </Route>
 
       <Route path={props.match.path}>

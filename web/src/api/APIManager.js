@@ -145,9 +145,6 @@ export default class APIManager {
             }
           });
 
-          console.log("hello1: ", columns);
-          console.log("hello2", Object.keys(gateResponseToAppend));
-
           columns.forEach((column) => {
             if (Object.keys(gateResponseToAppend).indexOf(column.field) <= -1) {
               gateResponseToAppend[column.field] = "NaN"
