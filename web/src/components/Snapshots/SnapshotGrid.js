@@ -163,14 +163,14 @@ export default function SnapshotGrid(props) {
 
   if (snapshots.length <= 0 || metricSnapshots.length <= 0 || (props.instrument == "tower" && columns.length <= 0)) {
     return (
-      <Grid container className={classes.root} style={{minWidth: "100%", paddingTop: "1rem"}} spacing={3}>
+      <Grid container className={classes.root} style={{minWidth: "100%"}} spacing={3}>
           {metadata.map((meta) => (
             <Grid item 
               key={(("BalloonName" in meta) ? meta.BalloonName : meta.archive_number) + "_" + props.instrument} 
               sm={6}
               md={6}
-              lg={6}
-              xl={4}
+              lg={4}
+              xl={3}
               style={{height: "17rem", minWidth: matchesSm ? "100%" : "Auto"}}>
                 <PlaceholderCard/>
             </Grid>
@@ -179,21 +179,21 @@ export default function SnapshotGrid(props) {
     );
   } else {
     return (
-      <Grid container className={classes.root} style={{minWidth: "100%", paddingTop: "1rem"}} spacing={3}>
+      <Grid container className={classes.root} style={{minWidth: "100%"}} spacing={3}>
           {snapshots.map((snapshot, index) => (
             <Grid item 
               key={("BalloonName" in snapshot.instrument ? snapshot.instrument.BalloonName : snapshot.instrument.asset_id) + "_" + props.instrument}
               sm={6}
               md={6}
-              lg={6}
-              xl={4}
+              lg={4}
+              xl={3}
               style={{minWidth: matchesSm ? "100%" : "Auto"}}
               onClick={() => {
                 props.setFocusedSnapshot(snapshot);
                 props.setFocusedSnapshotMetric(metricSnapshots[index]);
                 props.setFocusedColumns(props.instrument == "tower" ? columns : []);
               }}>
-                <Link to={`${match.path}/${props.apiManager.hashCode(snapshot.instrument.location)}/detail`} style={{textDecoration: "none"}}>
+                <Link to={`${match.url}/detail/${"asset_id" in snapshot.instrument ? snapshot.instrument.asset_id : snapshot.instrument.BalloonName}`} style={{textDecoration: "none"}}>
                   <SnapshotCard 
                     snapshot={snapshot} 
                     instrumentType={props.instrument}

@@ -3,7 +3,7 @@ import './App.css';
 
 import Navbar from './components/NavBar/Navbar';
 
-import { Container, useMediaQuery } from '@material-ui/core';
+import { Box, Container, useMediaQuery } from '@material-ui/core';
 
 import { ThemeProvider } from '@material-ui/styles';
 import theme from './theme';
@@ -23,11 +23,11 @@ export default function App() {
     <Router>
       <UserProvider>
         <ThemeProvider theme={theme}>
-          <div className="App">
+          <Box className="App" display="flex" flexDirection="column" style={{height: "100vh"}}>
             <nav style={{paddingBottom: matchesSm ? "5rem" : matchesMd ? "8rem": 0}}>
               <Navbar/>
             </nav>
-            <Container style={{paddingBottom: "3rem"}}>
+            <Box flexGrow={1} style={{padding: 20}}>
               <Switch>
                 <Route path="/home" component={SnapshotHub}></Route>
                 <Route path="/docs" render={(props) => (
@@ -40,8 +40,8 @@ export default function App() {
                 </Route>
                 )}/>
               </Switch>
-            </Container>
-          </div>
+            </Box>
+          </Box>
         </ThemeProvider>
       </UserProvider>
     </Router>

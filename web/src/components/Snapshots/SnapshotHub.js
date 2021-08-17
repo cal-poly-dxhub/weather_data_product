@@ -2,18 +2,19 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import Box from '@material-ui/core/Box';
 import Backdrop from '@material-ui/core/Backdrop';
+import { useMediaQuery } from '@material-ui/core';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 import theme from '../../theme'
 
 import { Route, Switch, useHistory, useRouteMatch, Redirect } from 'react-router-dom';
+import GridOrDetailSwitch from './GridOrDetailSwitch'
 
 import InstrumentChips from '../Chips/InstrumentChips';
 import CategoryChips from '../Chips/CategoryChips';
-import SnapshotGrid from './SnapshotGrid';
+import TowerViewSwitch from './TowerMap';
 
 import { UserContext } from '../../contexts/UserProvider';
-import DetailView from '../DetailView/DetailView';
 
 import APIManager from '../../api/APIManager';
 
@@ -28,6 +29,8 @@ export default function SnapshotHub(props) {
   const apiManager = new APIManager();
   const history = useHistory();
   const match = useRouteMatch();
+  const Spacer = require('react-spacer');
+  const matchesXs = useMediaQuery(theme.breakpoints.down('xs'));
 
   const pageAccessedByReload = (
     (window.performance.navigation && window.performance.navigation.type === 1) ||
@@ -43,15 +46,18 @@ export default function SnapshotHub(props) {
     }
   }, []);
 
-  const snapshotGrid = (instrumentName, categoryName="") => (
-    <SnapshotGrid 
-      instrument={instrumentName} 
-      category={categoryName} 
-      setFocusedSnapshot={setFocusedSnapshot} 
-      setFocusedSnapshotMetric={setFocusedSnapshotMetric} 
-      setFocusedColumns={setFocusedColumns}
+  const gridOrDetailSwitch = (instrumentName, categoryName="") => (
+    <GridOrDetailSwitch
+      focusedSnapshot={focusedSnapshot}
+      focusedSnapshotMetric={focusedSnapshotMetric}
+      focusedColumns={focusedColumns}
+      instrumentName={instrumentName}
+      categoryName={categoryName}
       setInstrument={setInstrument}
-      setCategory={setCategory}
+      setCategory={setCategory} 
+      setFocusedSnapshot={setFocusedSnapshot} 
+      setFocusedSnapshotMetric={setFocusedSnapshotMetric}  
+      setFocusedColumns={setFocusedColumns}   
       apiManager={apiManager}
       setGoBack={setGoBack}
     />
@@ -59,36 +65,23 @@ export default function SnapshotHub(props) {
 
   const categoryChips = (instrumentName, categoryName) => (
     <CategoryChips 
-    instrument={state.instruments[instrumentName]} 
-    category={categoryName} 
-    setCategory={setCategory} 
-    baseURL={`${match.path}/${instrumentName}`}/>
+      instrument={state.instruments[instrumentName]} 
+      category={categoryName} 
+      setCategory={setCategory} 
+      baseURL={`${match.path}/${instrumentName}`}/>
   );
 
-  function renderSwitch() {
+  function InstrumentAndCategorySwitch() {
     return (
     <Switch>
-      <Route path={`${props.match.path}/${instrument}${category == "" ? "" : `/${category}`}${focusedSnapshot.instrument == null ? "" : `/${apiManager.hashCode(focusedSnapshot.instrument.location)}`}/detail`}>
-        <DetailView
-          snapshot={!state.settings.imperial ? focusedSnapshotMetric : focusedSnapshot} 
-          columns={focusedColumns}
-          instrument={instrument}
-          category={category}
-          units={focusedSnapshot.units}
-          isMetric={!state.settings.imperial} 
-          apiManager={apiManager}
-          setGoBack={setGoBack}
-        />
-      </Route>
-
       <Route path={`${match.path}/profiler/temp`}>
         {categoryChips("profiler", "temp")}
-        {snapshotGrid("profiler", "temp")}
+        {gridOrDetailSwitch("profiler", "temp")}
       </Route>
 
       <Route path={`${match.path}/profiler/wind`}>
         {categoryChips("profiler", "wind")}
-        {snapshotGrid("profiler", "wind")}
+        {gridOrDetailSwitch("profiler", "wind")}
       </Route>
 
       <Route path={`${match.path}/profiler`}>
@@ -96,19 +89,33 @@ export default function SnapshotHub(props) {
       </Route>
 
       <Route path={`${match.path}/asos`}>
-        {snapshotGrid("asos")}
+        {gridOrDetailSwitch("asos")}
       </Route>
 
       <Route path={`${match.path}/amps`}>
-        {snapshotGrid("amps")}
+        {gridOrDetailSwitch("amps")}
       </Route>
 
       <Route path={`${match.path}/tower`}>
-        {snapshotGrid("tower")}
+        <Box display="flex" flexDirection="column" flexGrow={1}>
+          <TowerViewSwitch 
+            focusedSnapshot={focusedSnapshot}
+            focusedSnapshotMetric={focusedSnapshotMetric}
+            focusedColumns={focusedColumns}
+            setInstrument={setInstrument}
+            setCategory={setCategory} 
+            setFocusedSnapshot={setFocusedSnapshot} 
+            setFocusedSnapshotMetric={setFocusedSnapshotMetric}  
+            setFocusedColumns={setFocusedColumns}   
+            apiManager={apiManager}
+            setGoBack={setGoBack}
+          />
+        </Box>
+        {/* {snapshotGrid("tower")} */}
       </Route>
 
       <Route path={`${match.path}/sodar`}>
-        {snapshotGrid("sodar")}
+        {gridOrDetailSwitch("sodar")}
       </Route>
 
       <Route path={props.match.path}>
@@ -119,21 +126,23 @@ export default function SnapshotHub(props) {
   }
 
   return (
-    <Box>
-      <section>
+    <Box display="flex" flexDirection="column" flexGrow={1} style={{minHeight: "100%"}}>
+      <Backdrop style={{zIndex: theme.zIndex.drawer + 1, color: '#fff'}} open={didGoBack}>
+        <Box flexDirection="column" display="flex" alignItems="center">
+          <CircularProgress color="inherit" />
+        </Box>
+      </Backdrop>
+
+      <Box display="flex" alignItems="center" style={{minWidth: matchesXs ? "100%" : "1000px", maxWidth: "1500px"}}>
         <InstrumentChips 
           instrument={instrument} 
           setInstrument={setInstrument} 
           setCategory={setCategory}/>
-      </section>
-      <section>
-        <Backdrop style={{zIndex: theme.zIndex.drawer + 1, color: '#fff'}} open={didGoBack}>
-          <Box flexDirection="column" display="flex" alignItems="center">
-            <CircularProgress color="inherit" />
-          </Box>
-        </Backdrop>
-        {renderSwitch()}
-      </section>
+      </Box>
+
+      <Box display="flex" flexDirection="column" flexGrow={1} style={{paddingTop: "10px"}}>
+        {InstrumentAndCategorySwitch()}
+      </Box>
     </Box>
   );
 }

@@ -30,13 +30,8 @@ export default function InstrumentChips(props) {
   const classes = useStyles();
   const match = useRouteMatch();
 
-  useEffect(() => {
-    // console.log("url: " + `${match.url}`)
-
-    // Object.keys(state.instruments).map((key, index) => (
-    //   console.log(`${match.url}/${key}`)
-    // ))
-  }, [])
+  // useEffect(() => {
+  // }, [])
 
   return (
     <Grid container direction='column' alignItems='flex-start'>

@@ -208,7 +208,8 @@ export default class APIManager {
       const baseUrl = hostUrl
       + instrumentPath 
       + (categoryPath == null ? "" : categoryPath)  
-      + `snapshot?units=${includeUnits}`;
+      + `snapshot?units=${includeUnits}`
+      + (assetId == null ? "" : `&assetId=${assetId}`);
 
       return await axios
       .get(baseUrl, {
@@ -219,6 +220,7 @@ export default class APIManager {
         }
       })
       .then((resp) => {
+        console.log("url: ", baseUrl);
         console.log("data: ", resp.data)
 
         resp.data.forEach((snapshot) => {
