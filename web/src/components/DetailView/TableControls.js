@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import Slider from '@material-ui/core/Slider';
-import { Divider, Typography } from '@material-ui/core';
+import { Divider, TableContainer, Typography } from '@material-ui/core';
 import TablePagination from '@material-ui/core/TablePagination';
 import Box from '@material-ui/core/Box';
 import { useMediaQuery } from '@material-ui/core';
@@ -48,13 +48,13 @@ export default function TableControls(props) {
       style={{
         color: currentIndex == 0 ? "black" : "gray", 
         backgroundColor: currentIndex == 0 ? "yellow" : "#2a272e", 
-        minWidth: "150px",
-        maxWidth: "200px",
+        minWidth: "140px",
+        // maxWidth: "150px",
         padding: "5px", 
         borderRadius: "5px", 
         textAlign: "center",
       }}>
-        {`${props.timestamps[currentIndex]} ${currentIndex == 0 ? '(Most Recent)' : ''}`}
+        {`${props.timestamps[currentIndex]} ${currentIndex == 0 ? '' : ''}`}
     </Typography>
   );
 
@@ -73,7 +73,9 @@ export default function TableControls(props) {
       onChangeRowsPerPage={handleChangeRowsPerPage}
       ActionsComponent={TablePaginationActions}
       style={{borderWidth: 0, padding: 0, overflowX: "scroll"}}
-    />
+    >
+
+    </TablePagination>
   );
 
   const slider = (
@@ -87,7 +89,10 @@ export default function TableControls(props) {
       marks={marks}
       min={0}
       max={props.numMeasurements > 0 ? props.numMeasurements-1 : 0}
-      style={{width: props.numMeasurements * 50, maxWidth: "300px", marginLeft: "10px"}}
+      style={{
+        width: props.numMeasurements * 50, 
+        maxWidth: matchesSm ? "50%" : "250px", 
+      }}
     />
   );
 
@@ -103,15 +108,22 @@ export default function TableControls(props) {
             alignItems="center" 
             justifyContent="center"
             style={{
-              minWidth: "98%",
-              padding: "10px"
+              padding: "10px",
+              maxWidth: "calc(100% - 40px)",
+              marginLeft: "10px"
             }}>          
             {slider} <Spacer grow={1} width={20}/> {timestamp}
           </Box>
 
           <Divider style={{backgroundColor: "#464646", minWidth: "100%"}}/>
 
-          {pagination}
+          <table>
+            <tbody>
+              <tr>
+                {pagination}
+              </tr>
+            </tbody>
+          </table>
       </Box>
     );
   } else {    // Mobile and no slider, or Desktop w/ or w/o slider
@@ -120,12 +132,21 @@ export default function TableControls(props) {
         display="flex"
         alignItems="center" 
         justifyContent="center"
-        style={{padding: "10px"}}>
-        {pagination}
+        style={{paddingRight: "10px"}}
+      >
+        <table>
+          <tbody>
+            <tr>
+              {pagination}
+            </tr>
+          </tbody>
+        </table>
+            
+        <Spacer grow={1} width={10}/>
 
         {props.numMeasurements > 1 ? slider : undefined}
 
-        <Spacer grow={1} width={10}/>
+        <Spacer width={20}/>
 
         {timestamp}
       </Box>

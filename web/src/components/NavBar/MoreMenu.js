@@ -37,7 +37,7 @@ export default function MoreMenu(props) {
       ) : undefined}
       <div style={{padding: "1rem"}}>
         <Typography variant="subtitle2" style={{color: "#635b69"}}>VAFB XUI Demo</Typography>
-        <Typography variant="body2" style={{color: "#635b69"}}>Version 3.2</Typography>
+        <Typography variant="body2" style={{color: "#635b69"}}>Version 4.0.0</Typography>
       </div>
     </Menu>
   );

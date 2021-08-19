@@ -17,17 +17,23 @@ export default function TowerCard(props) {
   } else {
     return (
       <Box>
-        <Box onClick={() => {
-          props.setInstrument("tower");
-          props.setCategory("");
-          props.setFocusedSnapshot({});
-          props.setFocusedSnapshotMetric({});   
+        <Box 
+          onClick={() => {
+            props.setInstrument("tower");
+            props.setCategory("");
+            props.setFocusedSnapshot({});
+            props.setFocusedSnapshotMetric({});   
 
-          let detailViewUrl = `/home/tower/detail/${props.metadata.archive_number}`;
+            let detailViewUrl = `/home/tower/detail/${props.metadata.archive_number}`;
 
-          history.push(detailViewUrl);
-        }}>
-          Tower number: {props.metadata.archive_number}
+            history.push(detailViewUrl);
+          }}
+
+          style={{
+            color: 'white'
+          }}
+        >
+          {props.metadata.location}
         </Box>
 
         {props.metadata.collocated_instruments ? (

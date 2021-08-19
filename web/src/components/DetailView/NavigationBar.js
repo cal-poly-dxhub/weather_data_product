@@ -63,7 +63,7 @@ export default function DetailNavigationBar(props) {
     <Box display="flex" flexDirection={matchesSm ? 'column' : 'row'} alignItems="center" style={{paddingBottom: "2rem", minWidth: "100%"}}>
       <Box display="flex" alignItems="center" style={{minWidth: matchesSm ? "100%" : "Auto"}}>
         <IconButton edge="start" aria-label="Go Back" style={{color: "gray"}} onClick={() => {
-          history.push(`/home/${props.instrument}`)
+          history.push(`/home/${props.instrument}${props.category == "" ? "" : `/${props.category}`}`);
 
           if (props.instrument != "tower") {
             props.setGoBack(true);

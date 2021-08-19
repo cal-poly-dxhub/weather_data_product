@@ -109,7 +109,6 @@ export const initialState = {
         },
         tower: {
             path: "tower/",
-            codes: [],
             data: []
         },
         asos: {

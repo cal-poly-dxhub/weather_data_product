@@ -13,9 +13,10 @@ import GoogleMapReact from 'google-map-react';
 import TowerCard from './TowerCard';
 import { Switch, useRouteMatch, Route, Redirect } from 'react-router-dom';
 
-function TowerMap(props) {
+export default function TowerMap(props) {
   const matchesXs = useMediaQuery(theme.breakpoints.down('xs'));
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
     <Box 
       display="flex"
@@ -44,7 +45,7 @@ function TowerMap(props) {
               margin: 20,
               minWidth: "calc(100% - 40px)",
               minHeight: "100%",
-              backgroundColor: "gray",
+              backgroundColor: "#242026",
               borderRadius: "10px",
             }}
           >
@@ -72,7 +73,7 @@ function TowerMap(props) {
           bootstrapURLKeys={{ key: 'AIzaSyCpDdUirt6fRgnMFCuORsAQXOC3hBsBVg0'}}
           defaultCenter={{lat: 34.712686, lng: -120.583249}}
           defaultZoom={10.6}
-          zoom={matchesSm ? 10.6 : 11.2}
+          zoom={matchesSm ? 10 : 10.5}
           yesIWantToUseGoogleMapApiInternals
           options={map => ({
             fullscreenControl: false,
@@ -105,51 +106,5 @@ function TowerMap(props) {
         </GoogleMapReact> 
       </Box> 
     </Box>
-  );
-}
-
-export default function TowerViewSwitch(props) {
-  const [metadata, setMetadata] = useState([]);
-  const [state, dispatch] = useContext(UserContext);
-  const [selectedMetadata, selectMetadata] = useState("");
-  const match = useRouteMatch();
-
-  useEffect(() => {
-    props.setInstrument("tower");
-
-    let instrumentPath = state.instruments["tower"].path;
-    
-    props.apiManager.sendMetadataRequest(instrumentPath, "")
-      .then((metadata) => {
-      setMetadata(metadata);
-      });
-  }, []);
-
-  return (
-    <Switch>
-      <Route path={`${match.path}/detail/:asset_id`}>
-        <DetailView
-          {...props}
-          snapshot={!state.settings.imperial ? props.focusedSnapshotMetric : props.focusedSnapshot} 
-          instrument="tower"
-          category=""
-          isMetric={!state.settings.imperial} 
-          units={props.focusedSnapshot ? props.focusedSnapshot.units : {}}
-        />
-      </Route>
-
-      <Route path={`${match.path}/map`}>
-        <TowerMap 
-          {...props}
-          metadata={metadata}
-          selectMetadata={selectMetadata}
-          selectedMetadata={selectedMetadata}
-        />
-      </Route>
-
-      <Route path={`${match.path}`}>
-        <Redirect to={`${match.path}/map`}/>
-      </Route>
-    </Switch>
   );
 }

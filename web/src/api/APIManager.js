@@ -29,7 +29,7 @@ export default class APIManager {
     return hash;
   }
 
-  async sendDownloadLinkRequest(instrumentPath, categoryPath, assetID) {
+  async sendDownloadLinkRequest(instrumentPath, categoryPath=null, assetID) {
     try {
       const baseUrl = hostUrl
       + instrumentPath 
@@ -53,7 +53,7 @@ export default class APIManager {
     }
   }
 
-  async sendMetadataRequest(instrumentPath, categoryPath, key) {
+  async sendMetadataRequest(instrumentPath, categoryPath=null) {
     try {
       let baseUrl = hostUrl
       + instrumentPath 
@@ -209,7 +209,11 @@ export default class APIManager {
       + instrumentPath 
       + (categoryPath == null ? "" : categoryPath)  
       + `snapshot?units=${includeUnits}`
-      + (assetId == null ? "" : `&assetId=${assetId}`);
+      + (assetId == null ? "" : 
+          instrumentPath == "amps/" ?
+            `&balloonName=${assetId}` :
+            `&assetId=${assetId}`
+      );
 
       return await axios
       .get(baseUrl, {

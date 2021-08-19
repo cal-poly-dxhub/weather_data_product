@@ -1,6 +1,4 @@
 import Box from '@material-ui/core/Box';
-import CardContent from '@material-ui/core/CardContent';
-import Card from '@material-ui/core/Card';
 
 import './shimmer.css'
 
@@ -8,58 +6,69 @@ export default function PlaceholderCard() {
   const Spacer = require('react-spacer');
 
   return (
-    <Card style={{backgroundColor: "#242026", width: "100%", height: "100%"}} variant="outlined">
-      <CardContent>
-        <Box flexDirection='row' display="flex" alignItems="center" alignContent="center">
-          <Box flexDirection='column' display="flex" alignItems="center" alignContent="center" style={{minWidth: "35%"}}>
-            <Spacer grow={1}/>
+    <Box 
+      style={{
+        backgroundColor: "#242026", 
+        '&:hover': {
+          borderColor: '#ffffff',
+        },
+        width: "100%", 
+        height: "100%",
+        overflow: "hidden", 
+        borderRadius: "10px",  
+      }}   
+      flexDirection='row' 
+      display="flex" 
+      alignItems="center" 
+      alignContent="center"
+    >
+      <Spacer width={20}/>
 
-            <Box className="darkui1-shimmer" style={{width: "60px", height: "30px"}} display="flex" alignItems="center" justifyContent="center"></Box>
+      <Box flexBasis="35%" flexDirection='column' display="flex" alignItems="center" alignContent="center">
+        <Spacer grow={1}/>
 
-            <Spacer height={10}/>
+        <Box className="darkui1-shimmer" style={{width: "60px", height: "30px", borderRadius: "15px"}} display="flex" alignItems="center" justifyContent="center"></Box>
 
-            <Box className="darkui1-shimmer" style={{width: "100px", height: "10px"}}></Box>
+        <Spacer height={10}/>
 
-            <Spacer height={10}/>
+        <Box className="darkui1-shimmer" style={{width: "100px", height: "10px", borderRadius: "5px"}}></Box>
 
-            <Box className="darkui1-shimmer" style={{width: "100px", height: "10px"}}></Box>
+        <Spacer height={10}/>
 
-            <Spacer grow={1}/>
-          </Box>
+        <Box className="darkui1-shimmer" style={{width: "100px", height: "10px", borderRadius: "6px"}}></Box>
 
-          <Spacer width={20}/>
+        <Spacer grow={1}/>
+      </Box>
 
-          <Box flexDirection='column' display="flex" alignItems="center" style={{minWidth: "65%"}}>
-            <Box className="darkui1-shimmer" style={{width: "100%", height: "20px"}} display="flex" alignItems="center" justifyContent="center"></Box>
+      <Spacer width={20}/>
 
-            <Spacer height={20} grow={1}/>
+      <Box flexBasis="65%"  flexDirection='column' display="flex" alignItems="center">
+        <Box className="darkui1-shimmer" style={{width: "100%", height: "30px", borderRadius: "10px"}} display="flex" alignItems="center" justifyContent="center"></Box>
 
-            <Box className="darkui1-shimmer" style={{width: "100%", height: "15px"}}></Box>
+        <Spacer height={30} grow={1}/>
 
-            <Spacer height={15}/>
+        <Box className="darkui1-shimmer" style={{width: "100%", height: "15px", borderRadius: "7px"}}></Box>
 
-            <Box className="darkui1-shimmer" style={{width: "100%", height: "15px"}}></Box>
+        <Spacer height={20}/>
 
-            <Spacer height={15}/>
+        <Box className="darkui1-shimmer" style={{width: "100%", height: "15px", borderRadius: "7px"}}></Box>
 
-            <Box className="darkui1-shimmer" style={{width: "100%", height: "15px"}}></Box>
+        <Spacer height={20}/>
 
-            <Spacer height={15}/>
+        <Box className="darkui1-shimmer" style={{width: "100%", height: "15px", borderRadius: "7px"}}></Box>
 
-            <Box className="darkui1-shimmer" style={{width: "100%", height: "15px"}}></Box>
+        <Spacer height={20}/>
 
-            <Spacer height={15}/>
+        <Box className="darkui1-shimmer" style={{width: "100%", height: "15px", borderRadius: "7px"}}></Box>
 
-            <Box className="darkui1-shimmer" style={{width: "100%", height: "15px"}}></Box>
+        <Spacer height={20}/>
 
-            <Spacer height={15}/>
+        <Box className="darkui1-shimmer" style={{width: "100%", height: "15px", borderRadius: "7px"}}></Box>
 
-            <Box className="darkui1-shimmer" style={{width: "100%", height: "15px"}}></Box>
+        <Spacer grow={1}/>
+      </Box>
 
-            <Spacer grow={1}/>
-          </Box>
-        </Box>
-      </CardContent>
-    </Card>
+      <Spacer width={20}/>
+    </Box>
   );
 }

@@ -12,8 +12,6 @@ import SnapshotCard from './SnapshotCard';
 import PlaceholderCard from '../Misc/PlaceholderCard';
 import { UserContext } from '../../contexts/UserProvider';
 
-const ROOT_PLACEHOLDER = {asset_name: "Root"}
-
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -42,7 +40,6 @@ export default function SnapshotGrid(props) {
   const classes = useStyles();
   const [snapshots, setSnapshots] = useState([]);
   const [metricSnapshots, setMetricSnapshots] = React.useState([]);
-  const [metadata, setMetadata] = useState([ROOT_PLACEHOLDER]);
   const [columns, setColumns] = useState([]);
   const [state, dispatch] = useContext(UserContext);
   const history = useHistory();
@@ -55,14 +52,14 @@ export default function SnapshotGrid(props) {
       setMetricSnapshots(metricSnapshots);  
     }
 
-    if (props.instrument == "tower" && columns.length <= 0) {
+    if (props.instrumentName == "tower" && columns.length <= 0) {
       let columnsToSave = props.apiManager.sendTowerCodesRequest();
       setColumns(columnsToSave);
     }
   }, [snapshots]);
 
   useEffect(() => {
-    if (metricSnapshots.length > 0 && props.instrument != "tower") {
+    if (metricSnapshots.length > 0 && props.instrumentName != "tower") {
       props.setGoBack(false);
     }
   }, [metricSnapshots]);
@@ -74,99 +71,80 @@ export default function SnapshotGrid(props) {
   }, [columns]);
 
   useEffect(() => { 
+    props.setInstrument(props.instrumentName);
+    props.setCategory(props.categoryName);
     props.setFocusedSnapshot({});
-    // setMetricSnapshots([]);
     setSnapshots([]);
-    // setColumns([]);
-    // setMetadata([ROOT_PLACEHOLDER]);
 
-    const key = props.instrument + "/" + props.category
+    const key = props.instrumentName + "/" + props.categoryName;
 
-    if (state.instruments[props.instrument].data != null && 
-      state.instruments[props.instrument].data.length > 0) 
-    {
-      setSnapshots(state.instruments[props.instrument].data);
-
-      if (props.instrument == "tower") {
-        props.apiManager.sendTowerCodesRequest()
-        .then(columnsToSave => {
-          setColumns(columnsToSave);
-
-          props.apiManager.sendMetadataRequest(
-            state.instruments[props.instrument].path,
-            state.instruments[props.instrument][props.category] ? state.instruments[props.instrument][props.category].path : null
-          ).then((metadata) => {
-            setMetadata(metadata);
-          });    
-        });
+    const saveCallback = (dataToSave) => dispatch({
+      type: "instruments/data",
+      payload: {
+        key: key,
+        data: dataToSave
       }
-    } else if (props.category != "" && 
-      state.instruments[props.instrument][props.category] != null && 
-      state.instruments[props.instrument][props.category].data != null && 
-      state.instruments[props.instrument][props.category].data.length > 0) 
-    {
-      setSnapshots(state.instruments[props.instrument][props.category].data);
-    } else {
-      let instrumentPath = state.instruments[props.instrument].path;
-      let categoryPath = state.instruments[props.instrument][props.category] ? state.instruments[props.instrument][props.category].path : null;
-      
-      props.apiManager.sendMetadataRequest(
-        instrumentPath,
-        categoryPath
-      ).then((metadata) => {
-        setMetadata(metadata);
+    });  
 
-        props.apiManager.sendSnapshotRequest(
-          instrumentPath,
-          categoryPath
-        ).then((snapshotsData) => {
-          switch (props.instrument) {
-            case "tower":
-              props.apiManager.sendTowerCodesRequest()
-              .then(columnsToSave => {
-                setColumns(columnsToSave);
 
-                let towerSnapshotsData = props.apiManager.mapCodesToSnapshotData(snapshotsData, columnsToSave);
-                setSnapshots(towerSnapshotsData);
-  
-                dispatch({
-                  type: "instruments/data",
-                  payload: {
-                    key: key,
-                    data: towerSnapshotsData
-                  }
-                });
-              });
+    switch (props.instrumentName) {
+      case "profiler":
+        if (state.instruments["profiler"][props.categoryName].data.length > 0) { 
+          let recover = state.instruments["profiler"][props.categoryName].data;
+          setSnapshots(recover);
+          break; 
+        }
 
-              break;
-            default:
-              setSnapshots(snapshotsData);
-
-              dispatch({
-                type: "instruments/data",
-                payload: {
-                  key: key,
-                  data: snapshotsData
-                }
-              });        
-              break;
-          }
+        props.apiManager.sendSnapshotRequest(state.instruments["profiler"].path, state.instruments["profiler"][props.categoryName].path)
+        .then((data) => {
+          setSnapshots(data);
+          saveCallback(data);
         });
-      });
+
+        break;
+      case "tower":
+        console.log("Snapshot grid for tower not supported yet.");
+
+        // props.apiManager.sendTowerCodesRequest()
+        // .then(columnsToSave => {
+        //   setColumns(columnsToSave);
+
+        //   let towerSnapshotsData = props.apiManager.mapCodesToSnapshotData(data, columnsToSave);
+        //   setSnapshots(towerSnapshotsData);
+        //   dataToSave = towerSnapshotsData;
+
+        //   props.apiManager.sendTowerCodesRequest()
+        //   .then(columnsToSave => {
+        //     setColumns(columnsToSave);
+        //   });        
+        // });  
+
+        break;
+      default:
+        console.log("recovered?: ", state.instruments[props.instrumentName].data);
+
+        if (state.instruments[props.instrumentName].data.length > 0) {
+          let recover = state.instruments[props.instrumentName].data;
+          setSnapshots(recover);
+          break; 
+        }
+
+        props.apiManager.sendSnapshotRequest(state.instruments[props.instrumentName].path, "")
+        .then((data) => {
+          setSnapshots(data);
+          saveCallback(data);
+        });
+
+        break;
     }
-  }, [props.instrument, props.category]);
+  }, [props.instrumentName, props.categoryName]);
 
-  useEffect(() => {
-    props.setInstrument(props.instrument);
-    props.setCategory(props.category);
-  }, []);
-
-  if (snapshots.length <= 0 || metricSnapshots.length <= 0 || (props.instrument == "tower" && columns.length <= 0)) {
+  if (snapshots.length <= 0 || metricSnapshots.length <= 0) {
     return (
       <Grid container className={classes.root} style={{minWidth: "100%"}} spacing={3}>
-          {metadata.map((meta) => (
+          {props.metadata.map((meta) => (
             <Grid item 
-              key={(("BalloonName" in meta) ? meta.BalloonName : meta.archive_number) + "_" + props.instrument} 
+              key={(("BalloonName" in meta) ? meta.BalloonName : meta.archive_number) + "_" + props.instrumentName} 
               sm={6}
               md={6}
               lg={4}
@@ -182,7 +160,7 @@ export default function SnapshotGrid(props) {
       <Grid container className={classes.root} style={{minWidth: "100%"}} spacing={3}>
           {snapshots.map((snapshot, index) => (
             <Grid item 
-              key={("BalloonName" in snapshot.instrument ? snapshot.instrument.BalloonName : snapshot.instrument.asset_id) + "_" + props.instrument}
+              key={("BalloonName" in snapshot.instrument ? snapshot.instrument.BalloonName : snapshot.instrument.asset_id) + "_" + props.instrumentName}
               sm={6}
               md={6}
               lg={4}
@@ -191,17 +169,17 @@ export default function SnapshotGrid(props) {
               onClick={() => {
                 props.setFocusedSnapshot(snapshot);
                 props.setFocusedSnapshotMetric(metricSnapshots[index]);
-                props.setFocusedColumns(props.instrument == "tower" ? columns : []);
+                props.setFocusedColumns(props.instrumentName == "tower" ? columns : []);
               }}>
-                <Link to={`${match.url}/detail/${"asset_id" in snapshot.instrument ? snapshot.instrument.asset_id : snapshot.instrument.BalloonName}`} style={{textDecoration: "none"}}>
+                <Link to={`${match.url}/detail/${"BalloonName" in snapshot.instrument ? snapshot.instrument.BalloonName : snapshot.instrument.asset_id}`} style={{textDecoration: "none"}}>
                   <SnapshotCard 
                     snapshot={snapshot} 
-                    instrumentType={props.instrument}
+                    instrumentType={props.instrumentName}
                     columns={columns}
                     metricSnapshot={metricSnapshots[index]}
-                    category={props.category}
+                    category={props.categoryName}
                     numRows={5}
-                    metadata={metadata[index]}
+                    metadata={props.metadata[index]}
                     isMetric={!state.settings.imperial} 
                   />
                 </Link>

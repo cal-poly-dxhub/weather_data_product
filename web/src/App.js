@@ -38,7 +38,6 @@ export default function App() {
                 <Route path="/">
                   <Redirect to="/home"/>
                 </Route>
-                )}/>
               </Switch>
             </Box>
           </Box>

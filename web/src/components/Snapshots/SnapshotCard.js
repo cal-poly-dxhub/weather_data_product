@@ -17,7 +17,6 @@ import { useMediaQuery } from '@material-ui/core';
 
 import theme from '../../theme'
 
-
 import MetadataItem from '../Misc/MetadataItem'
 import { UserContext } from '../../contexts/UserProvider';
 
@@ -28,11 +27,11 @@ const useStyles = makeStyles({
     '&:hover': {
       borderColor: '#ffffff',
     },
-    minHeight: "100%",
+    minHeight: "17rem",
     borderColor: "gray", 
-    borderWidth: "1px", 
+    borderWidth: "2px", 
     overflow: "hidden", 
-    borderRadius: "5px",
+    borderRadius: "10px",
   }
 });
 
@@ -66,7 +65,6 @@ function QuickMetadataColumn(props) {
 // PREVIEW: Table Data
 
 function GateResponsePreview(props) {  
-  const classes = useStyles();
   const [headers, setHeaders] = useState([]);
 
   useEffect(() => {
@@ -93,7 +91,7 @@ function GateResponsePreview(props) {
   }, [props.response])
 
   return (
-      <Table size="small" aria-label="a dense table">
+      <Table size="small" aria-label="a dense table" style={{backgroundColor: "#2b272e"}}>
         <TableHead>
           <TableRow>
             {headers.slice(1, 4).map((header) => (
@@ -157,12 +155,13 @@ export default function SnapshotCard(props) {
         flexDirection='column' 
         display="flex" 
         style={{
+          // backgroundColor: "black",
           maxWidth: "150px", 
           minWidth: matchesXs ? "100%" : "150px",
-          paddingTop: 15,
+          paddingLeft: matchesXs ? 0 : "20px"
         }}
       >
-        <Spacer grow={1}/>
+        <Spacer grow={1} height={15}/>
 
         <Box display="flex" alignItems="center" justifyContent="center">
           <Typography variant="h3" style={{fontWeight: 'bold', textAlign: "center"}}>
@@ -179,7 +178,7 @@ export default function SnapshotCard(props) {
           isMetric={props.isMetric}/>
         </Box>
 
-        <Spacer grow={1}/>
+        <Spacer grow={1} height={10}/>
       </Box>
 
       <Box 
@@ -191,7 +190,9 @@ export default function SnapshotCard(props) {
           minWidth: '50%', 
           borderRadius: 5, 
           overflow: "hidden",
-          padding: 15
+          paddingLeft: matchesXs ? 20 : 10,
+          paddingRight: matchesXs ? 20 : 20,
+          paddingBottom: 15
         }}
       >
         {props.instrumentType == "tower" ? (
@@ -218,12 +219,12 @@ export default function SnapshotCard(props) {
               )}
           </div>
         ) : (
-          <TableContainer>
+          <TableContainer style={{borderRadius: "10px", overflowY: "hidden"}}>
             <GateResponsePreview 
-            response={props.isMetric && Object.keys(metricSnapshot).length != 0 ? metricSnapshot.measurements[0] : props.snapshot.measurements[0]} 
-            numRows={props.numRows} 
-            isMetric={props.isMetric}
-            units={props.snapshot.units}/>
+              response={props.isMetric && Object.keys(metricSnapshot).length != 0 ? metricSnapshot.measurements[0] : props.snapshot.measurements[0]} 
+              numRows={props.numRows} 
+              isMetric={props.isMetric}
+              units={props.snapshot.units}/>
           </TableContainer>
         )}
       </Box>

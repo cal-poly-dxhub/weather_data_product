@@ -97,20 +97,7 @@ export default function SnapshotHub(props) {
       </Route>
 
       <Route path={`${match.path}/tower`}>
-        <Box display="flex" flexDirection="column" flexGrow={1}>
-          <TowerViewSwitch 
-            focusedSnapshot={focusedSnapshot}
-            focusedSnapshotMetric={focusedSnapshotMetric}
-            focusedColumns={focusedColumns}
-            setInstrument={setInstrument}
-            setCategory={setCategory} 
-            setFocusedSnapshot={setFocusedSnapshot} 
-            setFocusedSnapshotMetric={setFocusedSnapshotMetric}  
-            setFocusedColumns={setFocusedColumns}   
-            apiManager={apiManager}
-            setGoBack={setGoBack}
-          />
-        </Box>
+        {gridOrDetailSwitch("tower")}
         {/* {snapshotGrid("tower")} */}
       </Route>
 
@@ -126,21 +113,26 @@ export default function SnapshotHub(props) {
   }
 
   return (
-    <Box display="flex" flexDirection="column" flexGrow={1} style={{minHeight: "100%"}}>
+    <Box display="flex" flexDirection="column" flexGrow={1} style={{
+      minHeight: "100%",
+    }}>
       <Backdrop style={{zIndex: theme.zIndex.drawer + 1, color: '#fff'}} open={didGoBack}>
         <Box flexDirection="column" display="flex" alignItems="center">
           <CircularProgress color="inherit" />
         </Box>
       </Backdrop>
 
-      <Box display="flex" alignItems="center" style={{minWidth: matchesXs ? "100%" : "1000px", maxWidth: "1500px"}}>
+      <Box display="flex" alignItems="center" style={{
+        minWidth: "100%", 
+        maxWidth: "1500px",
+      }}>
         <InstrumentChips 
           instrument={instrument} 
           setInstrument={setInstrument} 
           setCategory={setCategory}/>
       </Box>
 
-      <Box display="flex" flexDirection="column" flexGrow={1} style={{paddingTop: "10px"}}>
+      <Box display="flex" flexDirection="column" flexGrow={1}>
         {InstrumentAndCategorySwitch()}
       </Box>
     </Box>

@@ -14,7 +14,8 @@ import { useParams } from 'react-router';
 import DetailNavigationBar from './NavigationBar';
 import TableControls from './TableControls';
 import GenericTable from './GenericTable';
-import CustomTable from './CustomTable'
+import PlaceholderDetail from '../Misc/PlaceholderDetail';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles({
   root: {
@@ -35,6 +36,7 @@ export default function DetailView(props) {
   const [numMeasurements, setNumMeasurements] = useState(1);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [page, setPage] = React.useState(0);
+  const [failedToLoad, setFailedToLoad] = useState(false);
 
   let { asset_id } = useParams();
 
@@ -57,7 +59,6 @@ export default function DetailView(props) {
                 props.setFocusedColumns(columnsToSave);
     
                 let towerSnapshotsData = props.apiManager.mapCodesToSnapshotData(snapshotsData, columnsToSave);
-                // console.log();
                 props.setFocusedSnapshot(towerSnapshotsData[0]);
 
                 let metricFocusedSnapshot = props.apiManager.convertToMetric(towerSnapshotsData);
@@ -71,6 +72,8 @@ export default function DetailView(props) {
               props.setFocusedSnapshotMetric(metricFocusedSnapshot[0]);    
               break;
           }
+        } else {
+          setFailedToLoad(true);
         }
       });
     } else {
@@ -140,9 +143,22 @@ export default function DetailView(props) {
         </Card>
       </Box>
     );
+  } else if (failedToLoad) {
+    return (
+      <Typography variant="h3" style={{
+        color: "gray", 
+        paddingLeft: "10%", 
+        paddingRight: "10%", 
+        paddingTop: "200px", 
+        textAlign: "center", 
+        fontWeight: "bold"
+      }}>
+        Sorry! That instrument is missing!
+      </Typography>
+    );
   } else {
     return (
-      <div style={{color: "white"}}>If this takes too long, the asset id could be missing...</div>
+      <PlaceholderDetail/>
     );
   }
 }
