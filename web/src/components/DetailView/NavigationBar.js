@@ -115,8 +115,6 @@ export default function DetailNavigationBar(props) {
           overflowY: "hidden",
         }}
       >
-        <Spacer width={matchesSm ? '0px' : '15px'}/>
-
         <Box 
           display="flex"
           alignItems="center"

@@ -16,6 +16,11 @@ import { Switch, useRouteMatch, Route, Redirect } from 'react-router-dom';
 export default function TowerMap(props) {
   const matchesXs = useMediaQuery(theme.breakpoints.down('xs'));
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
+  const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
+
+  useEffect(() => {
+    props.selectMetadata({});
+  }, []);
 
   return (
     <Box 
@@ -28,6 +33,7 @@ export default function TowerMap(props) {
         margin: "0 auto",
       }}
     >
+      {Object.keys(props.selectedMetadata).length > 0 ? (
       <Box 
         display="flex"
         style={{
@@ -55,11 +61,11 @@ export default function TowerMap(props) {
               setCategory={props.setCategory}
               setFocusedSnapshot={props.setFocusedSnapshot} 
               setFocusedSnapshotMetric={props.setFocusedSnapshotMetric}  
-              // selectMetadata={props.selectMetadata}   
               apiManager={props.apiManager}  
             />
           </Box>
       </Box>
+      ) : undefined}
 
       <Box 
         style={{
@@ -73,17 +79,17 @@ export default function TowerMap(props) {
         <GoogleMapReact
           bootstrapURLKeys={{ key: 'AIzaSyCpDdUirt6fRgnMFCuORsAQXOC3hBsBVg0'}}
           defaultCenter={{lat: 34.712686, lng: -120.583249}}
-          defaultZoom={10.6}
+          defaultZoom={10.5}
           zoom={matchesSm ? 10 : 10.5}
           yesIWantToUseGoogleMapApiInternals
           options={map => ({
             fullscreenControl: false,
-            mapTypeId: map.MapTypeId.SATELLITE,
+            // mapTypeId: map.MapTypeId.SATELLITE,
             // clickableIcons: false,
-            zoomControl: false,
+            zoomControl: true,
             // disableDoubleClickZoom: true,
             // streetViewControl: false,
-            gestureHandling: "none",
+            gestureHandling: "greedy",
           })}
         >
           {props.metadata.map(icon => (
@@ -92,7 +98,7 @@ export default function TowerMap(props) {
               lat={icon.latitude} 
               lng={icon.longitude} 
               style={{
-                color: props.selectedMetadata.archive_number == icon.archive_number ? "black" : "white", 
+                color: props.selectedMetadata.archive_number == icon.archive_number ? "black" : "#b5b5b5", 
                 filter: props.selectedMetadata.archive_number == icon.archive_number ? "drop-shadow(0px 0px 6px yellow)" : null
                 }}
               onClick={() => {
