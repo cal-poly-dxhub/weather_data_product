@@ -39,7 +39,6 @@ export default function GridOrDetailSwitch(props) {
         default:
           props.apiManager.sendMetadataRequest(state.instruments[props.instrumentName].path, "")
           .then((metadata) => {
-            console.log(metadata);
             setMetadata(metadata);
           });
 
@@ -59,6 +58,14 @@ export default function GridOrDetailSwitch(props) {
           }
 
           break;
+        case "tower":
+          let foundTower = metadata.find(meta => meta.archive_number == props.focusedSnapshot.instrument.asset_id);
+
+          if (foundTower != undefined) {
+            selectMetadata(foundTower);
+          }
+
+          break;  
         default:
           let found = metadata.find(meta => meta.asset_id == props.focusedSnapshot.instrument.asset_id);
 

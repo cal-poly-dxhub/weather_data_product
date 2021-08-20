@@ -54,7 +54,8 @@ export default function TowerMap(props) {
               setInstrument={props.setInstrument}
               setCategory={props.setCategory}
               setFocusedSnapshot={props.setFocusedSnapshot} 
-              setFocusedSnapshotMetric={props.setFocusedSnapshotMetric}     
+              setFocusedSnapshotMetric={props.setFocusedSnapshotMetric}  
+              // selectMetadata={props.selectMetadata}   
               apiManager={props.apiManager}  
             />
           </Box>

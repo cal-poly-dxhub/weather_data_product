@@ -100,52 +100,83 @@ export default function DetailNavigationBar(props) {
       <Box 
         display="flex" 
         flexWrap="nowrap" 
-        justifyContent="center" 
         alignContent="center" 
         alignItems="center"
+        justifyContent={matchesSm ? "center" : "left"}
         style={{
           borderRadius: "10px", 
           borderColor: "#2a272e", 
-          borderWidth: "2px", 
+          borderWidth: Object.keys(props.selectedMetadata).length > 0 ? "2px" : 0, 
           borderStyle: "solid", 
-          minWidth: matchesSm ? "100%" : "Auto", 
+          width: matchesSm ? "100%" : "Auto", 
+          maxWidth: matchesSm ? "100%" : "60%",
           paddingTop: "10px", 
-          paddingBottom: "10px"
+          paddingBottom: "10px",
+          overflowY: "hidden",
         }}
       >
-        <Spacer width={matchesSm ? '0px' : '10px'}/>
+        <Spacer width={matchesSm ? '0px' : '15px'}/>
 
-        {("BalloonType" in props.snapshot.instrument)
-          ? (
-            <Box display="flex" flexWrap="nowrap">
-              <Box>
-                <MetadataItem direction="column" title="BALLOON TYPE" value={props.snapshot.instrument.BalloonType}/>
-              </Box>
-              <Spacer width='40px'/>
-              <Box>
-                <MetadataItem direction="column" title="LAUNCH" value={props.snapshot.instrument.location}/>
-              </Box>
-            </Box>
-          )
-          : (
-            <Box display="flex" flexWrap="nowrap">
-              <Box>
-                <MetadataItem direction="column" title="HEIGHT" value={`${props.snapshot.instrument.asset_height} ${props.isMetric ? 'm' : 'ft'}`}/>
-              </Box>
-              <Spacer width='40px'/>
-              <Box>
-                <MetadataItem direction="column" title="ID" value={props.snapshot.instrument.asset_id}/>
-              </Box>
-            </Box>  
-        )}
+        <Box 
+          display="flex"
+          alignItems="center"
+          style={{
+            overflowX: "scroll",
+            msOverflowStyle: "none",
+            marginBottom: "-30px"
+          }}
+        >
+          {Object.entries(props.selectedMetadata).map(item => {
+            if (typeof item[1] == "string" || typeof item[1] == "number") {
+              return (
+                <Box
+                  style={{
+                    paddingBottom: "30px"
+                  }}
+                >
+                  <MetadataItem 
+                    direction="column" 
+                    title={item[0]} 
+                    value={item[1]}
+                  />
+                </Box>
+              );  
+            }
+          })}
 
-        <Spacer width={matchesSm ? '0px' : '50px'}/>
+          <Box style={{paddingLeft: matchesSm ? 0 : "35px"}}>
+            &nbsp;
+          </Box>
+        </Box>
+
+        <Box 
+          style={{
+            width: matchesSm ? '0px' : '20px',
+            marginRight: matchesSm ? 0 : "-30px",
+            backgroundColor: "#1C1A1E",
+            boxShadow: matchesSm ? null : "0 0 20px 40px #1C1A1E",
+            height: "100%",
+            zIndex: 1
+          }}
+        >
+          &nbsp;
+        </Box>
 
         {matchesSm ? undefined : (
-          <AddToArchiveButton dispatch={dispatch} exports={state.exports} archiveMetadata={props.archiveMetadata}/>
+          <Box
+            style={{
+              zIndex: 3
+            }}
+          >
+            <AddToArchiveButton 
+              dispatch={dispatch} 
+              exports={state.exports} 
+              archiveMetadata={props.archiveMetadata}
+            />
+          </Box>
         )}
 
-        <Spacer width={matchesSm ? '0px' : '10px'}/>
+        <Spacer width={matchesSm ? '0px' : '15px'}/>
       </Box>
     </Box>
   )

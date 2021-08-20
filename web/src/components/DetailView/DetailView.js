@@ -72,6 +72,8 @@ export default function DetailView(props) {
               props.setFocusedSnapshotMetric(metricFocusedSnapshot[0]);    
               break;
           }
+
+          setNumMeasurements(snapshotsData[0].measurements.length);
         } else {
           setFailedToLoad(true);
         }

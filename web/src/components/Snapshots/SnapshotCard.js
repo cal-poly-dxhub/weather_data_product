@@ -24,11 +24,11 @@ const useStyles = makeStyles({
   root: {
     border: "solid", 
     backgroundColor: '#242026',
+    borderColor: "#4a4a4a", 
     '&:hover': {
-      borderColor: '#ffffff',
+      borderColor: 'gray',
     },
     minHeight: "17rem",
-    borderColor: "gray", 
     borderWidth: "2px", 
     overflow: "hidden", 
     borderRadius: "10px",

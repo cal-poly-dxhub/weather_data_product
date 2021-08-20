@@ -7,11 +7,26 @@ export default function MetadataItem(props) {
 
   if (props.direction == "column") {
     return (
-      <Box display="flex" flexDirection='column'>
+      <Box 
+        display="flex" 
+        flexDirection='column'
+        style={{
+          paddingLeft: "15px",
+          paddingRight: "15px",
+        }}
+      >
         <Box style={{color: 'gray', fontWeight: 'bold', textAlign: 'center'}}>
-          {props.title}
+          {props.title.toUpperCase()}
         </Box>
-        <Box style={{color: 'white', textAlign: 'center'}}>
+
+        <Spacer height={2}/>
+
+        <Box 
+          style={{
+            color: 'white', 
+            textAlign: 'center'
+            }}
+          >
           {props.value}
         </Box>
       </Box>
@@ -22,7 +37,7 @@ export default function MetadataItem(props) {
         <Spacer grow={1}/>
   
         <Box justifyContent="flex-end" style={{color: 'gray', fontWeight: 'bold', verticalAlign: "right", textAlign: "right", width: "50%"}}>
-          {props.title}
+          {props.title.toUpperCase()}
         </Box>
   
         <Spacer width={5}/>

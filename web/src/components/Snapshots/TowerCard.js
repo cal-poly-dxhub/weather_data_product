@@ -13,7 +13,7 @@ export default function TowerCard(props) {
   }, [props.metadata]);
 
   if (props.metadata == null) {
-    return (<div></div>);
+    return (<div>Loading Metadata...</div>);
   } else {
     return (
       <Box>
