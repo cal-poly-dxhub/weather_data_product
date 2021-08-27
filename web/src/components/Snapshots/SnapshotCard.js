@@ -121,10 +121,7 @@ export default function SnapshotCard(props) {
   const [metricSnapshot, setMetricSnapshot] = React.useState({});
   const Spacer = require('react-spacer');
   const matchesXs = useMediaQuery(theme.breakpoints.down('xs'));
-  const [ center, setCenter ] = React.useState({
-    lat: 0,
-    lng: 0
-  });
+  const [ center, setCenter ] = React.useState({ lat: 0, lng: 0 });
 
   useEffect(() => {
     if (props.metadata && props.metadata.latitude && props.metadata.longitude) {
@@ -158,13 +155,16 @@ export default function SnapshotCard(props) {
           // backgroundColor: "black",
           maxWidth: "150px", 
           minWidth: matchesXs ? "100%" : "150px",
-          paddingLeft: matchesXs ? 0 : "20px"
+          paddingLeft: matchesXs ? 0 : props.instrumentType == "tower" ? "60px" : "20px"
         }}
       >
         <Spacer grow={1} height={15}/>
 
         <Box display="flex" alignItems="center" justifyContent="center">
-          <Typography variant="h3" style={{fontWeight: 'bold', textAlign: "center"}}>
+          <Typography 
+            variant={props.snapshot.instrument.location.length > 15 ? "h4" : "h3"} 
+            style={{fontWeight: 'bold', textAlign: "center"}}
+          >
             {props.snapshot.instrument.location}
           </Typography>
         </Box>
@@ -173,9 +173,10 @@ export default function SnapshotCard(props) {
 
         <Box>
           <QuickMetadataColumn 
-          instrument={props.isMetric && Object.keys(metricSnapshot).length != 0  ? metricSnapshot.instrument : props.snapshot.instrument} 
-          index={state.instruments.index} 
-          isMetric={props.isMetric}/>
+            instrument={props.isMetric && Object.keys(metricSnapshot).length != 0  ? metricSnapshot.instrument : props.snapshot.instrument} 
+            index={state.instruments.index} 
+            isMetric={props.isMetric}
+          />
         </Box>
 
         <Spacer grow={1} height={10}/>
@@ -192,16 +193,18 @@ export default function SnapshotCard(props) {
           overflow: "hidden",
           paddingLeft: matchesXs ? 20 : 10,
           paddingRight: matchesXs ? 20 : 20,
-          paddingBottom: 15
+          paddingBottom: 15,
+          paddingTop: 15
         }}
       >
+        <Spacer grow={1}/>
         {props.instrumentType == "tower" ? (
-          <div>
-            {center.lat == 0 ?
-              undefined : (
+          <div style={{minWidth: matchesXs ? "100%" : "90%", height: matchesXs ? 200 : "100%", overflow: "hidden", borderRadius: "5px"}}>
+            {center.lat != 0 ? (
                 <GoogleMapReact
                   bootstrapURLKeys={{ key: 'AIzaSyCpDdUirt6fRgnMFCuORsAQXOC3hBsBVg0'}}
-                  defaultCenter={center}
+                  defaultCenter={{lat: 0, lng: 0}}
+                  center={center}
                   defaultZoom={15}
                   yesIWantToUseGoogleMapApiInternals
                   options={map => ({
@@ -211,12 +214,12 @@ export default function SnapshotCard(props) {
                     zoomControl: false,
                     disableDoubleClickZoom: true,
                     streetViewControl: false,
-                    gestureHandling: "cooperative",
+                    gestureHandling: "none",
                   })}
                 >
                   <LocationOnIcon lat={center.lat} lng={center.lng} style={{color: "white", filter: "drop-shadow(0px 0px 6px yellow)"}}/>
                 </GoogleMapReact>  
-              )}
+            ) : undefined}
           </div>
         ) : (
           <TableContainer style={{borderRadius: "10px", overflowY: "hidden"}}>

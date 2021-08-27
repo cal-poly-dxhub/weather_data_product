@@ -103,26 +103,25 @@ export default function SnapshotGrid(props) {
 
         break;
       case "tower":
-        console.log("Snapshot grid for tower not supported yet.");
+        props.apiManager.sendTowerCodesRequest()
+        .then(columnsToSave => {
+          setColumns(columnsToSave);
 
-        // props.apiManager.sendTowerCodesRequest()
-        // .then(columnsToSave => {
-        //   setColumns(columnsToSave);
-
-        //   let towerSnapshotsData = props.apiManager.mapCodesToSnapshotData(data, columnsToSave);
-        //   setSnapshots(towerSnapshotsData);
-        //   dataToSave = towerSnapshotsData;
-
-        //   props.apiManager.sendTowerCodesRequest()
-        //   .then(columnsToSave => {
-        //     setColumns(columnsToSave);
-        //   });        
-        // });  
+          if (state.instruments["tower"].data.length > 0) {
+            let recover = state.instruments["tower"].data;
+            setSnapshots(recover);
+          } else {
+            props.apiManager.sendSnapshotRequest(state.instruments["tower"].path, "")
+            .then((data) => {
+              let towerSnapshotsData = props.apiManager.mapCodesToSnapshotData(data, columnsToSave);
+              setSnapshots(towerSnapshotsData);
+              saveCallback(towerSnapshotsData);
+            });  
+          }
+        });  
 
         break;
       default:
-        console.log("recovered?: ", state.instruments[props.instrumentName].data);
-
         if (state.instruments[props.instrumentName].data.length > 0) {
           let recover = state.instruments[props.instrumentName].data;
           setSnapshots(recover);

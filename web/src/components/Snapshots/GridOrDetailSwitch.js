@@ -12,7 +12,8 @@ import TowerMap from './TowerMap'
 
 const ROOT_PLACEHOLDER = {asset_name: "Root"}
 
-export default function GridOrDetailSwitch(props) {
+export default function 
+GridOrDetailSwitch(props) {
   const [state, dispatch] = useContext(UserContext);
   const [metadata, setMetadata] = useState([ROOT_PLACEHOLDER]);
   const [selectedMetadata, selectMetadata] = useState({});
@@ -103,7 +104,15 @@ export default function GridOrDetailSwitch(props) {
 
   return (
       <Switch>
-        <Route path={`/home/tower/map`}>
+        <Route path={`${match.path}/detail/:asset_id`}>
+          {detailView(props.instrumentName, props.categoryName)}
+        </Route>
+
+        <Route path={`${match.path}/list/detail/:asset_id`}>
+          {detailView(props.instrumentName, props.categoryName)}
+        </Route>
+
+        <Route exact path={`/home/tower/map`}>
           <TowerMap 
             {...props}
             metadata={metadata}
@@ -112,12 +121,12 @@ export default function GridOrDetailSwitch(props) {
           />
         </Route>
 
-        <Route path={`${match.path}/detail/:asset_id`}>
-          {detailView(props.instrumentName, props.categoryName)}
+        <Route path={`/home/tower/list`}>
+          {snapshotGrid("tower", "list")}
         </Route>
 
         <Route path={`/home/tower`}>
-          <Redirect to={`/home/tower/map`}/>
+          <Redirect to={"/home/tower/map"}/>
         </Route>
 
         <Route path={`${match.path}`}>

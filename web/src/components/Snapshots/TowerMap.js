@@ -20,6 +20,7 @@ export default function TowerMap(props) {
 
   useEffect(() => {
     props.selectMetadata({});
+    props.setCategory("map");
   }, []);
 
   return (

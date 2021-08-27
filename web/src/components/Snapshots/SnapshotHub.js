@@ -9,6 +9,7 @@ import theme from '../../theme'
 
 import { Route, Switch, useHistory, useRouteMatch, Redirect } from 'react-router-dom';
 import GridOrDetailSwitch from './GridOrDetailSwitch'
+import MapGridChips from '../Chips/MapGridChips';
 
 import InstrumentChips from '../Chips/InstrumentChips';
 import CategoryChips from '../Chips/CategoryChips';
@@ -97,8 +98,12 @@ export default function SnapshotHub(props) {
       </Route>
 
       <Route path={`${match.path}/tower`}>
-        {gridOrDetailSwitch("tower")}
-        {/* {snapshotGrid("tower")} */}
+        <MapGridChips 
+          setCategory={setCategory} 
+          category={category}
+          baseURL={`${match.path}/tower`}
+        />
+        {gridOrDetailSwitch("tower", category == "map" ? "map" : category == "" ? "map" : "list")}
       </Route>
 
       <Route path={`${match.path}/sodar`}>
@@ -106,7 +111,7 @@ export default function SnapshotHub(props) {
       </Route>
 
       <Route path={props.match.path}>
-        <Redirect to={`${props.match.path}/tower`}/>
+        <Redirect to={`${props.match.path}/tower/map`}/>
       </Route>
     </Switch>
     );

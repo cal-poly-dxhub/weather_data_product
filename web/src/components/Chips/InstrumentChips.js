@@ -56,6 +56,10 @@ export default function InstrumentChips(props) {
                     props.setCategory(Object.keys(state.instruments[key])[1])
                   }
 
+                  if (key == "tower") {
+                    props.setCategory("map");
+                  }
+
                   localStorage.setItem("instrumentKey", key)
                   }}
                 />
