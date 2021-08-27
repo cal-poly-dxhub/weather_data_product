@@ -155,7 +155,7 @@ export default function SnapshotCard(props) {
           // backgroundColor: "black",
           maxWidth: "150px", 
           minWidth: matchesXs ? "100%" : "150px",
-          paddingLeft: matchesXs ? 0 : props.instrumentType == "tower" ? "60px" : "20px"
+          paddingLeft: matchesXs ? 0 : props.instrumentType == "tower" ? "40px" : "20px"
         }}
       >
         <Spacer grow={1} height={15}/>
