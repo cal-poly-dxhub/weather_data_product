@@ -89,6 +89,8 @@ export default function TowerMap(props) {
             zoomControl: true,
             // disableDoubleClickZoom: true,
             // streetViewControl: false,
+            draggableCursor: "default",
+            draggingCursor: "pointer",
             gestureHandling: "greedy",
           })}
         >

@@ -106,7 +106,7 @@ export default function SnapshotHub(props) {
       </Route>
 
       <Route path={props.match.path}>
-        <Redirect to={`${props.match.path}/sodar`}/>
+        <Redirect to={`${props.match.path}/tower`}/>
       </Route>
     </Switch>
     );

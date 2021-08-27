@@ -79,13 +79,25 @@ export default function Navbar() {
 
   return (
     <ThemeProvider theme={theme}>
-      <AppBar position={matchesMd ? "fixed" : "static"} color={matchesMd ? "secondary" : "transparent"} elevation={matchesMd ? 2 : 0} style={{margin: "0 auto", maxWidth: matchesMd ? null : "1500px", paddingTop: matchesSm ? 0: matchesMd ? "1rem" :"2rem", paddingBottom: matchesSm ? 0: matchesMd ? "1rem" :"2rem"}}>
-        <Toolbar className={classes.root} style={{marginLeft: matchesSm ? 10 : 50, marginRight: matchesSm ? 10 : 50}}>
-          <img style={{width: matchesMd ? 30 : 40, paddingRight: matchesSm ? 0 : 10}} src='https://user-images.githubusercontent.com/22374768/121132655-19ccb000-c7cd-11eb-8e26-89c10ca8a8c6.png'/>
-          
-          {matchesSm
-          ? undefined
-          : <NavTitle/>}
+      <AppBar 
+        position={matchesMd ? "fixed" : "static"} 
+        color={matchesMd ? "secondary" : "transparent"} 
+        elevation={matchesMd ? 2 : 0} 
+        style={{
+          margin: "0 auto", 
+          maxWidth: matchesMd ? null : "1500px", 
+          paddingTop: matchesSm ? 0: matchesMd ? "1rem" :"2rem", 
+          paddingBottom: matchesSm ? 0: matchesMd ? "1rem" :"2rem"
+        }}
+      >
+        <Toolbar 
+          className={classes.root} 
+          style={{
+            marginLeft: matchesSm ? 10 : 50, 
+            marginRight: matchesSm ? 10 : 50
+          }}
+        >   
+          <NavTitle/>       
 
           <Spacer grow='1' />
 

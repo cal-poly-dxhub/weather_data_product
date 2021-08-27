@@ -92,6 +92,10 @@ export const reducer = (state, action) => {
 
 export const initialState = {
     instruments: {
+        tower: {
+            path: "tower/",
+            data: []
+        },
         sodar: {
             path: "mini-sodar/",
             data: []
@@ -106,10 +110,6 @@ export const initialState = {
                 path: "wind/",
                 data: []
             }
-        },
-        tower: {
-            path: "tower/",
-            data: []
         },
         asos: {
             path: "asos/",
